@@ -11,6 +11,8 @@ if ($_SESSION['id_admin'] == "") {
   <html lang="en">
 
   <head>
+    <link rel="icon" href="img/icon.png" type="image/ico">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
@@ -29,7 +31,7 @@ if ($_SESSION['id_admin'] == "") {
     <link rel="stylesheet" type="text/css" href="./style.css" />
     <script type="module" src="./index.js"></script>
     <script src="https://developers.google.com/maps/get-started"></script>
-    <title>สถานที่ของฉัน</title>
+    <title>ร้านค้าเเละที่พัก</title>
   </head>
   <style>
     body {
@@ -188,7 +190,7 @@ if ($_SESSION['id_admin'] == "") {
           <img src="img/pro.jpg" class="rounded-circle " alt="...">
 
 
-          <a class="btn btn-success" type="submit" href="logout.php">ออกจากระบบ</a>
+          <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
         </form>
       </div>
       </div>
@@ -218,6 +220,8 @@ if ($_SESSION['id_admin'] == "") {
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
               <li><a class="dropdown-item mt-2" href="typeareaMG.php">Area Type Management</a></li>
               <li><a class="dropdown-item mt-2" href="tourtypeMG.php">Tour Type Management</a></li>
+              <li><a class="dropdown-item mt-2" href="tagplacesMG.php">Places Tag Management</a></li>
+              <li><a class="dropdown-item mt-2" href="areacategoryMG.php">Area Category Management</a></li>
 
             </ul>
           </li>
@@ -246,10 +250,10 @@ if ($_SESSION['id_admin'] == "") {
 
     <div class="addplace ">
       <div style="width: 1000px; padding: 20px; white-space: nowrap;">
-        <h1><b>รายการสถานที่ท่องเที่ยวย่อย</b></h1>
+        <h1><b>รายการร้านค้า เเละ ที่พักใกล้เคียง</b></h1>
       </div>
-      <div style="width: 300px; padding: 20px; margin-left: 540px; white-space: nowrap; margin-top: 7px;">
-        <a href="addplacesbyAD.php" class="btn btn-warning">เพิ่มสถานที่ท่องเที่ยวย่อย</a>
+      <div style="width: 300px; padding: 20px; margin-left: 495px; white-space: nowrap; margin-top: 7px;">
+        <a href="addplacesbyAD.php" class="btn btn-warning">เพิ่มร้านค้า เเละ ที่พัก</a>
       </div>
 
     </div>
@@ -303,9 +307,10 @@ if ($_SESSION['id_admin'] == "") {
             <thead>
               <tr>
                 <th scope="col">ลำดับสถานที่</th>
-                <th scope="col">รายการสถานที่ท่องเที่ยวย่อย</th>
-                <th scope="col">รายละเอียดสถานที่ท่องเที่ยวย่อย</th>
-                <th scope="col">สถานที่หลักที่อยู่</th>
+                <th scope="col">รูปภาพหน้าปก</th>
+                <th scope="col">รายการร้านค้า เเละ ที่พักใกล้เคียง</th>
+                <th scope="col">รายละเอียด</th>
+                <th scope="col">ใกล้กับสถานที่ท่องเที่ยว</th>
                 <th scope="col">เจ้าของสถานที่</th>
                 <th scope="col">เเก้ไข</th>
                 <th scope="col">ลบ</th>
@@ -318,6 +323,7 @@ if ($_SESSION['id_admin'] == "") {
                 <tr>
                   <td><?php echo $index ?></td>
                   <?php $index = $index + 1; ?> <!-- Corrected line -->
+                  <td><img src="<?php echo $row['img_Places1']; ?>" alt="Image" width="100" height="100" style="border-radius: 10px;"></td>
                   <td><?php echo $row['name_places']; ?></td>
                   <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo $row['details_places']; ?></td>
                   <?php

@@ -11,6 +11,7 @@ if ($_SESSION['id_admin'] == "") {
   <html lang="en">
 
   <head>
+    <link rel="icon" href="img/icon.png" type="image/ico">
     <script type="text/javascript" src="https://api.longdo.com/map/?key=5f0cf4be3ba02be29c4136aca052b5fd"></script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -182,7 +183,7 @@ if ($_SESSION['id_admin'] == "") {
           <img src="img/pro.jpg" class="rounded-circle " alt="...">
 
 
-          <a class="btn btn-success" type="submit" href="logout.php">ออกจากระบบ</a>
+          <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
         </form>
       </div>
       </div>
@@ -212,6 +213,8 @@ if ($_SESSION['id_admin'] == "") {
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
               <li><a class="dropdown-item mt-2" href="typeareaMG.php">Area Type Management</a></li>
               <li><a class="dropdown-item mt-2" href="tourtypeMG.php">Tour Type Management</a></li>
+              <li><a class="dropdown-item mt-2" href="tagplacesMG.php">Places Tag Management</a></li>
+              <li><a class="dropdown-item mt-2" href="areacategoryMG.php">Area Category Management</a></li>
 
             </ul>
           </li>

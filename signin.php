@@ -89,6 +89,7 @@ if (isset($_POST['login'])) {
 <html lang="en">
 
 <head>
+    <link rel="icon" href="img/icon.png" type="image/ico">
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -260,7 +261,7 @@ if (isset($_POST['login'])) {
                 <input type="password" class="form-control" id="password" name="password" placeholder="Password">
                 <div class="foget">
                     <A id="forget" href="https://scontent.furt3-1.fna.fbcdn.net/v/t39.30808-6/434367184_285734601235243_8748818194988889946_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeGovIrEPOeeLjXXtYxgrK4VJkFfO92fAHEmQV873Z8AcZM-V-dPTSpTasYgoDGIzW6ymvPvh5X07cBL-IHMWyfq&_nc_ohc=_jrSD89-1fYAX9Ejph6&_nc_ht=scontent.furt3-1.fna&oh=00_AfCzrnAid7_rdFylwqR-pSyg4DvRWEL7AfwD0RNLzmcODw&oe=66105E72">
-                        <h7>Forget Password</h7>
+                        <h7>Forgot Password</h7>
                     </A>
                 </div>
 

@@ -11,6 +11,8 @@ if ($_SESSION['id_admin'] == "") {
     <html lang="en">
 
     <head>
+        <link rel="icon" href="img/icon.png" type="image/ico">
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
@@ -188,7 +190,7 @@ if ($_SESSION['id_admin'] == "") {
                     <img src="img/pro.jpg" class="rounded-circle " alt="...">
 
 
-                    <a class="btn btn-success" type="submit" href="logout.php">ออกจากระบบ</a>
+                    <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
                 </form>
             </div>
             </div>
@@ -218,6 +220,8 @@ if ($_SESSION['id_admin'] == "") {
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <li><a class="dropdown-item mt-2" href="typeareaMG.php">Area Type Management</a></li>
                             <li><a class="dropdown-item mt-2" href="tourtypeMG.php">Tour Type Management</a></li>
+                            <li><a class="dropdown-item mt-2" href="tagplacesMG.php">Places Tag Management</a></li>
+                            <li><a class="dropdown-item mt-2" href="areacategoryMG.php">Area Category Management</a></li>
 
                         </ul>
                     </li>
@@ -259,35 +263,62 @@ if ($_SESSION['id_admin'] == "") {
                 background-color: #ccc;
                 /* Change to the desired gray color */
             }
+
+
+            /* Style the page link text color */
+            .pagination .page-link {
+                color: black;
+            }
+
+            /* Style for the active page */
+            .pagination .active .page-link,
+            .pagination .page-link:hover {
+                background-color: #ffc107;
+                border-color: #ffc107;
+                color: black;
+            }
         </style>
-
-
-
 
 
         <?php
         include_once('functions.php');
         $fetchdataarea = new DB_con();
-        $sql = $fetchdataarea->fetchdataarea();
 
+        // Set the number of results to display per page
+        $results_per_page = 5;
 
-        $index = 1;
+        // Determine which page number the visitor is currently on
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        if ($page < 1) {
+            $page = 1;
+        }
 
+        // Determine the SQL LIMIT starting number for the results on the displaying page
+        $start_from = ($page - 1) * $results_per_page;
+
+        // Fetch the data with LIMIT
+        $sql = $fetchdataarea->fetchdataareapage($start_from, $results_per_page);
+
+        // Get the total number of records to calculate the number of pages needed
+        $total_results = $fetchdataarea->countTotalAreas();
+        $total_pages = ceil($total_results / $results_per_page);
+
+        $index = $start_from + 1;
         ?>
 
-
-
-        <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px;box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
+        <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
             <b>สถานที่ท่องเที่ยว</b>
-            <div style="margin-top: 20px; ">
-                <table class="table table-bordered" style="font-size: 15px; ">
+            <div style="margin-top: 20px;">
+                <div class="container" style=" margin-bottom: 20px;">
+                    <input type="text" id="searchInput" class="form-control" placeholder="ค้นหาชื่อสถานที่..." onkeyup="filterTable()">
+                </div>
+                <table class="table table-bordered" style="font-size: 15px;" id="placesTable">
                     <thead>
                         <tr>
                             <th scope="col">ลำดับสถานที่</th>
-                            <th scope="col">รูปภาพหน้าปก</th> <!-- New column for images -->
+                            <th scope="col">รูปภาพหน้าปก</th>
                             <th scope="col">รายการสถานที่ท่องเที่ยวหลัก</th>
                             <th scope="col">เบอร์โทรศัพท์</th>
-                            <th scope="col">Link ติดต่อสถานที่เพิ่มเติม</th>
                             <th scope="col">Link googlemap</th>
                             <th scope="col">แก้ไข</th>
                             <th scope="col">ลบ</th>
@@ -298,12 +329,11 @@ if ($_SESSION['id_admin'] == "") {
                         while ($row = mysqli_fetch_array($sql)) {
                         ?>
                             <tr>
-                                <td><?php echo $index ?></td>
-                                <?php $index = $index + 1; ?>
-                                <td><img src="<?php echo $row['img_Area1']; ?>" alt="Image" width="100" height="100" style="border-radius: 10px;"></td> <!-- Display image -->
+                                <td><?php echo $index; ?></td>
+                                <?php $index++; ?>
+                                <td><img src="<?php echo $row['img_Area1']; ?>" alt="Image" width="100" height="100" style="border-radius: 10px;"></td>
                                 <td><?php echo $row['name_Area']; ?></td>
                                 <td><?php echo $row['phonenum_Area']; ?></td>
-                                <td><?php echo $row['url_Area']; ?></td>
                                 <td><?php echo $row['has_map_Area']; ?></td>
                                 <td><a href="updateArea.php?id=<?php echo $row['id_Area']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
                                 <td><a href="deleteArea.php?del=<?php echo $row['id_Area']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
@@ -313,10 +343,55 @@ if ($_SESSION['id_admin'] == "") {
                         ?>
                     </tbody>
                 </table>
+
+                <!-- Pagination controls -->
+                <nav aria-label="Page navigation example" style="font-size: 15px; ">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item <?php if ($page <= 1) {
+                                                    echo 'disabled';
+                                                } ?>">
+                            <a class="page-link" href="<?php if ($page > 1) {
+                                                            echo "?page=" . ($page - 1);
+                                                        } ?>" tabindex="-1" aria-disabled="true">หน้าเเรก</a>
+                        </li>
+                        <?php for ($i = 1; $i <= $total_pages; $i++) { ?>
+                            <li class="page-item <?php if ($i == $page) {
+                                                        echo 'active';
+                                                    } ?>">
+                                <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                            </li>
+                        <?php } ?>
+                        <li class="page-item <?php if ($page >= $total_pages) {
+                                                    echo 'disabled';
+                                                } ?>">
+                            <a class="page-link" href="<?php if ($page < $total_pages) {
+                                                            echo "?page=" . ($page + 1);
+                                                        } ?>">หน้าต่อไป</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
+        <script>
+            function filterTable() {
+                const input = document.getElementById('searchInput');
+                const filter = input.value.toUpperCase();
+                const table = document.getElementById('placesTable');
+                const tr = table.getElementsByTagName('tr');
 
-
+                for (let i = 0; i < tr.length; i++) {
+                    const td = tr[i].getElementsByTagName('td')[2]; // Column with place names
+                    if (td) {
+                        const textValue = td.textContent || td.innerText;
+                        if (textValue.toUpperCase().indexOf(filter) > -1) {
+                            tr[i].style.display = '';
+                        } else {
+                            tr[i].style.display = 'none';
+                        }
+                    }
+                }
+            }
+        </script>
 
 
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

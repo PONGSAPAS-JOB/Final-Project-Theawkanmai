@@ -15,45 +15,41 @@ if ($_SESSION['id_admin'] == "") {
 
     if (isset($_POST['insert'])) {
 
-        $name_typeArea = $_POST['name_typeArea'];
+        $tag_description = $_POST['tag_description'];
 
 
-        $sql = $userdata->addtypearea(
-            $name_typeArea
+        $sql = $userdata->addtagplaces(
+            $tag_description
         );
 
 
         if ($sql) {
-            // echo "<script>alert('Add Area Success!');</script>";
-            // echo "<script>window.location.href='areaandplacesMG.php'</script>";
+
             echo   "<script>
                 $(document).ready(function() {
                     Swal.fire({
-                        title: 'Add Type Area Success!',
+                        title: 'Add Tag Places Success!',
                         text: 'กำลังบันทึกข้อมูลประเภท',
                         icon: 'success',
                         timer: 1000,
                         showConfirmButton: false
                     }).then(() => {
-                        window.location.href = 'typeareaMG.php';
+                        window.location.href = 'tagplacesMG.php';
                     });
                 });
             </script>";
         } else {
 
-            // echo "<script>alert('Add Area Failed!');</script>";
-            // echo "<script>window.location.href='addarea.php'</script>";
-            // echo error_reporting();
             echo   "<script>
                 $(document).ready(function() {
                     Swal.fire({
-                        title: 'Add Type Area Failed!',
+                        title: 'Add Tag Places Failed!',
                         text: 'ไม่สามารถเพิ่มประเภทได้ โปรดลองอีกครั้ง!',
                         icon: 'error',
                         
                         showConfirmButton: false
                     }).then(() => {
-                        window.location.href = 'typeareaMG.php';
+                        window.location.href = 'tagplacesMG.php';
                     });
                 });
             </script>";
@@ -66,6 +62,7 @@ if ($_SESSION['id_admin'] == "") {
 
     <head>
         <link rel="icon" href="img/icon.png" type="image/ico">
+
         <script type="text/javascript" src="https://api.longdo.com/map/?key=5f0cf4be3ba02be29c4136aca052b5fd"></script>
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -76,7 +73,7 @@ if ($_SESSION['id_admin'] == "") {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Lily+Script+One&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <title>เพิ่มประเภทสถานที่ท่องเที่ยวหลัก</title>
+        <title>เพิ่มหมวดหมู่ของสถานที่</title>
     </head>
     <style>
         body {
@@ -92,7 +89,7 @@ if ($_SESSION['id_admin'] == "") {
         }
     </style>
 
-    <body>
+    <body onload="init();">
         <style>
             @font-face {
                 font-family: 'Lily Script One';
@@ -330,9 +327,9 @@ if ($_SESSION['id_admin'] == "") {
         <div class="addplace "><a></a></div>
         <div class="container">
             <div style="display: flex; ">
-                <h1 class="mt-3" style="width: 600px; "> จัดการประเภทของสถานที่ </h1>
+                <h1 class="mt-3" style="width: 600px; "> จัดการหมวดหมู่ของสถานที่ </h1>
                 <div style="width: 300px; padding: 20px; margin-left: 300px; margin-top: 3px; ">
-                    <a href="addarea.php" class="btn btn-warning"> เพิ่มสถานที่หลัก -></a>
+                    <a href="addplacesbyAD.php" class="btn btn-warning"> เพิ่มร้านค้า , ที่พัก -></a>
                 </div>
             </div>
             <hr>
@@ -340,13 +337,13 @@ if ($_SESSION['id_admin'] == "") {
             <form method="POST" action="" enctype="multipart/form-data">
                 <div style="display: flex; ">
                     <div class="mb-3 " style="margin-right: 150px; width: 500px; ">
-                        <label for="name_typeArea" class="form-label required-label">ใส่ชื่อประเภทของสถานที่ที่ต้องการจะเพิ่ม</label>
-                        <input type="text" class="form-control " id="name_typeArea" name="name_typeArea" aria-describedby="ชื่อประเภท" onblur="nameTypeareacheck(this.value)" required>
-                        <span id="areaTypeavailable"></span>
+                        <label for="tag_description" class="form-label required-label">ใส่ชื่อหมวดหมู่ของสถานที่ที่ต้องการจะเพิ่ม</label>
+                        <input type="text" class="form-control " id="tag_description" name="tag_description" aria-describedby="ชื่อประเภท" onblur="nametagplacescheck(this.value)" required>
+                        <span id="tagplacesnameavailable"></span>
                     </div>
                 </div>
 
-                <button type="submit" name="insert" id="insert" class="mt-3 mb-3 btn btn-warning">เพิ่มประเภทของสถานที่หลักใหม่</button>
+                <button type="submit" name="insert" id="insert" class="mt-3 mb-3 btn btn-warning">เพิ่มหมวดหมู่ของสถานที่ใหม่</button>
 
             </form>
 
@@ -355,8 +352,8 @@ if ($_SESSION['id_admin'] == "") {
 
             <?php
             include_once('functions.php');
-            $fetchdataType = new DB_con();
-            $sqlType = $fetchdataType->fetchdataType();
+            $fetchdataTag = new DB_con();
+            $sqlTag = $fetchdataTag->fetchdataTag();
 
             $index = 1;
 
@@ -364,25 +361,25 @@ if ($_SESSION['id_admin'] == "") {
 
 
             <div class="containertb" style="margin-left: 0px; font-size: 25px; background-color: #ffffff; width: 980px; padding: 20px;box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
-                <b>รายการประเภทสถานที่ท่องเที่ยวหลัก</b>
+                <b>รายการหมวดหมู่สถานที่</b>
                 <div style="margin-top: 20px; ">
                     <table class="table table-bordered" style="font-size: 15px;">
                         <thead>
                             <tr>
-                                <th scope="col">ลำดับประเภท</th>
-                                <th scope="col">ชื่อประเภทสถานที่ท่องเที่ยวหลัก</th>
+                                <th scope="col">ลำดับหมวดหมู่</th>
+                                <th scope="col">ชื่อหมวดหมู่ของสถานที่</th>
                                 <th scope="col">ลบ</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                            while ($row = mysqli_fetch_array($sqlType)) {
+                            while ($row = mysqli_fetch_array($sqlTag)) {
                             ?>
                                 <tr>
                                     <td><?php echo $index ?></td>
                                     <?php $index = $index + 1; ?>
-                                    <td><?php echo $row['name_typeArea']; ?></td>
-                                    <td><a href="deleteAreaType.php?del=<?php echo $row['id_type_area']; ?>">ลบ</a></td>
+                                    <td><?php echo $row['tag_description']; ?></td>
+                                    <td><a href="deleteTagPlaces.php?del=<?php echo $row['id_tag']; ?>">ลบ</a></td>
                                 </tr>
                             <?php
                             }
@@ -401,13 +398,13 @@ if ($_SESSION['id_admin'] == "") {
 
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script>
-            function nameTypeareacheck(val) {
+            function nametagplacescheck(val) {
                 $.ajax({
                     type: 'POST',
-                    url: 'checkareaType_available.php',
-                    data: 'name_typeArea=' + val,
+                    url: 'checktagplaces_available.php',
+                    data: 'tag_description=' + val,
                     success: function(data) {
-                        $('#areaTypeavailable').html(data);
+                        $('#tagplacesnameavailable').html(data);
                     }
                 });
 

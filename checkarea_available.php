@@ -12,8 +12,8 @@ $num = mysqli_num_rows($sql);
 
 if ($num > 0) {
     echo "<span style='color: red;'>มีชื่อสถานที่นี้อยู่ในระบบเเล้ว</span>";
-    echo "<script>$('#submit').prop('disabled', true);</script>";
+    echo "<script>$('#insert').prop('disabled', true);</script>";
 } else {
     echo "<span style='color: green;'>ชื่อสถานที่ยังไม่มีในระบบ</span>";
-    echo "<script>$('#submit').prop('disabled', false);</script>";
+    echo "<script>$('#insert').prop('disabled', false);</script>";
 }

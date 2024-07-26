@@ -1,17 +1,17 @@
 <?php
 include_once('functions.php');
 
-$areaType = new DB_con();
+$nametagplacescheck = new DB_con();
 
 //รับค่า
-$name_typeArea = $_POST['name_typeArea'];
+$tag_description = $_POST['tag_description'];
 
-$sql = $areaType->areaTypeavailable($name_typeArea);
+$sql = $nametagplacescheck->tagplacesnameavailable($tag_description);
 
 $num = mysqli_num_rows($sql);
 
 if ($num > 0) {
-    echo "<span style='color: red;'>มีชื่อประเภทนี้อยู่ในระบบเเล้ว</span>";
+    echo "<span style='color: red;'>มีชื่อประเภทอยู่ในระบบเเล้ว</span>";
     echo "<script>$('#insert').prop('disabled', true);</script>";
 } else {
     echo "<span style='color: green;'>ชื่อประเภทยังไม่มีในระบบ</span>";

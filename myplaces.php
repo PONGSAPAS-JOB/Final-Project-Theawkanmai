@@ -11,6 +11,7 @@ if ($_SESSION['Id_manager'] == "") {
   <html lang="en">
 
   <head>
+    <link rel="icon" href="img/icon.png" type="image/ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -130,7 +131,7 @@ if ($_SESSION['Id_manager'] == "") {
               <img src="img/pro.jpg" class="rounded-circle " alt="...">
 
 
-              <a class="btn btn-success" type="submit" href="logout.php">ออกจากระบบ</a>
+              <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
             </form>
           </div>
         </div>

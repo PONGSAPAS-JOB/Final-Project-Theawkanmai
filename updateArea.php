@@ -203,7 +203,7 @@ if ($_SESSION['id_admin'] == "") {
                     
                     showConfirmButton: false
                 }).then(() => {
-                    window.location.href = 'updateArea.php';
+                    history.back();
                 });
             });
         </script>";
@@ -215,6 +215,7 @@ if ($_SESSION['id_admin'] == "") {
     <html lang="en">
 
     <head>
+        <link rel="icon" href="img/icon.png" type="image/ico">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
@@ -423,7 +424,7 @@ if ($_SESSION['id_admin'] == "") {
                     <img src="img/pro.jpg" class="rounded-circle " alt="...">
 
 
-                    <a class="btn btn-success" type="submit" href="logout.php">ออกจากระบบ</a>
+                    <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
                 </form>
             </div>
             </div>
@@ -453,6 +454,8 @@ if ($_SESSION['id_admin'] == "") {
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <li><a class="dropdown-item mt-2" href="typeareaMG.php">Area Type Management</a></li>
                             <li><a class="dropdown-item mt-2" href="tourtypeMG.php">Tour Type Management</a></li>
+                            <li><a class="dropdown-item mt-2" href="tagplacesMG.php">Places Tag Management</a></li>
+                            <li><a class="dropdown-item mt-2" href="areacategoryMG.php">Area Category Management</a></li>
 
                         </ul>
                     </li>
@@ -481,6 +484,8 @@ if ($_SESSION['id_admin'] == "") {
 
             #map {
                 height: 50%;
+                width: 100%;
+                max-width: 500px;
             }
 
             .addplace {
@@ -585,13 +590,11 @@ if ($_SESSION['id_admin'] == "") {
                         include_once('functions.php');
                         $fetchdataType = new DB_con();
                         $sqlType = $fetchdataType->fetchdataType();
-
-
                         ?>
 
                         <div class="mb-3" style="width: 200px; margin-right: 10px;">
                             <label for="name_typeArea" class="form-label required-label">ประเภทของสถานที่</label>
-                            <select class="form-select" id="name_typeArea" name="name_typeArea" aria-describedby="ประเภท" onchange="showOtherInput()" required>
+                            <select class="form-select" id="name_typeArea" name="name_typeArea" aria-describedby="ประเภท" required>
                                 <option disabled selected>โปรดเลือกประเภท</option>
                                 <?php
                                 while ($rowType = mysqli_fetch_array($sqlType)) {
@@ -603,14 +606,16 @@ if ($_SESSION['id_admin'] == "") {
                                 }
                                 ?>
                             </select>
-
                         </div>
 
-                        <button id="addtypeButton" class="btnaddat rounded"><i class="fa fa-plus"></i></button>
+                        <button id="addtypeButton" class="btnaddat rounded" type="button"><i class="fa fa-plus"></i></button>
+
 
                         <script>
                             $(document).ready(function() {
-                                $('#addtypeButton').click(function() {
+                                $('#addtypeButton').click(function(event) {
+                                    event.preventDefault(); // Prevent the default button behavior
+
                                     Swal.fire({
                                         title: 'คุณต้องการเพิ่มประเภทของสถานที่หรือไม่?',
                                         text: "กำลังจะเข้าสู่หน้าเพิ่มประเภทสถานที่ ข้อมูลที่กรอกไว้จะต้องเริ่มต้นกรอกใหม่",
@@ -624,205 +629,213 @@ if ($_SESSION['id_admin'] == "") {
                                         if (result.isConfirmed) {
                                             Swal.fire({
                                                 title: 'กำลังเข้าสู่หน้าเพิ่มประเภทของสถานที่',
-
                                                 icon: 'success',
                                                 timer: 1000,
                                                 showConfirmButton: false
                                             }).then(() => {
                                                 window.location.href = 'typeareaMG.php';
                                             });
-
                                         }
                                     });
                                 });
                             });
                         </script>
-
-
                     </div>
 
-                    <div class="mb-3" style="border: 10px;">
-                        <label for="map" class="form-label">แผนที่ (คลิกซ้ายเพื่อดูข้อมูล)</label>
-                        <div id="map" style="height: 500px; width: 100%; border: 3px solid #FFFFFF;"></div>
-                    </div>
+                    <hr>
 
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            if (typeof google !== "undefined" && google.maps && google.maps.importLibrary) {
-                                google.maps.importLibrary("maps").then(() => {
-                                    initMap();
-                                });
-                            } else {
-                                console.error("Google Maps library failed to load.");
-                            }
-                        });
+                    <div style="display: flex;">
+                        <div>
+                            <div class="mb-3" style="border: 10px;">
+                                <label for="map" class="form-label">แผนที่ (คลิกซ้ายเพื่อดูข้อมูล)</label>
+                                <div id="map" style="height: 500px; width: 500px; border: 3px solid #FFFFFF;"></div>
+                            </div>
+                        </div>
 
-                        function initMap() {
-                            const map = new google.maps.Map(document.getElementById("map"), {
-                                center: {
-                                    lat: 19.16439475341099,
-                                    lng: 99.89638077976038
-                                },
-                                zoom: 12,
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function() {
+                                if (typeof google !== "undefined" && google.maps && google.maps.importLibrary) {
+                                    google.maps.importLibrary("maps").then(() => {
+                                        initMap();
+                                    });
+                                } else {
+                                    console.error("Google Maps library failed to load.");
+                                }
                             });
 
-                            let marker;
-
-                            const initialLatitude = parseFloat("<?php echo $row['latitude_Area']; ?>");
-                            const initialLongitude = parseFloat("<?php echo $row['longitude_Area']; ?>");
-
-                            // Check if initialLatitude and initialLongitude are valid numbers
-                            if (!isNaN(initialLatitude) && !isNaN(initialLongitude)) {
-                                map.setCenter({
-                                    lat: initialLatitude,
-                                    lng: initialLongitude
+                            function initMap() {
+                                const map = new google.maps.Map(document.getElementById("map"), {
+                                    center: {
+                                        lat: 19.16439475341099,
+                                        lng: 99.89638077976038
+                                    },
+                                    zoom: 12,
                                 });
-                                marker = new google.maps.Marker({
-                                    position: {
+
+                                let marker;
+
+                                const initialLatitude = parseFloat("<?php echo $row['latitude_Area']; ?>");
+                                const initialLongitude = parseFloat("<?php echo $row['longitude_Area']; ?>");
+
+                                // Check if initialLatitude and initialLongitude are valid numbers
+                                if (!isNaN(initialLatitude) && !isNaN(initialLongitude)) {
+                                    map.setCenter({
                                         lat: initialLatitude,
                                         lng: initialLongitude
-                                    },
-                                    map: map,
-                                    icon: {
-                                        url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' // Red pin icon
-                                    }
-                                });
-                            }
+                                    });
+                                    marker = new google.maps.Marker({
+                                        position: {
+                                            lat: initialLatitude,
+                                            lng: initialLongitude
+                                        },
+                                        map: map,
+                                        icon: {
+                                            url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' // Red pin icon
+                                        }
+                                    });
+                                }
 
-                            // Add a click event listener to the map
-                            map.addListener("click", (event) => {
-                                const latitude_Area = event.latLng.lat();
-                                const longitude_Area = event.latLng.lng();
+                                // Add a click event listener to the map
+                                map.addListener("click", (event) => {
+                                    const latitude_Area = event.latLng.lat();
+                                    const longitude_Area = event.latLng.lng();
 
-                                // Convert latitude and longitude to address
-                                const geocoder = new google.maps.Geocoder();
+                                    // Convert latitude and longitude to address
+                                    const geocoder = new google.maps.Geocoder();
 
-                                geocoder.geocode({
-                                    location: {
-                                        lat: latitude_Area,
-                                        lng: longitude_Area
-                                    }
-                                }, (results, status) => {
-                                    if (status === "OK") {
-                                        const addressComponents = parseAddressComponents(results[0].address_components);
-                                        const filteredAddress = filterAddressComponents(results[0].address_components);
-                                        const googleMapLink = `https://www.google.com/maps?q=${latitude_Area},${longitude_Area}`;
+                                    geocoder.geocode({
+                                        location: {
+                                            lat: latitude_Area,
+                                            lng: longitude_Area
+                                        }
+                                    }, (results, status) => {
+                                        if (status === "OK") {
+                                            const addressComponents = parseAddressComponents(results[0].address_components);
+                                            const filteredAddress = filterAddressComponents(results[0].address_components);
+                                            const googleMapLink = `https://www.google.com/maps?q=${latitude_Area},${longitude_Area}`;
 
-                                        // Update input fields with new coordinates
-                                        document.getElementById("latitude_Area").value = latitude_Area.toFixed(4);
-                                        document.getElementById("longitude_Area").value = longitude_Area.toFixed(4);
-                                        document.getElementById("address").value = filteredAddress;
-                                        document.getElementById("sub_dis_Area").value = addressComponents.subdistrict || "";
-                                        document.getElementById("dis_Area").value = addressComponents.district || "";
-                                        document.getElementById("provi_Area").value = addressComponents.province || "";
-                                        document.getElementById("has_map_Area").value = googleMapLink;
+                                            // Update input fields with new coordinates
+                                            document.getElementById("latitude_Area").value = latitude_Area.toFixed(4);
+                                            document.getElementById("longitude_Area").value = longitude_Area.toFixed(4);
+                                            document.getElementById("address").value = filteredAddress;
+                                            document.getElementById("sub_dis_Area").value = addressComponents.subdistrict || "";
+                                            document.getElementById("dis_Area").value = addressComponents.district || "";
+                                            document.getElementById("provi_Area").value = addressComponents.province || "";
+                                            document.getElementById("has_map_Area").value = googleMapLink;
 
-                                        const postalCode = results[0].address_components.find(
-                                            (component) => component.types.includes("postal_code")
-                                        );
-                                        document.getElementById("post_code").value = postalCode ? postalCode.long_name : "";
+                                            const postalCode = results[0].address_components.find(
+                                                (component) => component.types.includes("postal_code")
+                                            );
+                                            document.getElementById("post_code").value = postalCode ? postalCode.long_name : "";
 
-                                        if (marker) {
-                                            marker.setPosition({
-                                                lat: latitude_Area,
-                                                lng: longitude_Area
-                                            });
-                                        } else {
-                                            // Add a new marker
-                                            marker = new google.maps.Marker({
-                                                position: {
+                                            if (marker) {
+                                                marker.setPosition({
                                                     lat: latitude_Area,
                                                     lng: longitude_Area
-                                                },
-                                                map: map,
-                                                icon: {
-                                                    url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' // Red pin icon
-                                                }
-                                            });
+                                                });
+                                            } else {
+                                                // Add a new marker
+                                                marker = new google.maps.Marker({
+                                                    position: {
+                                                        lat: latitude_Area,
+                                                        lng: longitude_Area
+                                                    },
+                                                    map: map,
+                                                    icon: {
+                                                        url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' // Red pin icon
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                            console.error("Geocoder failed:", status);
                                         }
-                                    } else {
-                                        console.error("Geocoder failed:", status);
-                                    }
+                                    });
                                 });
-                            });
 
-                        }
-
-                        function parseAddressComponents(addressComponents) {
-                            const subdistrict = addressComponents.find((component) =>
-                                component.types.includes("sublocality_level_1") || component.types.includes("locality")
-                            );
-                            const district = addressComponents.find((component) =>
-                                component.types.includes("administrative_area_level_2")
-                            );
-                            const province = addressComponents.find((component) =>
-                                component.types.includes("administrative_area_level_1")
-                            );
-
-                            return {
-                                subdistrict: subdistrict ? stripPrefix(subdistrict.long_name, "ตำบล") : "",
-                                district: district ? stripPrefix(district.long_name, "อำเภอ") : "",
-                                province: province ? province.long_name : "",
-                            };
-                        }
-
-                        function filterAddressComponents(addressComponents) {
-                            const excludeTypes = ["sublocality_level_1", "locality", "administrative_area_level_2", "administrative_area_level_1", "postal_code", "country"];
-                            const filteredComponents = addressComponents.filter(component =>
-                                !excludeTypes.some(type => component.types.includes(type))
-                            );
-                            return filteredComponents.map(component => component.long_name).join(", ");
-                        }
-
-                        function stripPrefix(text, prefix) {
-                            if (text.startsWith(prefix)) {
-                                return text.slice(prefix.length).trim();
                             }
-                            return text;
-                        }
-                    </script>
 
-                    <div style="display: flex; ">
-                        <div class="mb-3" style="margin-right: 50px; width: 500px;">
-                            <label for="has_map_Area" class="form-label">Link Google Map</label>
-                            <input type="text" class="form-control" id="has_map_Area" name="has_map_Area" aria-describedby="ลิ้งค์เเผนที่" value="<?php echo $row['has_map_Area']; ?>" required>
-                        </div>
-                        <div class="mb-3" style="margin-right: 20px;">
-                            <label for="latitude_Area" class="form-label">Latitude ของสถานที่</label>
-                            <input type="text" class="form-control " id="latitude_Area" name="latitude_Area" aria-describedby="Latitude ของสถานที่" value="<?php echo $row['latitude_Area']; ?>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="longitude_Area" class="form-label">Longitude ของสถานที่</label>
-                            <input type="text" class="form-control " id="longitude_Area" name="longitude_Area" aria-describedby="Longitude ของสถานที่" value="<?php echo $row['longitude_Area']; ?>" required>
-                        </div>
-                    </div>
-                    <div style="display: flex; ">
-                        <div class="mb-3" style="margin-right: 20px;">
-                            <label for="address" class="form-label">ที่อยู่ เลขที่ ซอย ถนน</label>
-                            <input type="text" class="form-control" id="address" name="address" aria-describedby="ที่อยู่ เลขที่" value="<?php echo $row['address_Area']; ?>">
-                        </div>
-                        <div class="mb-3" style="margin-right: 20px;">
-                            <label for="sub_dis_Area" class="form-label">ตำบล</label>
-                            <input type="text" class="form-control" id="sub_dis_Area" name="sub_dis_Area" aria-describedby="ตำบล" value="<?php echo $row['sub_dis_Area']; ?>" required>
-                        </div>
-                        <div class="mb-3" style="margin-right: 20px;">
-                            <label for="dis_Area" class="form-label">อำเภอ</label>
-                            <input type="text" class="form-control" id="dis_Area" name="dis_Area" aria-describedby="อำเภอ" value="<?php echo $row['dis_Area']; ?>" required>
-                        </div>
+                            function parseAddressComponents(addressComponents) {
+                                const subdistrict = addressComponents.find((component) =>
+                                    component.types.includes("sublocality_level_1") || component.types.includes("locality")
+                                );
+                                const district = addressComponents.find((component) =>
+                                    component.types.includes("administrative_area_level_2")
+                                );
+                                const province = addressComponents.find((component) =>
+                                    component.types.includes("administrative_area_level_1")
+                                );
 
-                        <div class="mb-3" style="margin-right: 20px;">
-                            <label for="provi_Area" class="form-label">จังหวัด</label>
-                            <input type="text" class="form-control" id="provi_Area" name="provi_Area" aria-describedby="จังหวัด" value="<?php echo $row['provi_Area']; ?>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="post_code" class="form-label">รหัสไปรษณีย์</label>
-                            <input type="text" class="form-control" id="post_code" name="post_code" aria-describedby="รหัสไปรษณีย์" value="<?php echo $row['post_code']; ?>" required>
+                                return {
+                                    subdistrict: subdistrict ? stripPrefix(subdistrict.long_name, "ตำบล") : "",
+                                    district: district ? stripPrefix(district.long_name, "อำเภอ") : "",
+                                    province: province ? province.long_name : "",
+                                };
+                            }
+
+                            function filterAddressComponents(addressComponents) {
+                                const excludeTypes = ["sublocality_level_1", "locality", "administrative_area_level_2", "administrative_area_level_1", "postal_code", "country"];
+                                const filteredComponents = addressComponents.filter(component =>
+                                    !excludeTypes.some(type => component.types.includes(type))
+                                );
+                                return filteredComponents.map(component => component.long_name).join(", ");
+                            }
+
+                            function stripPrefix(text, prefix) {
+                                if (text.startsWith(prefix)) {
+                                    return text.slice(prefix.length).trim();
+                                }
+                                return text;
+                            }
+                        </script>
+
+                        <div style="margin-left: 50px; margin-top: 30px; width: 420px;">
+                            <div class="mb-3" style=" width: 425px;">
+                                <label for="has_map_Area" class="form-label">Link Google Map</label>
+                                <input type="text" class="form-control" id="has_map_Area" name="has_map_Area" aria-describedby="ลิ้งค์เเผนที่" value="<?php echo $row['has_map_Area']; ?>" required>
+                            </div>
+                            <div style="display: flex; width: 425px;">
+                                <div class="mb-3" style="margin-right: 30px; width: 300px;">
+                                    <label for="latitude_Area" class="form-label">Latitude ของสถานที่</label>
+                                    <input type="text" class="form-control " id="latitude_Area" name="latitude_Area" aria-describedby="Latitude ของสถานที่" value="<?php echo $row['latitude_Area']; ?>" required>
+                                </div>
+                                <div class="mb-3" style=" width: 300px;">
+                                    <label for="longitude_Area" class="form-label">Longitude ของสถานที่</label>
+                                    <input type="text" class="form-control " id="longitude_Area" name="longitude_Area" aria-describedby="Longitude ของสถานที่" value="<?php echo $row['longitude_Area']; ?>" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" style="margin-right: 20px; width: 425px;">
+
+                                <label for="address" class="form-label">ที่อยู่ เลขที่ ซอย ถนน</label>
+                                <input type="text" class="form-control" id="address" name="address" aria-describedby="ที่อยู่ เลขที่" value="<?php echo $row['address_Area']; ?>">
+                            </div>
+                            <div style="display: flex; width: 425px;">
+                                <div class="mb-3" style="margin-right: 30px; width: 300px;">
+                                    <label for="sub_dis_Area" class="form-label">ตำบล</label>
+                                    <input type="text" class="form-control" id="sub_dis_Area" name="sub_dis_Area" aria-describedby="ตำบล" value="<?php echo $row['sub_dis_Area']; ?>" required>
+                                </div>
+                                <div class="mb-3" style=" width: 300px;">
+                                    <label for="dis_Area" class="form-label">อำเภอ</label>
+                                    <input type="text" class="form-control" id="dis_Area" name="dis_Area" aria-describedby="อำเภอ" value="<?php echo $row['dis_Area']; ?>" required>
+                                </div>
+                            </div>
+                            <div style="display: flex; width: 425px;">
+                                <div class="mb-3" style="margin-right: 30px; width: 300px;">
+                                    <label for="provi_Area" class="form-label">จังหวัด</label>
+                                    <input type="text" class="form-control" id="provi_Area" name="provi_Area" aria-describedby="จังหวัด" value="<?php echo $row['provi_Area']; ?>" required>
+                                </div>
+                                <div class="mb-3" style=" width: 300px;">
+                                    <label for="post_code" class="form-label">รหัสไปรษณีย์</label>
+                                    <input type="text" class="form-control" id="post_code" name="post_code" aria-describedby="รหัสไปรษณีย์" value="<?php echo $row['post_code']; ?>" required>
+                                </div>
+                            </div>
+                            <hr>
                         </div>
                     </div>
                     <div style="display: flex; ">
                         <div class="mb-3" style="margin-right: 20px; ">
                             <label for="phonenum_Area" class="form-label">เบอร์โทรศัพท์ สถานที่</label>
-                            <input type="text" class="form-control" id="phonenum_Area" name="phonenum_Area" aria-describedby="เบอร์โทรศัพท์ สถานที่" value="<?php echo $row['phonenum_Area']; ?>" required>
+                            <input type="text" class="form-control" id="phonenum_Area" name="phonenum_Area" aria-describedby="เบอร์โทรศัพท์ สถานที่" value="<?php echo $row['phonenum_Area']; ?>">
                         </div>
                         <div class="mb-3" style="margin-right: 20px; width: 400px;">
                             <label for="email_Area" class="form-label">Email สถานที่</label>
@@ -899,11 +912,12 @@ if ($_SESSION['id_admin'] == "") {
                                     <?php } ?>
                                 </select>
                             </div>
-                            <button id="addtypetourButton" class="btnaddtt rounded"><i class="fa fa-plus"></i></button>
+                            <button id="addtypetourButton" class="btnaddtt rounded" type="button"><i class="fa fa-plus"></i></button>
 
                             <script>
                                 $(document).ready(function() {
                                     $('#addtypetourButton').click(function() {
+                                        event.preventDefault(); // Prevent the default button behavior
                                         Swal.fire({
                                             title: 'คุณต้องการเพิ่มประเภทของนักท่องเที่ยวหรือไม่?',
                                             text: "กำลังจะเข้าสู่หน้าเพิ่มประเภทของนักท่องเที่ยว ข้อมูลที่กรอกไว้จะต้องเริ่มต้นกรอกใหม่",
@@ -1304,37 +1318,55 @@ if ($_SESSION['id_admin'] == "") {
                     <script>
                         let imageError = false;
 
-                        function showPreview(url, previewId) {
+                        function convertGoogleDriveLink(url) {
+                            const regex = /https:\/\/drive\.google\.com\/file\/d\/(.*?)\/view/;
+                            const match = url.match(regex);
+                            if (match && match[1]) {
+                                const fileId = match[1];
+                                const directLink = `https://lh3.googleusercontent.com/d/${fileId}=s1600-rw`;
+                                console.log('Converted URL:', directLink); // Log the converted URL
+                                return directLink;
+                            }
+                            console.log('Original URL:', url); // Log the original URL if it doesn't match
+                            return url; // Return the original URL if it doesn't match the Google Drive format
+                        }
+
+                        function showPreview(url, previewId, inputId) {
                             const imgPreview = document.getElementById(previewId);
+                            const directUrl = convertGoogleDriveLink(url);
+                            const inputField = document.getElementById(inputId);
+                            console.log('Direct URL:', directUrl); // Log the direct URL
                             if (url) {
-                                imgPreview.src = url;
-                                imgPreview.style.display = 'block'; // แสดงภาพตัวอย่าง
-                                // reset ค่าของ imageError เมื่อมีการโหลดภาพใหม่
+                                imgPreview.src = directUrl;
+                                imgPreview.style.display = 'block'; // Show the preview image
+                                inputField.value = directUrl; // Update the input field with the direct URL
+                                console.log('Updated Input Value:', inputField.value); // Log the updated input value
                                 imageError = false;
                             } else {
                                 imgPreview.src = '';
-                                imgPreview.style.display = 'none'; // ซ่อนภาพตัวอย่างหากไม่มี URL
+                                imgPreview.style.display = 'none'; // Hide the preview image if there's no URL
                             }
 
                             imgPreview.onerror = () => {
+                                console.log('Image loading error for URL:', directUrl); // Log the error URL
                                 imgPreview.src = '';
                                 imgPreview.alt = 'Link นี้ไม่ใช่ Link ของรูปภาพ!.';
-                                // เมื่อเกิด error ในการโหลดรูปภาพ กำหนดค่าของ imageError เป็น true
                                 imageError = true;
-                                // ปิดการใช้งานปุ่ม submit เมื่อเกิด error
                                 document.getElementById('submitBtn').disabled = true;
                             };
 
                             imgPreview.onload = () => {
                                 imgPreview.alt = 'Preview will be displayed here.';
-                                // เปิดการใช้งานปุ่ม submit เมื่อโหลดรูปภาพเสร็จสมบูรณ์
                                 document.getElementById('submitBtn').disabled = false;
                             };
                         }
 
-                        // เพิ่มฟังก์ชันสำหรับการตรวจสอบสถานะของ error เพื่อปิดการใช้งานปุ่ม submit
+
                         function checkSubmit() {
-                            // หากเกิด error ในการโหลดรูปภาพ imageError จะมีค่าเป็น true และจะไม่ให้ submit
+                            const uploadfile1 = document.getElementById('uploadfile1').value;
+                            console.log('uploadfile1 Value:', uploadfile1); // Log the value of uploadfile1
+
+                            // If an error occurs while loading the image, imageError will be true, preventing the submit
                             if (imageError) {
                                 alert('ไม่สามารถ Submit ได้ เนื่องจากมี Link รูปภาพที่ไม่ถูกต้อง');
                                 return false;
@@ -1345,72 +1377,69 @@ if ($_SESSION['id_admin'] == "") {
                         function clearInput(inputId, previewId) {
                             const inputField = document.getElementById(inputId);
                             inputField.value = '';
-                            showPreview('', previewId); // เคลียร์ภาพตัวอย่าง
+                            showPreview('', previewId, inputId); // Clear the preview image
                         }
-
                         document.addEventListener("DOMContentLoaded", function() {
                             // Show preview for img_Area1
                             const imgArea1Value = "<?php echo $row['img_Area1']; ?>";
                             if (imgArea1Value) {
-                                showPreview(imgArea1Value, 'imgPreview1');
+                                showPreview(imgArea1Value, 'imgPreview1', 'uploadfile1');
                             }
 
                             // Show preview for img_Area2
                             const imgArea2Value = "<?php echo $row['img_Area2']; ?>";
                             if (imgArea2Value) {
-                                showPreview(imgArea2Value, 'imgPreview2');
+                                showPreview(imgArea2Value, 'imgPreview2', 'uploadfile2');
                             }
 
                             // Show preview for img_Area3
                             const imgArea3Value = "<?php echo $row['img_Area3']; ?>";
                             if (imgArea3Value) {
-                                showPreview(imgArea3Value, 'imgPreview3');
+                                showPreview(imgArea3Value, 'imgPreview3', 'uploadfile3');
                             }
 
                             // Show preview for img_Area4
                             const imgArea4Value = "<?php echo $row['img_Area4']; ?>";
                             if (imgArea4Value) {
-                                showPreview(imgArea4Value, 'imgPreview4');
+                                showPreview(imgArea4Value, 'imgPreview4', 'uploadfile4');
                             }
                         });
                     </script>
 
-                    <div id="content">
-                        <div class="form-group mb-3">
-                            <label for="uploadfile1" class="form-label required-label">รูปภาพที่ 1 (รูปภาพหน้าปก)</label>
-                            <div style="position: relative;" class="input-group">
-                                <input class="form-control" type="text" id="uploadfile1" name="uploadfile1" required oninput="showPreview(this.value, 'imgPreview1')" value="<?php echo $row['img_Area1']; ?>">
-                                <button class="input-group-text " type="button" onclick="clearInput('uploadfile1', 'imgPreview1')">x</button>
-                            </div>
-                            <img id="imgPreview1" class="img-preview" src="" alt="Preview 1 will be displayed here.">
+                    <div class="form-group mb-3">
+                        <label for="uploadfile1" class="form-label required-label">รูปภาพที่ 1 (รูปภาพหน้าปก)</label>
+                        <div style="position: relative;" class="input-group">
+                            <input class="form-control" type="text" id="uploadfile1" name="uploadfile1" required oninput="showPreview(this.value, 'imgPreview1', 'uploadfile1')" value="<?php echo $row['img_Area1']; ?>">
+                            <button class="input-group-text" type="button" onclick="clearInput('uploadfile1', 'imgPreview1')">x</button>
                         </div>
+                        <img id="imgPreview1" class="img-preview" src="" alt="Preview 1 will be displayed here.">
+                    </div>
 
-                        <div class="form-group mb-3">
-                            <label for="uploadfile2" class="form-label">รูปภาพที่ 2 (รูปภาพเพิ่มเติม)</label>
-                            <div style="position: relative;" class="input-group">
-                                <input class="form-control" type="text" id="uploadfile2" name="uploadfile2" oninput="showPreview(this.value, 'imgPreview2')" value="<?php echo $row['img_Area2']; ?>">
-                                <button class="input-group-text " type="button" onclick="clearInput('uploadfile2', 'imgPreview2')">x</button>
-                            </div>
-                            <img id="imgPreview2" class="img-preview" src="" alt="Preview 2 will be displayed here.">
+                    <div class="form-group mb-3">
+                        <label for="uploadfile2" class="form-label">รูปภาพที่ 2 (รูปภาพเพิ่มเติม)</label>
+                        <div style="position: relative;" class="input-group">
+                            <input class="form-control" type="text" id="uploadfile2" name="uploadfile2" oninput="showPreview(this.value, 'imgPreview2', 'uploadfile2')" value="<?php echo $row['img_Area2']; ?>">
+                            <button class="input-group-text" type="button" onclick="clearInput('uploadfile2', 'imgPreview2')">x</button>
                         </div>
+                        <img id="imgPreview2" class="img-preview" src="" alt="Preview 2 will be displayed here.">
+                    </div>
 
-                        <div class="form-group mb-3">
-                            <label for="uploadfile3" class="form-label">รูปภาพที่ 3 (รูปภาพเพิ่มเติม)</label>
-                            <div style="position: relative;" class="input-group">
-                                <input class="form-control" type="text" id="uploadfile3" name="uploadfile3" oninput="showPreview(this.value, 'imgPreview3')" value="<?php echo $row['img_Area3']; ?>">
-                                <button class="input-group-text " type="button" onclick="clearInput('uploadfile3', 'imgPreview3')">x</button>
-                            </div>
-                            <img id="imgPreview3" class="img-preview" src="" alt="Preview 3 will be displayed here.">
+                    <div class="form-group mb-3">
+                        <label for="uploadfile3" class="form-label">รูปภาพที่ 3 (รูปภาพเพิ่มเติม)</label>
+                        <div style="position: relative;" class="input-group">
+                            <input class="form-control" type="text" id="uploadfile3" name="uploadfile3" oninput="showPreview(this.value, 'imgPreview3', 'uploadfile3')" value="<?php echo $row['img_Area3']; ?>">
+                            <button class="input-group-text" type="button" onclick="clearInput('uploadfile3', 'imgPreview3')">x</button>
                         </div>
+                        <img id="imgPreview3" class="img-preview" src="" alt="Preview 3 will be displayed here.">
+                    </div>
 
-                        <div class="form-group">
-                            <label for="uploadfile4" class="form-label">รูปภาพที่ 4 (รูปภาพเพิ่มเติม)</label>
-                            <div style="position: relative;" class="input-group">
-                                <input class="form-control" type="text" id="uploadfile4" name="uploadfile4" oninput="showPreview(this.value, 'imgPreview4')" value="<?php echo $row['img_Area4']; ?>">
-                                <button class="input-group-text " type="button" onclick="clearInput('uploadfile4', 'imgPreview4')">x</button>
-                            </div>
-                            <img id="imgPreview4" class="img-preview" src="" alt="Preview 4 will be displayed here.">
+                    <div class="form-group">
+                        <label for="uploadfile4" class="form-label">รูปภาพที่ 4 (รูปภาพเพิ่มเติม)</label>
+                        <div style="position: relative;" class="input-group">
+                            <input class="form-control" type="text" id="uploadfile4" name="uploadfile4" oninput="showPreview(this.value, 'imgPreview4', 'uploadfile4')" value="<?php echo $row['img_Area4']; ?>">
+                            <button class="input-group-text" type="button" onclick="clearInput('uploadfile4', 'imgPreview4')">x</button>
                         </div>
+                        <img id="imgPreview4" class="img-preview" src="" alt="Preview 4 will be displayed here.">
                     </div>
 
 
