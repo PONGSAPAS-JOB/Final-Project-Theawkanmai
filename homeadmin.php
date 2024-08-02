@@ -12,7 +12,16 @@ if ($_SESSION['id_admin'] == "") {
 
   <head>
     <link rel="icon" href="img/icon.png" type="image/ico">
-    <script type="text/javascript" src="https://api.longdo.com/map/?key=5f0cf4be3ba02be29c4136aca052b5fd"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Itim&family=LXGW+WenKai+TC&family=Lily+Script+One&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <!-- <script type="text/javascript" src="https://api.longdo.com/map/?key=5f0cf4be3ba02be29c4136aca052b5fd"></script> -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -22,40 +31,43 @@ if ($_SESSION['id_admin'] == "") {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lily+Script+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+    <script type="module" src="./index.js"></script>
+    <script src="https://developers.google.com/maps/get-started"></script>
     <title>หน้าหลัก admin</title>
   </head>
   <style>
     body {
+      font-family: "Itim", cursive;
+      font-weight: 400;
+      font-style: normal;
       margin-top: 0px;
       background-image: url('img/img4.png');
       background-repeat: no-repeat;
       background-attachment: fixed;
       background-size: 100% 100%;
+      overflow: hidden;
+      /* Disable scrolling */
+    }
+
+    i {
+      margin-left: 20%;
     }
   </style>
 
   <body>
     <style>
-      @font-face {
-        font-family: 'Lily Script One';
-        src: url('path_to_font_files/linly-script.woff2') format('woff2'),
-          url('path_to_font_files/linly-script.woff') format('woff');
-
-      }
-
       a {
-        font-family: 'Lily Script One', cursive;
-      }
 
-      h1 {
-        font-family: 'Lily Script One', cursive;
-      }
+        font-family: "LXGW WenKai TC", cursive;
 
+      }
 
       .navbar {
         position: fixed;
         top: 0;
         width: 100%;
+        height: 11%;
         /* Ensures the navbar spans the full width of the viewport */
         z-index: 1000;
         /* Ensure the navbar appears above other content */
@@ -90,18 +102,20 @@ if ($_SESSION['id_admin'] == "") {
         align-items: center;
       }
 
-      .navbar-brandcenter {
-        margin-left: 25%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-
       .navbar-brand .app-name {
+        font-family: "LXGW WenKai TC", cursive;
         margin-bottom: -5px;
+        font-size: 25px;
       }
 
       .navbar-brand .app-desc {
+        font-family: "Itim", cursive;
+        font-size: 12px;
+      }
+
+      .navbar-brand .app-desct {
+        font-family: "LXGW WenKai TC", cursive;
+
         font-size: 12px;
       }
 
@@ -149,6 +163,10 @@ if ($_SESSION['id_admin'] == "") {
       .custom-margin-left {
         margin-left: 20px;
         /* Custom left margin */
+      }
+
+      .btn .btn-success {
+        font-family: "Itim", cursive;
       }
     </style>
 
@@ -221,6 +239,15 @@ if ($_SESSION['id_admin'] == "") {
           <li class="nav-item mt-2">
             <a class="dropdown-item" href="memberMG.php">Member Management</a>
           </li>
+          <li class="nav-item mt-2">
+            <a class="dropdown-item dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Form Management
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <li><a class="dropdown-item mt-2" href="FormAns_User_personality.php">Form User personality</a></li>
+              <li><a class="dropdown-item mt-2" href="FormAns_Motivation.php">Form tourist attraction Motivation</a></li>
+            </ul>
+          </li>
         </ul>
       </div>
     </div>
@@ -230,6 +257,101 @@ if ($_SESSION['id_admin'] == "") {
     margin-top: 60px;
   } */
     </style>
+
+    <style>
+      b {
+        font-family: "Itim", cursive;
+
+      }
+
+      .container {
+
+        margin-top: 40px;
+        width: 100%;
+        /* Set the initial width */
+        max-width: 1000px;
+        margin-top: 10px;
+
+      }
+
+      #map {
+        height: 50%;
+        width: 100%;
+        max-width: 500px;
+      }
+
+      .addplace {
+        margin-top: 100px;
+        /* Adjusted margin-top to create space between button and cards */
+        width: 200px;
+        /* Set button width */
+        margin-left: 1255px;
+        margin-right: auto;
+        display: block;
+        /* Make the button a block-level element to center it */
+        text-align: center;
+        /* Center text within the button */
+      }
+
+      .required-label::after {
+        content: '*';
+        color: red;
+        margin-left: 5px;
+      }
+
+
+      #other-input {
+        display: none;
+      }
+
+
+      .img-preview {
+        display: block;
+        margin-top: 10px;
+        max-width: 100%;
+        max-height: 300px;
+        border: 1px solid #ccc;
+      }
+
+      .btnaddat {
+        margin-top: 35px;
+        background-color: #ffc107;
+        text-align: center;
+        border: none;
+        color: white;
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .btnaddtt {
+        margin-top: 35px;
+        margin-left: 20px;
+        background-color: #ffc107;
+        text-align: center;
+        border: none;
+        color: white;
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .img-preview {
+        display: none;
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 
 
 

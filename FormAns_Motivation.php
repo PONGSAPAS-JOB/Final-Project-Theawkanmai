@@ -183,7 +183,9 @@ if ($_SESSION['id_admin'] == "") {
                 <form class="d-flex justify-content-end ">
                     <a class="navbar-brand " href="#"><b>Welcome, </b></a>
                     <a class="navbar-brand" href="#">
-                        <span class="app-name"><b><?php echo $_SESSION['username']; ?></b></span>
+                        <span class="app-name"><b>
+                                <?php echo $_SESSION['username']; ?>
+                            </b></span>
                         <span class="app-desc">ผู้ดูเเลระบบ</span>
 
                     </a>
@@ -259,11 +261,9 @@ if ($_SESSION['id_admin'] == "") {
 
         <div class="addplace ">
             <div style="width: 1000px; padding: 20px; white-space: nowrap;">
-                <h1><b>รายการสถานที่ท่องเที่ยว</b></h1>
+                <h1><b>รายการผู้ที่ทำเเบบสอบถามเกี่ยวกับตนเองเเล้ว</b></h1>
             </div>
-            <div style="width: 300px; padding: 20px; margin-left: 670px; white-space: nowrap; margin-top: 7px;">
-                <a href="addarea.php" class="btn btn-warning">เพิ่มสถานที่หลัก</a>
-            </div>
+
 
         </div>
 
@@ -335,7 +335,7 @@ if ($_SESSION['id_admin'] == "") {
         ?>
 
         <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
-            <b>สถานที่ท่องเที่ยว</b>
+            <b>รายชื่อ</b>
             <div style="margin-top: 20px;">
                 <div class="container" style=" margin-bottom: 20px;">
                     <input type="text" id="searchInput" class="form-control" placeholder="ค้นหาชื่อสถานที่..." onkeyup="filterTable()">
@@ -357,12 +357,20 @@ if ($_SESSION['id_admin'] == "") {
                         while ($row = mysqli_fetch_array($sql)) {
                         ?>
                             <tr>
-                                <td><?php echo $index; ?></td>
+                                <td>
+                                    <?php echo $index; ?>
+                                </td>
                                 <?php $index++; ?>
                                 <td><img src="<?php echo $row['img_Area1']; ?>" alt="Image" width="100" height="100" style="border-radius: 10px;"></td>
-                                <td><?php echo $row['name_Area']; ?></td>
-                                <td><?php echo $row['phonenum_Area']; ?></td>
-                                <td><?php echo $row['has_map_Area']; ?></td>
+                                <td>
+                                    <?php echo $row['name_Area']; ?>
+                                </td>
+                                <td>
+                                    <?php echo $row['phonenum_Area']; ?>
+                                </td>
+                                <td>
+                                    <?php echo $row['has_map_Area']; ?>
+                                </td>
                                 <td><a href="updateArea.php?id=<?php echo $row['id_Area']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
                                 <td><a href="deleteArea.php?del=<?php echo $row['id_Area']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
                             </tr>
@@ -394,21 +402,23 @@ if ($_SESSION['id_admin'] == "") {
                                                         echo 'disabled';
                                                     } ?>">
                                 <a class="page-link" href="<?php if ($page > 1) {
-                                                                echo "?page=" . ($page - 1);
+                                                                echo " ?page=" . ($page - 1);
                                                             } ?>" tabindex="-1" aria-disabled="true">หน้าเเรก</a>
                             </li>
                             <?php for ($i = 1; $i <= $total_pages; $i++) { ?>
                                 <li class="page-item <?php if ($i == $page) {
                                                             echo 'active';
                                                         } ?>">
-                                    <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                    <a class="page-link" href="?page=<?php echo $i; ?>">
+                                        <?php echo $i; ?>
+                                    </a>
                                 </li>
                             <?php } ?>
                             <li class="page-item <?php if ($page >= $total_pages) {
                                                         echo 'disabled';
                                                     } ?>">
                                 <a class="page-link" href="<?php if ($page < $total_pages) {
-                                                                echo "?page=" . ($page + 1);
+                                                                echo " ?page=" . ($page + 1);
                                                             } ?>">หน้าต่อไป</a>
                             </li>
                         </ul>

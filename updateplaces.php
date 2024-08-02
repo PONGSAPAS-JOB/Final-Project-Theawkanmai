@@ -128,48 +128,65 @@ if ($_SESSION['Id_manager'] == "") {
 
 
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-warning " style="position: fixed;">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-          <span class="app-name">Theaw-kan-mai App</span>
-          <span class="app-desc">Location information management application</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" style="white-space: nowrap;" aria-current="page" href="home.php">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" style="white-space: nowrap;" aria-current="page" href="addplaces.php">Add Places</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" style="white-space: nowrap;" aria-current="page" href="myplaces.php">My Places</a>
-            </li>
-
-            <li class="nav-item">
-              <a class="nav-link disabled" style="white-space: nowrap;" href="#" tabindex="-1" aria-disabled="true">Promotion</a>
-            </li>
-          </ul>
-          <div>
-
-            <form class="d-flex justify-content-end ">
-              <a class="navbar-brand " href="#">Welcome, </a>
-              <a class="navbar-brand" href="#">
-                <span class="app-name"><?php echo $_SESSION['username']; ?></span>
-                <span class="app-desc">เจ้าของสถานที่</span>
-
-              </a>
-              <img src="img/pro.jpg" class="rounded-circle " alt="...">
-
-
-              <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
-            </form>
-          </div>
-        </div>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasExampleLabel">Menu</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
+      <div class="offcanvas-body">
+        <ul class="nav flex-column">
+          <li class="nav-item mt-3">
+            <a class="dropdown-item" aria-current="page" href="homeadmin.php">Home</a>
+          </li>
+          <li class="nav-item mt-2">
+            <a class="dropdown-item" href="Areamanagement.php">Area Management</a>
+          </li>
+          <li class="nav-item mt-2">
+            <a class="dropdown-item" href="areaandplacesMG.php">Places Management</a>
+          </li>
+          <li class="nav-item dropdown mt-2">
+            <a class="dropdown-item dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Type Management
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <li><a class="dropdown-item mt-2" href="typeareaMG.php">Area Type Management</a></li>
+              <li><a class="dropdown-item mt-2" href="tourtypeMG.php">Tour Type Management</a></li>
+              <li><a class="dropdown-item mt-2" href="tagplacesMG.php">Places Tag Management</a></li>
+              <li><a class="dropdown-item mt-2" href="areacategoryMG.php">Area Category Management</a></li>
+
+            </ul>
+          </li>
+          <li class="nav-item mt-2">
+            <a class="dropdown-item" href="memberMG.php">Member Management</a>
+          </li>
+          <li class="nav-item mt-2">
+            <a class="dropdown-item dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Form Management
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <li><a class="dropdown-item mt-2" href="FormAns_User_personality.php">Form User personality</a></li>
+              <li><a class="dropdown-item mt-2" href="FormAns_Motivation.php">Form tourist attraction Motivation</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <form class="d-flex justify-content-end ">
+      <a class="navbar-brand " href="#">Welcome, </a>
+      <a class="navbar-brand" href="#">
+        <span class="app-name"><?php echo $_SESSION['username']; ?></span>
+        <span class="app-desc">เจ้าของสถานที่</span>
+
+      </a>
+      <img src="img/pro.jpg" class="rounded-circle " alt="...">
+
+
+      <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
+    </form>
+    </div>
+    </div>
+    </div>
     </nav>
     <style>
       .container {

@@ -260,6 +260,15 @@ if ($_SESSION['id_admin'] == "") {
                     <li class="nav-item mt-2">
                         <a class="dropdown-item" href="memberMG.php">Member Management</a>
                     </li>
+                    <li class="nav-item mt-2">
+                        <a class="dropdown-item dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Form Management
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <li><a class="dropdown-item mt-2" href="FormAns_User_personality.php">Form User personality</a></li>
+                            <li><a class="dropdown-item mt-2" href="FormAns_Motivation.php">Form tourist attraction Motivation</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>

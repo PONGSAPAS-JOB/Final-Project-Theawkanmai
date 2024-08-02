@@ -31,7 +31,7 @@ if ($_SESSION['id_admin'] == "") {
         <link rel="stylesheet" type="text/css" href="./style.css" />
         <script type="module" src="./index.js"></script>
         <script src="https://developers.google.com/maps/get-started"></script>
-        <title>สถานที่ของฉัน</title>
+        <title>รายการผู้ที่ทำเเบบสอบถามเกี่ยวกับตนเองเเล้ว</title>
     </head>
     <style>
         body {
@@ -183,7 +183,9 @@ if ($_SESSION['id_admin'] == "") {
                 <form class="d-flex justify-content-end ">
                     <a class="navbar-brand " href="#"><b>Welcome, </b></a>
                     <a class="navbar-brand" href="#">
-                        <span class="app-name"><b><?php echo $_SESSION['username']; ?></b></span>
+                        <span class="app-name"><b>
+                                <?php echo $_SESSION['username']; ?>
+                            </b></span>
                         <span class="app-desc">ผู้ดูเเลระบบ</span>
 
                     </a>
@@ -259,11 +261,9 @@ if ($_SESSION['id_admin'] == "") {
 
         <div class="addplace ">
             <div style="width: 1000px; padding: 20px; white-space: nowrap;">
-                <h1><b>รายการสถานที่ท่องเที่ยว</b></h1>
+                <h1><b>รายการผู้ที่ทำเเบบสอบถามเกี่ยวกับตนเองเเล้ว</b></h1>
             </div>
-            <div style="width: 300px; padding: 20px; margin-left: 670px; white-space: nowrap; margin-top: 7px;">
-                <a href="addarea.php" class="btn btn-warning">เพิ่มสถานที่หลัก</a>
-            </div>
+
 
         </div>
 
@@ -307,13 +307,13 @@ if ($_SESSION['id_admin'] == "") {
             }
         </style>
 
-
         <?php
         include_once('functions.php');
-        $fetchdataarea = new DB_con();
+
+        $fetchDataFormMembers = new DB_con(); // สร้างอินสแตนซ์ของคลาส DB_con
+        $result = $fetchDataFormMembers->fetchDataFormMembers(); // เรียกใช้ฟังก์ชันจากคลาส
         $results_per_page = isset($_GET['results_per_page']) ? (int)$_GET['results_per_page'] : 10;
 
-        // Determine which page number the visitor is currently on
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         if ($page < 1) {
             $page = 1;
@@ -323,53 +323,64 @@ if ($_SESSION['id_admin'] == "") {
         $start_from = ($page - 1) * $results_per_page;
 
         // Fetch the data with LIMIT
-        $sql = $fetchdataarea->fetchdataareapage($start_from, $results_per_page);
+        $sql = $fetchDataFormMembers->fetchDataFormMemberspage($start_from, $results_per_page);
 
-        $all_data_sql = $fetchdataarea->fetchdataareapage(0, PHP_INT_MAX); // Fetch all records
+        $all_data_sql = $fetchDataFormMembers->fetchDataFormMemberspage(0, PHP_INT_MAX); // Fetch all records
 
         // Get the total number of records to calculate the number of pages needed
-        $total_results = $fetchdataarea->countTotalAreas();
+        $total_results = $fetchDataFormMembers->countTotalFormMembers();
         $total_pages = ceil($total_results / $results_per_page);
 
         $index = $start_from + 1;
+
         ?>
 
-        <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
-            <b>สถานที่ท่องเที่ยว</b>
+
+        <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15);">
+            <b style="margin-left: 20px;">รายชื่อผู้ตอบเเบบสอบถาม</b>
             <div style="margin-top: 20px;">
                 <div class="container" style=" margin-bottom: 20px;">
-                    <input type="text" id="searchInput" class="form-control" placeholder="ค้นหาชื่อสถานที่..." onkeyup="filterTable()">
+                    <input type="text" id="searchInput" class="form-control" placeholder="ค้นหาชื่อผู้ใช้งาน..." onkeyup="filterTable()">
                 </div>
-                <table class="table table-bordered" style="font-size: 15px;" id="placesTable">
+                <table class="table table-bordered" style="font-size: 15px;  text-align: center;" id="placesTable">
                     <thead>
                         <tr>
-                            <th scope="col">ลำดับสถานที่</th>
-                            <th scope="col">รูปภาพหน้าปก</th>
-                            <th scope="col">รายการสถานที่ท่องเที่ยวหลัก</th>
+                            <th scope="col">ลำดับ</th>
+                            <th scope="col">ไอดีผู้ใช้งาน</th>
+                            <th scope="col">ชื่อผู้ใช้งาน</th>
+                            <th scope="col">E-mail ของผู้ใช้งาน</th>
                             <th scope="col">เบอร์โทรศัพท์</th>
-                            <th scope="col">Link googlemap</th>
+                            <th scope="col">ดูรายละเอียด</th>
                             <th scope="col">แก้ไข</th>
                             <th scope="col">ลบ</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        while ($row = mysqli_fetch_array($sql)) {
+                        if ($result && mysqli_num_rows($result) > 0) {
+
+                            while ($row = mysqli_fetch_array($result)) {
                         ?>
-                            <tr>
-                                <td><?php echo $index; ?></td>
-                                <?php $index++; ?>
-                                <td><img src="<?php echo $row['img_Area1']; ?>" alt="Image" width="100" height="100" style="border-radius: 10px;"></td>
-                                <td><?php echo $row['name_Area']; ?></td>
-                                <td><?php echo $row['phonenum_Area']; ?></td>
-                                <td><?php echo $row['has_map_Area']; ?></td>
-                                <td><a href="updateArea.php?id=<?php echo $row['id_Area']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
-                                <td><a href="deleteArea.php?del=<?php echo $row['id_Area']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
-                            </tr>
+                                <tr>
+                                    <td style="width: 50px;"><?php echo $index; ?></td>
+                                    <?php $index++; ?>
+                                    <td style="width: 70px;"><?php echo $row['id_member']; ?></td>
+                                    <td style="width: 200px;"><?php echo htmlspecialchars($row['username']); ?></td>
+                                    <td style="width: 200px;"><?php echo htmlspecialchars($row['email']); ?></td>
+                                    <td style="width: 100px;"><?php echo htmlspecialchars($row['phone']); ?></td>
+                                    <td style="width: 50px;"><a href="viewDetailsform.php?id=<?php echo $row['id_member']; ?>"><img src="img/resume.png" alt="รายละเอียด" width="30" height="30"></a></td>
+                                    <td style="width: 50px;"><a href="updateformMember.php?id=<?php echo $row['id_member']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
+                                    <td style="width: 50px;"><a href="deleteformMember.php?del=<?php echo $row['id_member']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
+                                </tr>
+
                         <?php
+                            }
+                        } else {
+                            echo "<tr><td colspan='8'>ไม่มีข้อมูล</td></tr>";
                         }
                         ?>
                     </tbody>
+
                 </table>
 
 
@@ -394,21 +405,23 @@ if ($_SESSION['id_admin'] == "") {
                                                         echo 'disabled';
                                                     } ?>">
                                 <a class="page-link" href="<?php if ($page > 1) {
-                                                                echo "?page=" . ($page - 1);
+                                                                echo " ?page=" . ($page - 1);
                                                             } ?>" tabindex="-1" aria-disabled="true">หน้าเเรก</a>
                             </li>
                             <?php for ($i = 1; $i <= $total_pages; $i++) { ?>
                                 <li class="page-item <?php if ($i == $page) {
                                                             echo 'active';
                                                         } ?>">
-                                    <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                    <a class="page-link" href="?page=<?php echo $i; ?>">
+                                        <?php echo $i; ?>
+                                    </a>
                                 </li>
                             <?php } ?>
                             <li class="page-item <?php if ($page >= $total_pages) {
                                                         echo 'disabled';
                                                     } ?>">
                                 <a class="page-link" href="<?php if ($page < $total_pages) {
-                                                                echo "?page=" . ($page + 1);
+                                                                echo " ?page=" . ($page + 1);
                                                             } ?>">หน้าต่อไป</a>
                             </li>
                         </ul>
@@ -433,7 +446,7 @@ if ($_SESSION['id_admin'] == "") {
                 const tr = table.getElementsByTagName('tr');
 
                 for (let i = 0; i < tr.length; i++) {
-                    const td = tr[i].getElementsByTagName('td')[2]; // Column with place names
+                    const td = tr[i].getElementsByTagName('td')[3]; // Column with place names
                     if (td) {
                         const textValue = td.textContent || td.innerText;
                         if (textValue.toUpperCase().indexOf(filter) > -1) {
