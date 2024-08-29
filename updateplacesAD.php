@@ -267,7 +267,7 @@ if ($_SESSION['id_admin'] == "") {
                 d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
             })
             ({
-                key: "AIzaSyAj-R3UXaISyaM2FVeGi9BCkxcB33bHHdg",
+                key: "AIzaSyADH48Q3EkxO3rtcTAhXj1Fz4XJcge5Ew4",
                 v: "weekly"
             });
         </script>

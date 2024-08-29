@@ -261,7 +261,14 @@ if ($_SESSION['id_admin'] == "") {
 
         <div class="addplace ">
             <div style="width: 1000px; padding: 20px; white-space: nowrap;">
-                <h1><b>รายการผู้ที่ทำเเบบสอบถามเกี่ยวกับสถานที่เเล้ว</b></h1>
+
+                <div style="display: flex; ">
+                    <h1 class="mt-3" style="width: 600px; "> <b>คำตอบเเบบสอบถาม ที่ผู้ใช้งานทำเเล้ว</b></h1>
+                    <div style="width: 300px; padding: 20px; margin-left: 300px; margin-top: 3px; ">
+                        <a href="FormAns_Motivation.php" class="btn btn-warning"> กลับหน้าก่อนหน้านี้ -></a>
+                    </div>
+                </div>
+
             </div>
 
 
@@ -307,157 +314,153 @@ if ($_SESSION['id_admin'] == "") {
             }
         </style>
 
+        <style>
+            .container {
+                font-size: 15px;
+                width: 100%;
+                max-width: 1220px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+                padding: 20px;
+            }
+
+            .header {
+                background-color: #ffc107;
+                padding: 10px;
+                font-weight: bold;
+            }
+
+            .section {
+                display: flex;
+                margin-bottom: 10px;
+            }
+
+            .section label {
+                width: 200px;
+                font-weight: bold;
+            }
+
+            .section .answer {
+                flex: 1;
+            }
+
+            .not-found {
+                text-align: center;
+                color: #999;
+            }
+
+            .table {
+                border-collapse: collapse;
+                font-size: 15px;
+            }
+
+            .table th,
+            .table td {
+                border: 1px solid #dee2e6;
+                padding: 8px;
+            }
+
+            .table th {
+                text-align: left;
+            }
+
+            .table .header-cell {
+
+                font-weight: bold;
+                text-align: left;
+            }
+        </style>
+
+
+
         <?php
         include_once('functions.php');
 
-        $fetchDataFormMotivation = new DB_con(); // สร้างอินสแตนซ์ของคลาส DB_con
-        $result = $fetchDataFormMotivation->fetchDataFormMotivation(); // เรียกใช้ฟังก์ชันจากคลาส
-        $results_per_page = isset($_GET['results_per_page']) ? (int)$_GET['results_per_page'] : 10;
+        // สร้างอินสแตนซ์ของคลาส DB_con
+        $db_con = new DB_con();
 
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        if ($page < 1) {
-            $page = 1;
+        // ตรวจสอบว่ามีการส่ง id_member มาหรือไม่
+        $id_member = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+        $username = '';
+
+        if ($id_member) {
+            // ดึงข้อมูลคำตอบของผู้ใช้ที่เลือกจาก form_member1
+            $result = $db_con->fetchAnswersMotivation($id_member);
+
+            // ดึงข้อมูลผู้ใช้จากฐานข้อมูล
+            $query = "SELECT username FROM member WHERE id_member = $id_member";
+            $userResult = mysqli_query($db_con->dbcon, $query);
+
+            if ($userResult && mysqli_num_rows($userResult) > 0) {
+                $userRow = mysqli_fetch_assoc($userResult);
+                $username = $userRow['username'];
+            }
+        } else {
+            $result = [];
         }
-
-        // Determine the SQL LIMIT starting number for the results on the displaying page
-        $start_from = ($page - 1) * $results_per_page;
-
-        // Fetch the data with LIMIT
-        $sql = $fetchDataFormMotivation->fetchDataFormMotivationpage($start_from, $results_per_page);
-
-        $all_data_sql = $fetchDataFormMotivation->fetchDataFormMotivationpage(0, PHP_INT_MAX); // Fetch all records
-
-        // Get the total number of records to calculate the number of pages needed
-        $total_results = $fetchDataFormMotivation->countTotalFormMotivation();
-        $total_pages = ceil($total_results / $results_per_page);
-
-        $index = $start_from + 1;
-
         ?>
 
+        <?php
+        include_once('functions.php');
+
+        // สร้างอินสแตนซ์ของคลาส DB_con
+        $db_con = new DB_con();
+
+        // ตรวจสอบว่ามีการส่ง id_member มาหรือไม่
+        $id_member = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+        $username = '';
+
+        if ($id_member) {
+            // ดึงข้อมูลคำตอบของผู้ใช้ที่เลือกจาก form_member1
+            $result = $db_con->fetchAnswersMotivation($id_member);
+
+            // ดึงข้อมูลผู้ใช้จากฐานข้อมูล
+            $query = "SELECT username FROM member WHERE id_member = $id_member";
+            $userResult = mysqli_query($db_con->dbcon, $query);
+
+            if ($userResult && mysqli_num_rows($userResult) > 0) {
+                $userRow = mysqli_fetch_assoc($userResult);
+                $username = $userRow['username'];
+            }
+        } else {
+            $result = [];
+        }
+        ?>
 
         <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15);">
-            <b style="margin-left: 20px;">รายชื่อผู้ตอบเเบบสอบถาม</b>
-            <div style="margin-top: 20px;">
-                <div class="container" style=" margin-bottom: 20px;">
-                    <input type="text" id="searchInput" class="form-control" placeholder="ค้นหาชื่อผู้ใช้งาน..." onkeyup="filterTable()">
-                </div>
-                <table class="table table-bordered" style="font-size: 15px;  text-align: center;" id="placesTable">
+            <h3><b>รายละเอียดเเบบสอบถามของ <?php echo htmlspecialchars($username); ?> ✨</b></h3>
+            <?php if ($id_member && $result && mysqli_num_rows($result) > 0) : ?>
+                <table class="table table-bordered" style="font-size: 15px;">
                     <thead>
                         <tr>
-                            <th scope="col">ลำดับ</th>
-                            <th scope="col">ไอดีผู้ใช้งาน</th>
-                            <th scope="col">ชื่อผู้ใช้งาน</th>
-                            <th scope="col">E-mail ของผู้ใช้งาน</th>
-                            <th scope="col">เบอร์โทรศัพท์</th>
-                            <th scope="col">ดูรายละเอียด</th>
-                            <th scope="col">แก้ไข</th>
-                            <th scope="col">ลบ</th>
+                            <th style="background-color: #ffc107;">รายการสถานที่ท่องเที่ยว</th>
+                            <th style="background-color: #ffc107;">คำตอบ</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        if ($result && mysqli_num_rows($result) > 0) {
-
-                            while ($row = mysqli_fetch_array($result)) {
-                        ?>
-                                <tr>
-                                    <td style="width: 50px;"><?php echo $index; ?></td>
-                                    <?php $index++; ?>
-                                    <td style="width: 70px;"><?php echo $row['id_member']; ?></td>
-                                    <td style="width: 200px;"><?php echo htmlspecialchars($row['username']); ?></td>
-                                    <td style="width: 200px;"><?php echo htmlspecialchars($row['email']); ?></td>
-                                    <td style="width: 100px;"><?php echo htmlspecialchars($row['phone']); ?></td>
-                                    <td style="width: 50px;"><a href="viewDetailsformcatagory.php?id=<?php echo $row['id_member']; ?>"><img src="img/resume.png" alt="รายละเอียด" width="30" height="30"></a></td>
-                                    <td style="width: 50px;"><a href="updateformcatagory.php?id=<?php echo $row['id_member']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
-                                    <td style="width: 50px;"><a href="deleteformcatagory.php?del=<?php echo $row['id_member']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
-                                </tr>
-
-                        <?php
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            foreach ($row as $column => $value) {
+                                if ($column != 'id_member') { // ข้ามคอลัมน์ id_member
+                                    $description = $db_con->getAnswerMotivationDescription($column, $value);
+                                    echo "<tr>";
+                                    echo "<td><b>" . htmlspecialchars($column) . "</b></td>";
+                                    echo "<td><img src='img/check.png' width='30' height='30'> " . ($description ?: 'ไม่ได้ถูกตอบไว้ในแบบสอบถาม') . "</td>";
+                                    echo "</tr>";
+                                }
                             }
-                        } else {
-                            echo "<tr><td colspan='8'>ไม่มีข้อมูล</td></tr>";
                         }
                         ?>
                     </tbody>
-
                 </table>
-
-
-                <div style="display: flex;">
-                    <div style="margin-bottom: 20px; margin-left: 20px; font-size: 25px; display: flex; width: 200px;">
-
-                        <label for="resultsPerPage" style=" font-size: 20px; width: 200px;" class="form-label">ผลลัพธ์ต่อหน้า:</label>
-                        <select id="resultsPerPage" class="form-control" style="  width: 60px;" onchange="updateResultsPerPage()">
-                            <option value="5" <?php echo $results_per_page == 5 ? 'selected' : ''; ?>>5</option>
-                            <option value="10" <?php echo $results_per_page == 10 ? 'selected' : ''; ?>>10</option>
-                            <option value="15" <?php echo $results_per_page == 15 ? 'selected' : ''; ?>>15</option>
-                            <option value="25" <?php echo $results_per_page == 25 ? 'selected' : ''; ?>>25</option>
-                            <option value="50" <?php echo $results_per_page == 50 ? 'selected' : ''; ?>>50</option>
-                            <option value="100" <?php echo $results_per_page == 100 ? 'selected' : ''; ?>>100</option>
-                        </select>
-                    </div>
-
-                    <!-- Pagination controls -->
-                    <nav aria-label="Page navigation example" style=" margin-left: 170px; font-size: 15px; ">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item <?php if ($page <= 1) {
-                                                        echo 'disabled';
-                                                    } ?>">
-                                <a class="page-link" href="<?php if ($page > 1) {
-                                                                echo " ?page=" . ($page - 1);
-                                                            } ?>" tabindex="-1" aria-disabled="true">หน้าเเรก</a>
-                            </li>
-                            <?php for ($i = 1; $i <= $total_pages; $i++) { ?>
-                                <li class="page-item <?php if ($i == $page) {
-                                                            echo 'active';
-                                                        } ?>">
-                                    <a class="page-link" href="?page=<?php echo $i; ?>">
-                                        <?php echo $i; ?>
-                                    </a>
-                                </li>
-                            <?php } ?>
-                            <li class="page-item <?php if ($page >= $total_pages) {
-                                                        echo 'disabled';
-                                                    } ?>">
-                                <a class="page-link" href="<?php if ($page < $total_pages) {
-                                                                echo " ?page=" . ($page + 1);
-                                                            } ?>">หน้าต่อไป</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
+            <?php else : ?>
+                <p>ไม่พบข้อมูล</p>
+            <?php endif; ?>
         </div>
-        <script>
-            function updateResultsPerPage() {
-                const select = document.getElementById('resultsPerPage');
-                const resultsPerPage = select.value;
-                const urlParams = new URLSearchParams(window.location.search);
-                urlParams.set('results_per_page', resultsPerPage);
-                window.location.search = urlParams.toString();
-            }
 
-
-            function filterTable() {
-                const input = document.getElementById('searchInput');
-                const filter = input.value.toUpperCase();
-                const table = document.getElementById('placesTable');
-                const tr = table.getElementsByTagName('tr');
-
-                for (let i = 0; i < tr.length; i++) {
-                    const td = tr[i].getElementsByTagName('td')[3]; // Column with place names
-                    if (td) {
-                        const textValue = td.textContent || td.innerText;
-                        if (textValue.toUpperCase().indexOf(filter) > -1) {
-                            tr[i].style.display = '';
-                        } else {
-                            tr[i].style.display = 'none';
-                        }
-                    }
-                }
-            }
-        </script>
 
 
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

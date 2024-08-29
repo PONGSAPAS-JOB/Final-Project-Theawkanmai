@@ -395,7 +395,7 @@ if ($_SESSION['id_admin'] == "") {
                                                     } ?>">
                                 <a class="page-link" href="<?php if ($page > 1) {
                                                                 echo "?page=" . ($page - 1);
-                                                            } ?>" tabindex="-1" aria-disabled="true">หน้าเเรก</a>
+                                                            } ?>" tabindex="-1" aria-disabled="true">หน้าก่อนหน้า</a>
                             </li>
                             <?php for ($i = 1; $i <= $total_pages; $i++) { ?>
                                 <li class="page-item <?php if ($i == $page) {

@@ -280,7 +280,7 @@ if ($_SESSION['id_admin'] == "") {
                 d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
             })
             ({
-                key: "AIzaSyAj-R3UXaISyaM2FVeGi9BCkxcB33bHHdg",
+                key: "AIzaSyADH48Q3EkxO3rtcTAhXj1Fz4XJcge5Ew4",
                 v: "weekly"
             });
         </script>
@@ -696,6 +696,7 @@ if ($_SESSION['id_admin'] == "") {
 
                             // Add a click event listener to the map
                             map.addListener("click", (event) => {
+                                console.log("Map clicked at: ", event.latLng.lat(), event.latLng.lng());
                                 const latitude_Area = event.latLng.lat();
                                 const longitude_Area = event.latLng.lng();
 

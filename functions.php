@@ -412,49 +412,6 @@ class DB_con
         return $result;
     }
 
-    public function fetchDataFormMembers()
-    {
-        $query = "
-        SELECT form_member1.id_member, member.username, member.email, member.phone
-        FROM form_member1
-        INNER JOIN member ON form_member1.id_member = member.id_member
-    ";
-
-        $result = mysqli_query($this->dbcon, $query);
-
-        if (!$result) {
-            // จัดการข้อผิดพลาด
-            die("Query failed: " . mysqli_error($this->dbcon));
-        }
-
-        return $result;
-    }
-
-
-
-
-    public function fetchdataformmember2()
-    {
-        $result = mysqli_query($this->dbcon, "SELECT * FROM form_member2");
-        return $result;
-    }
-
-    public function fetchDataFormMemberspage($start_from, $results_per_page)
-    {
-        $conn = $this->dbcon; // Assuming you have a method to get the DB connection
-        $query = "SELECT * FROM form_member1 LIMIT $start_from, $results_per_page";
-        return mysqli_query($conn, $query);
-    }
-
-    // Method to count total areas
-    public function countTotalFormMembers()
-    {
-        $conn = $this->dbcon; // Assuming you have a method to get the DB connection
-        $query = "SELECT COUNT(*) AS total FROM form_member1";
-        $result = mysqli_query($conn, $query);
-        $row = mysqli_fetch_assoc($result);
-        return (int)$row['total']; // Ensure it returns an integer
-    }
 
     public function fetchdataareapage($start_from, $results_per_page)
     {
@@ -790,83 +747,285 @@ class DB_con
     }
 
     //=================เกี่ยวกับเเบบสอบถาม=================================================================================================
-    public function fetchAnswers($id_member)
+
+    public function fetchDataFormMembers()
     {
-        // เตรียมคำสั่ง SQL
-        $stmt = $this->dbcon->prepare("
-            SELECT ans_form1, ans_form2, ans_form3, ans_form4, ans_form5, ans_form6, ans_form7, ans_form8 
-            FROM form_member1 
-            WHERE id_member = ?
-        ");
+        $query = "
+        SELECT ans_interest.id_member, member.username, member.email, member.phone
+        FROM ans_interest
+        INNER JOIN member ON ans_interest.id_member = member.id_member
+    ";
 
-        // ตรวจสอบว่าเตรียมคำสั่งสำเร็จหรือไม่
-        if ($stmt === false) {
-            die("Prepare failed: " . $this->dbcon->error);
-        }
+        $result = mysqli_query($this->dbcon, $query);
 
-        // ผูกพารามิเตอร์กับคำสั่ง SQL
-        $stmt->bind_param("i", $id_member);
-
-        // ดำเนินการคำสั่ง SQL
-        $stmt->execute();
-
-        // รับผลลัพธ์
-        $result = $stmt->get_result();
-
-        // ตรวจสอบข้อผิดพลาดในการรับผลลัพธ์
-        if ($result === false) {
-            die("Query failed: " . $this->dbcon->error);
+        if (!$result) {
+            // จัดการข้อผิดพลาด
+            die("Query failed: " . mysqli_error($this->dbcon));
         }
 
         return $result;
+    }
+
+    public function fetchdataformmember2()
+    {
+        $result = mysqli_query($this->dbcon, "SELECT * FROM form_member2");
+        return $result;
+    }
+
+    public function fetchDataFormMemberspage($start_from, $results_per_page)
+    {
+        $conn = $this->dbcon; // Assuming you have a method to get the DB connection
+        $query = "SELECT * FROM ans_interest LIMIT $start_from, $results_per_page";
+        return mysqli_query($conn, $query);
+    }
+
+    // Method to count total areas
+    public function countTotalFormMembers()
+    {
+        $conn = $this->dbcon; // Assuming you have a method to get the DB connection
+        $query = "SELECT COUNT(*) AS total FROM ans_interest";
+        $result = mysqli_query($conn, $query);
+        $row = mysqli_fetch_assoc($result);
+        return (int)$row['total']; // Ensure it returns an integer
+    }
+
+
+    public function fetchAnswers($id_member)
+    {
+        // Prepare the SQL statement
+        $stmt = $this->dbcon->prepare("
+            SELECT ans1, ans2, ans3, ans4, ans5, ans6, ans7, ans8
+            FROM ans_interest 
+            WHERE id_member = ?
+        ");
+
+        // Check for prepare errors
+        if ($stmt === false) {
+            throw new Exception("Prepare failed: " . $this->dbcon->error);
+        }
+
+        // Bind the parameter
+        $stmt->bind_param("i", $id_member);
+
+        // Execute the statement
+        if (!$stmt->execute()) {
+            throw new Exception("Execute failed: " . $stmt->error);
+        }
+
+        // Get the result
+        $result = $stmt->get_result();
+
+        // Check for result errors
+        if ($result === false) {
+            throw new Exception("Query failed: " . $this->dbcon->error);
+        }
+
+        // Close the statement
+        $stmt->close();
+
+        return $result;  // Return the mysqli_result object
     }
 
     public function getAnswerDescription($column, $value)
     {
         $descriptions = [
-            'ans_form1' => 'แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ (เช่น อุทยานแห่งชาติภูซาง, อุทยานแห่งชาติแม่ปืม)',
-            'ans_form2' => 'แหล่งท่องเที่ยวเชิงอาหาร (เช่น บ้านตะวัน กว๊านพะเยา, เฮือนไทลื้อแม่แสงดา)',
-            'ans_form3' => 'แหล่งท่องเที่ยวเชิงเทศกาล/งานประเพณี (เช่น ธุมะสิกขีศรีจอมทอง, วัดศรีโคมคำ)',
-            'ans_form4' => 'แหล่งท่องเที่ยวเชิงเกษตร (เช่น ไร่องุ่นภูกลองฮิลล์)',
-            'ans_form5' => 'แหล่งท่องเที่ยววัฒนธรรม/วิถีชีวิต (เช่น ศูนย์วัฒนธรรมไทลื้อ, ท่าเรือโบราณบ้านทุ่งกิ่ว)',
-            'ans_form6' => 'แหล่งท่องเที่ยวเชิงผจญภัย (เช่น ถ้ำใหญ่ผาตั้ง, ฝั่งต้า, บ่อสิบสอง)',
-            'ans_form7' => 'แหล่งท่องเที่ยวเชิงสุขภาพ (เช่น หมู่บ้านหนองหล่ม)',
-            'ans_form8' => 'แหล่งท่องเที่ยวเชิงศาสนา (เช่น วัดอนาลโยทิพยาราม, ศรีอุโมงค์คำ)'
+            'ans1' => 'แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ (เช่น อุทยานแห่งชาติภูซาง, อุทยานแห่งชาติแม่ปืม)',
+            'ans2' => 'แหล่งท่องเที่ยวเชิงอาหาร (เช่น บ้านตะวัน กว๊านพะเยา, เฮือนไทลื้อแม่แสงดา)',
+            'ans3' => 'แหล่งท่องเที่ยวเชิงเทศกาล/งานประเพณี (เช่น ธุมะสิกขีศรีจอมทอง, วัดศรีโคมคำ)',
+            'ans4' => 'แหล่งท่องเที่ยวเชิงเกษตร (เช่น ไร่องุ่นภูกลองฮิลล์)',
+            'ans5' => 'แหล่งท่องเที่ยววัฒนธรรม/วิถีชีวิต (เช่น ศูนย์วัฒนธรรมไทลื้อ, ท่าเรือโบราณบ้านทุ่งกิ่ว)',
+            'ans6' => 'แหล่งท่องเที่ยวเชิงผจญภัย (เช่น ถ้ำใหญ่ผาตั้ง, ฝั่งต้า, บ่อสิบสอง)',
+            'ans7' => 'แหล่งท่องเที่ยวเชิงสุขภาพ (เช่น หมู่บ้านหนองหล่ม)',
+            'ans8' => 'แหล่งท่องเที่ยวเชิงศาสนา (เช่น วัดอนาลโยทิพยาราม, ศรีอุโมงค์คำ)'
         ];
 
         return isset($descriptions[$column]) && $value == 1 ? $descriptions[$column] : '';
     }
 
-    public function fetchonerecordFormMembers1($id_member)
-    {
-        $stmt = $this->dbcon->prepare("SELECT * FROM form_member1 WHERE id_member = ?");
-        if ($stmt === false) {
-            die("Prepare failed: " . $this->dbcon->error);
-        }
-
-        $stmt->bind_param("i", $id_member);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result === false) {
-            die("Query failed: " . $this->dbcon->error);
-        }
-
-        return $result;
-    }
 
     //=======================================Form 2 ==================================================
 
     public function fetchAnswers2($id_member)
     {
-        // เตรียมคำสั่ง SQL
+        // ตรวจสอบว่าการเตรียมคำสั่งทำงานได้หรือไม่
         $stmt = $this->dbcon->prepare("
-        SELECT ans_2_1, ans_2_2, ans_2_3, ans_2_4, 
-               ans_3_1, ans_3_2, ans_3_3, ans_3_4,
-               ans_4_1, ans_4_2, ans_4_3, ans_4_4, ans_4_5, ans_4_6, ans_4_7, ans_4_8, ans_4_9,
-               ans_5_1, ans_5_2, ans_5_3, ans_5_4, ans_5_5, ans_5_6, ans_5_7, ans_5_8, ans_5_9,
-               ans_5_10, ans_5_11, ans_5_12, ans_5_13, ans_5_14, ans_5_15, ans_5_16, ans_5_17, ans_5_18, ans_5_19
-        FROM form_member2 
+            SELECT ans_form1, ans_form2, ans_form3, ans_form4
+            FROM form_member 
+            WHERE id_member = ?
+        ");
+
+        if ($stmt === false) {
+            throw new Exception("Prepare failed: " . $this->dbcon->error);
+        }
+
+        $stmt->bind_param("i", $id_member);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Execute failed: " . $stmt->error);
+        }
+
+        $result = $stmt->get_result();
+
+        if ($result === false) {
+            throw new Exception("Query failed: " . $this->dbcon->error);
+        }
+
+        return $result;
+    }
+
+
+    public function getAnswerDescription2($column, $value)
+    {
+
+        // คำอธิบายเฉพาะกลุ่มอื่น ๆ
+        $specificDescriptions = [
+            'ans_form1' => [
+                1 => 'ชาย',
+                2 => 'หญิง',
+                3 => 'LGBTQ+',
+                4 => 'ไม่ต้องการระบุ'
+            ],
+            'ans_form2' => [
+                1 => '12-18 ปี',
+                2 => '19-40 ปี',
+                3 => '41-60 ปี',
+                4 => 'มากกว่า 60 ปี'
+            ],
+            'ans_form3' => [
+                1 => 'เจ้าของกิจการ',
+                2 => 'ข้าราชการ',
+                3 => 'พนักงานบริษัท',
+                4 => 'พนักงานเอกชน',
+                5 => 'นักเรียน/นักศึกษา',
+                6 => 'อื่นๆ'
+            ],
+            'ans_form4' => [
+                1 => 'ต่ำกว่า 5,000 บาท',
+                2 => '5,001 - 10,000 บาท',
+                3 => '10,001 - 20,000 บาท',
+                4 => '20,001 - 30,000 บาท',
+                5 => '30,001 - 40,000 บาท',
+                6 => '40,001 บาทขึ้นไป'
+            ]
+        ];
+
+        // ส่งคืนคำอธิบายที่ตรงกับคอลัมน์และค่า
+        return $specificDescriptions[$column][$value] ?? '';
+    }
+
+
+
+    public function fetchonerecordFormMembers2($id_member)
+    {
+        $stmt = $this->dbcon->prepare("SELECT * FROM form_member WHERE id_member = ?");
+        if ($stmt === false) {
+            throw new Exception("Prepare failed: " . $this->dbcon->error);
+        }
+
+        $stmt->bind_param("i", $id_member);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Execute failed: " . $stmt->error);
+        }
+
+        $result = $stmt->get_result();
+
+        if ($result === false) {
+            throw new Exception("Query failed: " . $this->dbcon->error);
+        }
+
+        return $result;
+    }
+
+    //=======================================Form 3 ==================================================
+
+    public function fetchAnswers3($id_member)
+    {
+        $stmt = $this->dbcon->prepare("
+            SELECT eva_p1_ans1, eva_p1_ans2, eva_p1_ans3, eva_p1_ans4, eva_p1_ans5, eva_p1_ans6, eva_p1_ans7, eva_p1_ans8, eva_p1_ans9
+            FROM eva_form1 
+            WHERE id_member = ?
+        ");
+
+        if ($stmt === false) {
+            throw new Exception("Prepare failed: " . $this->dbcon->error);
+        }
+
+        $stmt->bind_param("i", $id_member);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Execute failed: " . $stmt->error);
+        }
+
+        $result = $stmt->get_result();
+
+        if ($result === false) {
+            throw new Exception("Query failed: " . $this->dbcon->error);
+        }
+
+        return $result;
+    }
+
+    public function getAnswerDescription3($column, $value)
+    {
+        // คำอธิบายทั่วไปสำหรับระดับความเห็น
+        $generalDescriptions = [
+            1 => '" 1 " เห็นด้วยน้อยที่สุด',
+            2 => '" 2 " เห็นด้วยน้อย',
+            3 => '" 3 " เห็นด้วยปานกลาง',
+            4 => '" 4 " เห็นด้วยมาก',
+            5 => '" 5 " เห็นด้วยมากที่สุด'
+        ];
+
+        // คำอธิบายสำหรับแต่ละคอลัมน์
+        $specificDescriptions = [
+            'eva_p1_ans1' => $generalDescriptions,
+            'eva_p1_ans2' => $generalDescriptions,
+            'eva_p1_ans3' => $generalDescriptions,
+            'eva_p1_ans4' => $generalDescriptions,
+            'eva_p1_ans5' => $generalDescriptions,
+            'eva_p1_ans6' => $generalDescriptions,
+            'eva_p1_ans7' => $generalDescriptions,
+            'eva_p1_ans8' => $generalDescriptions,
+            'eva_p1_ans9' => $generalDescriptions,
+        ];
+
+        // ส่งคืนคำอธิบายที่ตรงกับคอลัมน์และค่า
+        return $specificDescriptions[$column][$value] ?? '';
+    }
+
+
+    // Remove this function if it serves the same purpose as fetchAnswers3
+    public function fetchonerecordFormMembers3($id_member)
+    {
+        $stmt = $this->dbcon->prepare("SELECT * FROM eva_form1 WHERE id_member = ?");
+        if ($stmt === false) {
+            throw new Exception("Prepare failed: " . $this->dbcon->error);
+        }
+
+        $stmt->bind_param("i", $id_member);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Execute failed: " . $stmt->error);
+        }
+
+        $result = $stmt->get_result();
+
+        if ($result === false) {
+            throw new Exception("Query failed: " . $this->dbcon->error);
+        }
+
+        return $result;
+    }
+
+    //=======================================Form 3 ==================================================
+
+    public function fetchAnswers4($id_member)
+    {
+        $stmt = $this->dbcon->prepare("
+        SELECT eva_p2_ans1, eva_p2_ans2, eva_p2_ans3, eva_p2_ans4, eva_p2_ans5, eva_p2_ans6, eva_p2_ans7, eva_p2_ans8, eva_p2_ans9,
+               eva_p2_ans10, eva_p2_ans11, eva_p2_ans12, eva_p2_ans13, eva_p2_ans14, eva_p2_ans15, eva_p2_ans16, eva_p2_ans17, eva_p2_ans18, eva_p2_ans19
+        FROM eva_form2 
         WHERE id_member = ?
     ");
 
@@ -889,7 +1048,7 @@ class DB_con
         return $result;
     }
 
-    public function getAnswerDescription2($column, $value)
+    public function getAnswerDescription4($column, $value)
     {
         // คำอธิบายทั่วไปสำหรับระดับความเห็น
         $generalDescriptions = [
@@ -900,87 +1059,40 @@ class DB_con
             5 => '" 5 " เห็นด้วยมากที่สุด'
         ];
 
-        // คำอธิบายเฉพาะกลุ่มอื่น ๆ
-        $specificDescriptions = [
-            'ans_2_1' => [
-                1 => 'ชาย',
-                2 => 'หญิง',
-                3 => 'LGBTQ+',
-                4 => 'ไม่ต้องการระบุ'
-            ],
-            'ans_2_2' => [
-                1 => '12-18 ปี',
-                2 => '19-40 ปี',
-                3 => '41-60 ปี',
-                4 => 'มากกว่า 60 ปี'
-            ],
-            'ans_2_3' => [
-                1 => 'เจ้าของกิจการ',
-                2 => 'ข้าราชการ',
-                3 => 'พนักงานบริษัท',
-                4 => 'พนักงานเอกชน',
-                5 => 'นักเรียน/นักศึกษา',
-                6 => 'อื่นๆ'
-            ],
-            'ans_2_4' => [
-                1 => 'ต่ำกว่า 5,000 บาท',
-                2 => '5,001 - 10,000 บาท',
-                3 => '10,001 - 20,000 บาท',
-                4 => '20,001 - 30,000 บาท',
-                5 => '30,001 - 40,000 บาท',
-                6 => '40,001 บาทขึ้นไป'
-            ],
-            'ans_3_1' => [
-                1 => 'คนเดียว',
-                2 => 'คนรัก',
-                3 => 'เพื่อน',
-                4 => 'ครอบครัว'
-            ],
-            'ans_3_2' => [
-                1 => 'รถยนต์',
-                2 => 'รถสาธารณะ',
-                3 => 'รถจักยานยนต์',
-                4 => 'เช่ารถ',
-                5 => 'อื่นๆ'
-            ],
-            'ans_3_3' => [
-                1 => 'โรงแรม',
-                2 => 'วนอุทยาน',
-                3 => 'รีสอร์ท',
-                4 => 'โฮมสเตย์',
-                5 => 'บ้านพักส่วนตัว',
-                6 => 'อื่นๆ'
-            ],
-            'ans_3_4' => [
-                1 => 'น้อยกว่า 1,000 บาท',
-                2 => '1,001 - 2,000 บาท',
-                3 => '2,001 - 3,000 บาท',
-                4 => '3,001 - 4,000 บาท',
-                5 => '4,001 บาทขึ้นไป'
-            ],
-        ];
-
         // คำอธิบายที่ใช้ร่วมกัน
         $commonKeys = [
-            'ans_4_1', 'ans_4_2', 'ans_4_3', 'ans_4_4', 'ans_4_5', 'ans_4_6', 'ans_4_7', 'ans_4_8', 'ans_4_9',
-            'ans_5_1', 'ans_5_2', 'ans_5_3', 'ans_5_4', 'ans_5_5', 'ans_5_6', 'ans_5_7', 'ans_5_8', 'ans_5_9',
-            'ans_5_10', 'ans_5_11', 'ans_5_12', 'ans_5_13', 'ans_5_14', 'ans_5_15', 'ans_5_16', 'ans_5_17', 'ans_5_18', 'ans_5_19'
+            'eva_p2_ans1',
+            'eva_p2_ans2',
+            'eva_p2_ans3',
+            'eva_p2_ans4',
+            'eva_p2_ans5',
+            'eva_p2_ans6',
+            'eva_p2_ans7',
+            'eva_p2_ans8',
+            'eva_p2_ans9',
+            'eva_p2_ans10',
+            'eva_p2_ans11',
+            'eva_p2_ans12',
+            'eva_p2_ans13',
+            'eva_p2_ans14',
+            'eva_p2_ans15',
+            'eva_p2_ans16',
+            'eva_p2_ans17',
+            'eva_p2_ans18',
+            'eva_p2_ans19'
         ];
 
         // สร้าง array ของคำอธิบายสำหรับคีย์ที่ใช้ร่วมกัน
         $commonDescriptions = array_fill_keys($commonKeys, $generalDescriptions);
 
-        // รวมคำอธิบายทั้งหมด
-        $descriptions = array_merge($specificDescriptions, $commonDescriptions);
-
         // ส่งคืนคำอธิบายที่ตรงกับคอลัมน์และค่า
-        return $descriptions[$column][$value] ?? '';
+        return $commonDescriptions[$column][$value] ?? '';
     }
 
-
-    public function fetchonerecordFormMembers2($id_member)
+    // Remove this function if it serves the same purpose as fetchAnswers4
+    public function fetchonerecordFormMembers4($id_member)
     {
-        $stmt = $this->dbcon->prepare("SELECT * FROM form_member2 WHERE id_member = ?");
+        $stmt = $this->dbcon->prepare("SELECT * FROM eva_form2 WHERE id_member = ?");
         if ($stmt === false) {
             throw new Exception("Prepare failed: " . $this->dbcon->error);
         }
@@ -998,5 +1110,255 @@ class DB_con
         }
 
         return $result;
+    }
+
+    public function fetchAnswers5($id_member)
+    {
+        // ตรวจสอบว่าการเตรียมคำสั่งทำงานได้หรือไม่
+        $stmt = $this->dbcon->prepare("
+            SELECT ans_form5, ans_form6, ans_form7, ans_form8
+            FROM form_member 
+            WHERE id_member = ?
+        ");
+
+        if ($stmt === false) {
+            throw new Exception("Prepare failed: " . $this->dbcon->error);
+        }
+
+        $stmt->bind_param("i", $id_member);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Execute failed: " . $stmt->error);
+        }
+
+        $result = $stmt->get_result();
+
+        if ($result === false) {
+            throw new Exception("Query failed: " . $this->dbcon->error);
+        }
+
+        return $result;
+    }
+
+
+    public function getAnswerDescription5($column, $value)
+    {
+
+        // คำอธิบายเฉพาะกลุ่มอื่น ๆ
+        $specificDescriptions = [
+
+            'ans_form5' => [
+                1 => 'คนเดียว',
+                2 => 'คนรัก',
+                3 => 'เพื่อน',
+                4 => 'ครอบครัว'
+            ],
+            'ans_form6' => [
+                1 => 'รถยนต์',
+                2 => 'รถสาธารณะ',
+                3 => 'รถจักยานยนต์',
+                4 => 'เช่ารถ',
+                5 => 'อื่นๆ'
+            ],
+            'ans_form7' => [
+                1 => 'โรงแรม',
+                2 => 'วนอุทยาน',
+                3 => 'รีสอร์ท',
+                4 => 'โฮมสเตย์',
+                5 => 'บ้านพักส่วนตัว',
+                6 => 'อื่นๆ'
+            ],
+            'ans_form8' => [
+                1 => 'น้อยกว่า 1,000 บาท',
+                2 => '1,001 - 2,000 บาท',
+                3 => '2,001 - 3,000 บาท',
+                4 => '3,001 - 4,000 บาท',
+                5 => '4,001 บาทขึ้นไป'
+            ],
+        ];
+
+        // ส่งคืนคำอธิบายที่ตรงกับคอลัมน์และค่า
+        return $specificDescriptions[$column][$value] ?? '';
+    }
+
+
+
+    public function fetchonerecordFormMembers5($id_member)
+    {
+        $stmt = $this->dbcon->prepare("SELECT * FROM form_member WHERE id_member = ?");
+        if ($stmt === false) {
+            throw new Exception("Prepare failed: " . $this->dbcon->error);
+        }
+
+        $stmt->bind_param("i", $id_member);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Execute failed: " . $stmt->error);
+        }
+
+        $result = $stmt->get_result();
+
+        if ($result === false) {
+            throw new Exception("Query failed: " . $this->dbcon->error);
+        }
+
+        return $result;
+    }
+
+
+
+
+    public function deleteFormMembers1($id_member)
+    {
+        $deleteFormMembers1 = mysqli_query($this->dbcon, "DELETE FROM ans_interest WHERE id_member = '$id_member'");
+        return $deleteFormMembers1;
+    }
+
+    public function deleteFormMembers2($id_member)
+    {
+        $deleteFormMembers2 = mysqli_query($this->dbcon, "DELETE FROM form_member WHERE id_member = '$id_member'");
+        return $deleteFormMembers2;
+    }
+    public function deleteFormMembers3($id_member)
+    {
+        $deleteFormMembers3 = mysqli_query($this->dbcon, "DELETE FROM eva_form1 WHERE id_member = '$id_member'");
+        return $deleteFormMembers3;
+    }
+    public function deleteFormMembers4($id_member)
+    {
+        $deleteFormMembers4 = mysqli_query($this->dbcon, "DELETE FROM eva_form2 WHERE id_member = '$id_member'");
+        return $deleteFormMembers4;
+    }
+
+    ////////////////////////Form_Motivation///////////////
+
+    public function fetchDataFormMotivation()
+    {
+        $query = "
+        SELECT area_category_form.id_member, member.username, member.email, member.phone
+        FROM area_category_form
+        INNER JOIN member ON area_category_form.id_member = member.id_member
+    ";
+
+        $result = mysqli_query($this->dbcon, $query);
+
+        if (!$result) {
+            // จัดการข้อผิดพลาด
+            die("Query failed: " . mysqli_error($this->dbcon));
+        }
+
+        return $result;
+    }
+
+    public function fetchdataformMotivation2()
+    {
+        $result = mysqli_query($this->dbcon, "SELECT * FROM area_category_form");
+        return $result;
+    }
+
+    public function fetchDataFormMotivationpage($start_from, $results_per_page)
+    {
+        $conn = $this->dbcon; // Assuming you have a method to get the DB connection
+        $query = "SELECT * FROM area_category_form LIMIT $start_from, $results_per_page";
+        return mysqli_query($conn, $query);
+    }
+
+    // Method to count total areas
+    public function countTotalFormMotivation()
+    {
+        $conn = $this->dbcon; // Assuming you have a method to get the DB connection
+        $query = "SELECT COUNT(*) AS total FROM area_category_form";
+        $result = mysqli_query($conn, $query);
+        $row = mysqli_fetch_assoc($result);
+        return (int)$row['total']; // Ensure it returns an integer
+    }
+
+
+    public function fetchAnswersMotivation($id_member)
+    {
+        // Prepare the SQL statement
+        $stmt = $this->dbcon->prepare("
+            SELECT *
+            FROM area_category_form 
+            WHERE id_member = ?
+        ");
+
+        // Check for prepare errors
+        if ($stmt === false) {
+            throw new Exception("Prepare failed: " . $this->dbcon->error);
+        }
+
+        // Bind the parameter
+        $stmt->bind_param("i", $id_member);
+
+        // Execute the statement
+        if (!$stmt->execute()) {
+            throw new Exception("Execute failed: " . $stmt->error);
+        }
+
+        // Get the result
+        $result = $stmt->get_result();
+
+        // Check for result errors
+        if ($result === false) {
+            throw new Exception("Query failed: " . $this->dbcon->error);
+        }
+
+        // Close the statement
+        $stmt->close();
+
+        return $result;  // Return the mysqli_result object
+    }
+
+    public function getAnswerMotivationDescription($column, $value)
+    {
+        $descriptions = [
+            1 => 'แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ',
+            2 => 'แหล่งท่องเที่ยวเชิงอาหาร',
+            3 => 'แหล่งท่องเที่ยวเชิงเทศกาล/งานประเพณี',
+            4 => 'แหล่งท่องเที่ยวเชิงเกษตร',
+            5 => 'แหล่งท่องเที่ยววัฒนธรรม/วิถีชีวิต',
+            6 => 'แหล่งท่องเที่ยวเชิงผจญภัย',
+            7 => 'แหล่งท่องเที่ยวเชิงสุขภาพ',
+            8 => 'แหล่งท่องเที่ยวเชิงศาสนา'
+        ];
+
+        if (isset($value)) {
+            return isset($descriptions[$value]) ? $descriptions[$value] : 'ไม่ได้ถูกตอบไว้ในแบบสอบถาม';
+        } else {
+            return 'ไม่ได้ถูกตอบไว้ในแบบสอบถาม';
+        }
+    }
+
+    public function deleteFormMotivation($id_member)
+    {
+        $deleteFormMotivation = mysqli_query($this->dbcon, "DELETE FROM area_category_form WHERE id_member = '$id_member'");
+        return $deleteFormMotivation;
+    }
+
+    //============================================================================================================
+    // Function to calculate the Euclidean distance
+    function calculateDistance($answers, $cluster)
+    {
+        $distance = 0;
+        foreach ($answers as $i => $answer) {
+            $distance += pow($answer - $cluster[$i], 2);
+        }
+        return sqrt($distance);
+    }
+
+    // Function to find the nearest cluster
+    function findNearestCluster($newAnswers, $clusters)
+    {
+        $minDistance = PHP_INT_MAX;
+        $nearestCluster = -1;
+        foreach ($clusters as $clusterId => $cluster) {
+            $distance = calculateDistance($newAnswers, $cluster);
+            if ($distance < $minDistance) {
+                $minDistance = $distance;
+                $nearestCluster = $clusterId;
+            }
+        }
+        return $nearestCluster;
     }
 }

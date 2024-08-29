@@ -378,8 +378,7 @@ if ($_SESSION['id_admin'] == "") {
         include_once('functions.php');
 
         // สร้างอินสแตนซ์ของคลาส DB_con
-        $fetchonerecordFormMembers1 = new DB_con();
-        $fetchonerecordFormMembers2 = new DB_con();
+        $db_con = new DB_con();
 
         // ตรวจสอบว่ามีการส่ง id_member มาหรือไม่
         $id_member = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -388,17 +387,18 @@ if ($_SESSION['id_admin'] == "") {
 
         if ($id_member) {
             // ดึงข้อมูลคำตอบของผู้ใช้ที่เลือกจาก form_member1
-            $result1 = $fetchonerecordFormMembers1->fetchAnswers($id_member);
+            $result1 = $db_con->fetchAnswers($id_member);
 
-            // ดึงข้อมูลคำตอบของผู้ใช้ที่เลือกจาก form_member2
-            $result2 = $fetchonerecordFormMembers2->fetchAnswers2($id_member);
-            $result3 = $fetchonerecordFormMembers2->fetchAnswers2($id_member);
-            $result4 = $fetchonerecordFormMembers2->fetchAnswers2($id_member);
-            $result5 = $fetchonerecordFormMembers2->fetchAnswers2($id_member);
+            // Use the same function or a different one if fetchAnswers2 is supposed to be different
+            $result2 = $db_con->fetchAnswers2($id_member);
+            $result3 = $db_con->fetchAnswers3($id_member);
+            $result4 = $db_con->fetchAnswers4($id_member);
+            $result5 = $db_con->fetchAnswers5($id_member);
+
 
             // ดึงข้อมูลผู้ใช้จากฐานข้อมูล
             $query = "SELECT username FROM member WHERE id_member = $id_member";
-            $userResult = mysqli_query($fetchonerecordFormMembers1->dbcon, $query);
+            $userResult = mysqli_query($db_con->dbcon, $query);
 
             if ($userResult && mysqli_num_rows($userResult) > 0) {
                 $userRow = mysqli_fetch_assoc($userResult);
@@ -431,7 +431,7 @@ if ($_SESSION['id_admin'] == "") {
                             echo "<tr><td>";
                             $answers = [];
                             foreach ($row as $column => $value) {
-                                $description = $fetchonerecordFormMembers1->getAnswerDescription($column, $value);
+                                $description = $db_con->getAnswerDescription($column, $value);
                                 if ($description) {
                                     $answers[] = '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -460,8 +460,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">2.1. เพศของท่าน</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row2['ans_2_1'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_2_1', $row2['ans_2_1']);
+                                    if (isset($row2['ans_form1'])) {
+                                        $description = $db_con->getAnswerDescription2('ans_form1', $row2['ans_form1']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -474,8 +474,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">2.2. อายุของท่าน</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row2['ans_2_2'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_2_2', $row2['ans_2_2']);
+                                    if (isset($row2['ans_form2'])) {
+                                        $description = $db_con->getAnswerDescription2('ans_form2', $row2['ans_form2']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -488,8 +488,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">2.3. อาชีพของท่าน</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row2['ans_2_3'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_2_3', $row2['ans_2_3']);
+                                    if (isset($row2['ans_form3'])) {
+                                        $description = $db_con->getAnswerDescription2('ans_form3', $row2['ans_form3']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -502,8 +502,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">2.4. รายได้ต่อเดือน</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row2['ans_2_4'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_2_4', $row2['ans_2_4']);
+                                    if (isset($row2['ans_form4'])) {
+                                        $description = $db_con->getAnswerDescription2('ans_form4', $row2['ans_form4']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -529,14 +529,14 @@ if ($_SESSION['id_admin'] == "") {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($result3 && mysqli_num_rows($result3) > 0) : ?>
-                        <?php while ($row3 = mysqli_fetch_assoc($result3)) : ?>
+                    <?php if ($result5 && mysqli_num_rows($result5) > 0) : ?>
+                        <?php while ($row3 = mysqli_fetch_assoc($result5)) : ?>
                             <tr>
                                 <th class="header-cell">3.1. ท่านมักเดินทางท่องเที่ยวกับใคร</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row3['ans_3_1'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_3_1', $row3['ans_3_1']);
+                                    if (isset($row3['ans_form5'])) {
+                                        $description = $db_con->getAnswerDescription5('ans_form5', $row3['ans_form5']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -549,8 +549,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">3.2. ส่วนใหญ่ท่านเดินทางท่องเที่ยวโดยยานพาหนะใด</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row3['ans_3_2'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_3_2', $row3['ans_3_2']);
+                                    if (isset($row3['ans_form6'])) {
+                                        $description = $db_con->getAnswerDescription5('ans_form6', $row3['ans_form6']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -563,8 +563,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">3.3. ในการท่องเที่ยว ท่านมักเลือกที่พักแบบใด</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row3['ans_3_3'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_3_3', $row3['ans_3_3']);
+                                    if (isset($row3['ans_form7'])) {
+                                        $description = $db_con->getAnswerDescription5('ans_form7', $row3['ans_form7']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -577,8 +577,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">3.4. งบประมาณที่ใช้ในการท่องเที่ยวต่อวัน</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row3['ans_3_4'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_3_4', $row3['ans_3_4']);
+                                    if (isset($row3['ans_form8'])) {
+                                        $description = $db_con->getAnswerDescription5('ans_form8', $row3['ans_form8']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -589,7 +589,7 @@ if ($_SESSION['id_admin'] == "") {
                         <?php endwhile; ?>
                     <?php else : ?>
                         <tr>
-                            <td colspan="2" class="answer-cell">ไม่พบข้อมูล</td>
+                            <td colspan="4" class="answer-cell">ไม่พบข้อมูล</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -604,14 +604,14 @@ if ($_SESSION['id_admin'] == "") {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($result4 && mysqli_num_rows($result4) > 0) : ?>
-                        <?php while ($row4 = mysqli_fetch_assoc($result4)) : ?>
+                    <?php if ($result3 && mysqli_num_rows($result3) > 0) : ?>
+                        <?php while ($row4 = mysqli_fetch_assoc($result3)) : ?>
                             <tr>
                                 <th class="header-cell">4.1. ต้องการอยู่ในธรรมชาติที่สวยงามและอากาศบริสุทธิ์ มีน้ำตก พันธุ์ไม้สัตว์ป่า</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row4['ans_4_1'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_4_1', $row4['ans_4_1']);
+                                    if (isset($row4['eva_p1_ans1'])) {
+                                        $description = $db_con->getAnswerDescription3('eva_p1_ans1', $row4['eva_p1_ans1']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -624,8 +624,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">4.2. ต้องการหลีกหนีจากชีวิตประจำวัน</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row4['ans_4_2'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_4_2', $row4['ans_4_2']);
+                                    if (isset($row4['eva_p1_ans2'])) {
+                                        $description = $db_con->getAnswerDescription3('eva_p1_ans2', $row4['eva_p1_ans2']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -638,8 +638,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">4.3. ต้องการค้นหาตัวเอง/ทบทวนความคิดของตนเอง</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row4['ans_4_3'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_4_3', $row4['ans_4_3']);
+                                    if (isset($row4['eva_p1_ans3'])) {
+                                        $description = $db_con->getAnswerDescription3('eva_p1_ans3', $row4['eva_p1_ans3']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -652,8 +652,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">4.4. ต้องการสร้างแรงบันดาลใจและความคิดสร้างสรรค์</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row4['ans_4_4'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_4_4', $row4['ans_4_4']);
+                                    if (isset($row4['eva_p1_ans4'])) {
+                                        $description = $db_con->getAnswerDescription3('eva_p1_ans4', $row4['eva_p1_ans4']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -666,8 +666,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">4.5. ต้องการได้รับความรู้และประสบการณ์แปลกใหม่</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row4['ans_4_5'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_4_5', $row4['ans_4_5']);
+                                    if (isset($row4['eva_p1_ans5'])) {
+                                        $description = $db_con->getAnswerDescription3('eva_p1_ans5', $row4['eva_p1_ans5']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -680,8 +680,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">4.6. ต้องการสร้างความสัมพันธ์กับคนใกล้ชิด/ครอบครัว</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row4['ans_4_6'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_4_6', $row4['ans_4_6']);
+                                    if (isset($row4['eva_p1_ans6'])) {
+                                        $description = $db_con->getAnswerDescription3('eva_p1_ans6', $row4['eva_p1_ans6']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -694,8 +694,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">4.7. ต้องการสร้างความสัมพันธ์กับผู้อื่น</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row4['ans_4_7'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_4_7', $row4['ans_4_7']);
+                                    if (isset($row4['eva_p1_ans7'])) {
+                                        $description = $db_con->getAnswerDescription3('eva_p1_ans7', $row4['eva_p1_ans7']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -708,8 +708,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">4.8. ต้องการแสวงหาความตื่นเต้น เร้าใจ และความเสี่ยง</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row4['ans_4_8'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_4_8', $row4['ans_4_8']);
+                                    if (isset($row4['eva_p1_ans8'])) {
+                                        $description = $db_con->getAnswerDescription3('eva_p1_ans8', $row4['eva_p1_ans8']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -722,8 +722,8 @@ if ($_SESSION['id_admin'] == "") {
                                 <th class="header-cell">4.9. ต้องการเป็นที่ยอมรับนับถือจากผู้อื่น</th>
                                 <td class="answer-cell">
                                     <?php
-                                    if (isset($row4['ans_4_9'])) {
-                                        $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_4_9', $row4['ans_4_9']);
+                                    if (isset($row4['eva_p1_ans9'])) {
+                                        $description = $db_con->getAnswerDescription3('eva_p1_ans9', $row4['eva_p1_ans9']);
                                         if ($description) {
                                             echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                         }
@@ -749,19 +749,18 @@ if ($_SESSION['id_admin'] == "") {
                     <tr>
                         <th colspan="2" style="background-color: #ffd65e;">ท่านตัดสินใจเลือกเดินทางท่องเที่ยวเพราะเหตุใดมากที่สุด?</th>
                     </tr>
-
                 </thead>
                 <tbody>
                     <tr>
                         <th colspan="2" style="background-color: #ffe28e;">ด้านสิ่งที่ดึงดูดใจ (Attraction)</th>
                     </tr>
                     <?php
-                    if ($result5 && mysqli_num_rows($result5) > 0) {
-                        while ($row5 = mysqli_fetch_assoc($result5)) {
+                    if ($result4 && mysqli_num_rows($result4) > 0) {
+                        while ($row5 = mysqli_fetch_assoc($result4)) {
                             echo "<tr>";
                             echo "<th>5.1. ความสวยงามของแหล่งท่องเที่ยว</th><td>";
-                            if (isset($row5['ans_5_1'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_1', $row5['ans_5_1']);
+                            if (isset($row5['eva_p2_ans1'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans1', $row5['eva_p2_ans1']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -770,8 +769,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.2. ความมีชื่อเสียงของแหล่งท่องเที่ยว</th><td>";
-                            if (isset($row5['ans_5_2'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_2', $row5['ans_5_2']);
+                            if (isset($row5['eva_p2_ans2'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans2', $row5['eva_p2_ans2']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -780,8 +779,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.3. ความหลากหลายของประเภทแหล่งท่องเที่ยว</th><td>";
-                            if (isset($row5['ans_5_3'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_3', $row5['ans_5_3']);
+                            if (isset($row5['eva_p2_ans3'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans3', $row5['eva_p2_ans3']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -792,21 +791,18 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.4. มีป้ายบอกทางเข้าถึงแหล่งท่องเที่ยว</th><td>";
-                            if (isset($row5['ans_5_4'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_4', $row5['ans_5_4']);
+                            if (isset($row5['eva_p2_ans4'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans4', $row5['eva_p2_ans4']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
                             }
                             echo "</td></tr>";
 
-
-
-
                             echo "<tr>";
                             echo "<th>5.5. เส้นทางคมนาคมที่ใช้เข้าถึงแหล่งท่องเที่ยว</th><td>";
-                            if (isset($row5['ans_5_5'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_5', $row5['ans_5_5']);
+                            if (isset($row5['eva_p2_ans5'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans5', $row5['eva_p2_ans5']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -815,8 +811,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.6. มีสถานที่ให้บริการทางคมนาคม เช่น ปั๊มน้ำมัน จุดพักรถ อย่างทั่วถึง</th><td>";
-                            if (isset($row5['ans_5_6'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_6', $row5['ans_5_6']);
+                            if (isset($row5['eva_p2_ans6'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans6', $row5['eva_p2_ans6']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -825,8 +821,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.7. มีความปลอดภัยในการเดินทาง</th><td>";
-                            if (isset($row5['ans_5_7'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_7', $row5['ans_5_7']);
+                            if (isset($row5['eva_p2_ans7'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans7', $row5['eva_p2_ans7']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -835,8 +831,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.8. มีสถานที่จอดรถอย่างเพียงพอ</th><td>";
-                            if (isset($row5['ans_5_8'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_8', $row5['ans_5_8']);
+                            if (isset($row5['eva_p2_ans8'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans8', $row5['eva_p2_ans8']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -847,8 +843,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.9. มีร้านค้า ตั้งใกล้อยู่แหล่งท่องเที่ยวและชุมชน</th><td>";
-                            if (isset($row5['ans_5_9'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_9', $row5['ans_5_9']);
+                            if (isset($row5['eva_p2_ans9'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans9', $row5['eva_p2_ans9']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -857,8 +853,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.10. มีร้านอาหารสำหรับบริการที่หลากหลายและเพียงพอ</th><td>";
-                            if (isset($row5['ans_5_10'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_10', $row5['ans_5_10']);
+                            if (isset($row5['eva_p2_ans10'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans10', $row5['eva_p2_ans10']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -867,8 +863,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.11. มีสาธารณูปโภคขั้นพื้นฐาน เช่น น้ำสะอาด ไฟฟ้า สัญญาณโทรศัพท์ อย่างเหมาะสม</th><td>";
-                            if (isset($row5['ans_5_11'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_11', $row5['ans_5_11']);
+                            if (isset($row5['eva_p2_ans11'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans11', $row5['eva_p2_ans11']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -877,11 +873,10 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo '<tr><th colspan="2" style="background-color: #ffe28e;">ด้านการบริการที่พัก (Accommodation) </th></tr>';
 
-
                             echo "<tr>";
                             echo "<th>5.12. ประเภทของที่พักมีความหลากหลายให้เลือกใช้บริการ</th><td>";
-                            if (isset($row5['ans_5_12'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_12', $row5['ans_5_12']);
+                            if (isset($row5['eva_p2_ans12'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans12', $row5['eva_p2_ans12']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -890,8 +885,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.13. ที่พักมีราคาที่เหมาะสม</th><td>";
-                            if (isset($row5['ans_5_13'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_13', $row5['ans_5_13']);
+                            if (isset($row5['eva_p2_ans13'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans13', $row5['eva_p2_ans13']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -900,8 +895,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.14. มีสิ่งอำนวยความสะดวกที่รับรองความต้องการ เช่น อินเตอร์เน็ต ห้องออกกำลังกาย สระว่ายน้ำ ฯลฯ</th><td>";
-                            if (isset($row5['ans_5_14'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_14', $row5['ans_5_14']);
+                            if (isset($row5['eva_p2_ans14'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans14', $row5['eva_p2_ans14']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -910,11 +905,10 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo '<tr><th colspan="2" style="background-color: #ffe28e;">ด้านกิจกรรมการท่องเที่ยว (Activities) </th></tr>';
 
-
                             echo "<tr>";
                             echo "<th>5.15. กิจกรรมท่องเที่ยวมีความน่าสนใจ</th><td>";
-                            if (isset($row5['ans_5_15'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_15', $row5['ans_5_15']);
+                            if (isset($row5['eva_p2_ans15'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans15', $row5['eva_p2_ans15']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -923,8 +917,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.16. กิจกรรมท่องเที่ยวมีความหลากหลาย</th><td>";
-                            if (isset($row5['ans_5_16'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_16', $row5['ans_5_16']);
+                            if (isset($row5['eva_p2_ans16'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans16', $row5['eva_p2_ans16']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -933,8 +927,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.17. กิจกรรมท่องเที่ยวที่ส่งเสริมการเรียนรู้</th><td>";
-                            if (isset($row5['ans_5_17'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_17', $row5['ans_5_17']);
+                            if (isset($row5['eva_p2_ans17'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans17', $row5['eva_p2_ans17']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -943,8 +937,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.18. กิจกรรมท่องเที่ยวที่มีความปลอดภัย</th><td>";
-                            if (isset($row5['ans_5_18'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_18', $row5['ans_5_18']);
+                            if (isset($row5['eva_p2_ans18'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans18', $row5['eva_p2_ans18']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }
@@ -953,8 +947,8 @@ if ($_SESSION['id_admin'] == "") {
 
                             echo "<tr>";
                             echo "<th>5.19. กิจกรรมท่องเที่ยวที่ก่อให้เกิดประโยชน์ต่อสังคม</th><td>";
-                            if (isset($row5['ans_5_19'])) {
-                                $description = $fetchonerecordFormMembers2->getAnswerDescription2('ans_5_19', $row5['ans_5_19']);
+                            if (isset($row5['eva_p2_ans19'])) {
+                                $description = $db_con->getAnswerDescription4('eva_p2_ans19', $row5['eva_p2_ans19']);
                                 if ($description) {
                                     echo '<img src="img/check.png" width="30" height="30"> ' . $description;
                                 }

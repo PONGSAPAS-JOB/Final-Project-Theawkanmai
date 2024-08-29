@@ -2,6 +2,8 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <?php
 
+
+
 session_start();
 
 if ($_SESSION['id_admin'] == "") {
@@ -14,17 +16,17 @@ if ($_SESSION['id_admin'] == "") {
     $userdata = new DB_con();
 
     if (isset($_POST['insert'])) {
-        $tag_description = $_POST['tag_description'];
+
         $name_Area = $_POST['name_Area'];
-        $name_places = $_POST['name_places'];
-        $latitude_Places = $_POST['latitude_Places'];
-        $longitude_Places = $_POST['longitude_Places'];
-        $address_Places = $_POST['address'];
-        $sub_dis_Places = $_POST['sub_dis_Places'];
-        $dis_Places = $_POST['dis_Places'];
-        $provi_Places = $_POST['provi_Places'];
+        $latitude_Area = $_POST['latitude_Area'];
+        $longitude_Area = $_POST['longitude_Area'];
+        $address_Area = $_POST['address'];
+        $sub_dis_Area = $_POST['sub_dis_Area'];
+        $dis_Area = $_POST['dis_Area'];
+        $provi_Area = $_POST['provi_Area'];
         $post_code = $_POST['post_code'];
-        $details_places = $_POST['details_places'];
+        $info_Area = $_POST['info_Area'];
+        $activityinfo_Area = $_POST['activityinfo_Area'];
 
         $tour_type_descrip1 = $_POST['tour_type_descrip1'];
         $tour_type_descrip2 = $_POST['tour_type_descrip2'];
@@ -43,19 +45,19 @@ if ($_SESSION['id_admin'] == "") {
         //รูปภาพที่ 4
         $filename4 = $_POST["uploadfile4"];
 
-        $has_Map = $_POST['has_Map'];
-        $phonenum_places = $_POST['phonenum_places'];
+        $has_map_Area = $_POST['has_map_Area'];
+        $phonenum_Area = $_POST['phonenum_Area'];
 
-        if (isset($_POST['email_places'])) {
-            $email_places = $_POST['email_places'];
+        if (isset($_POST['email_Area'])) {
+            $email_Area = $_POST['email_Area'];
         } else {
-            $email_places = '';
+            $email_Area = '';
         }
 
-        if (isset($_POST['url_places'])) {
-            $url_places = $_POST['url_places'];
+        if (isset($_POST['url_Area'])) {
+            $url_Area = $_POST['url_Area'];
         } else {
-            $url_places = '';
+            $url_Area = '';
         }
         //เวลาเปิด
         if (isset($_POST['ontime_Mon'])) {
@@ -138,29 +140,31 @@ if ($_SESSION['id_admin'] == "") {
             $price_in = '';
         }
 
+        $name_typeArea = $_POST['name_typeArea'];
 
-        $sql = $userdata->addplacesbyadmin(
-            $tag_description,
+
+
+        $sql = $userdata->addarea(
             $name_Area,
-            $name_places,
-            $latitude_Places,
-            $longitude_Places,
-            $address_Places,
-            $sub_dis_Places,
-            $dis_Places,
-            $provi_Places,
+            $latitude_Area,
+            $longitude_Area,
+            $address_Area,
+            $sub_dis_Area,
+            $dis_Area,
+            $provi_Area,
             $post_code,
-            $details_places,
+            $info_Area,
+            $activityinfo_Area,
             $tour_type_descrip1,
             $tour_type_descrip2,
             $filename1,
             $filename2,
             $filename3,
             $filename4,
-            $has_Map,
-            $phonenum_places,
-            $email_places,
-            $url_places,
+            $has_map_Area,
+            $phonenum_Area,
+            $email_Area,
+            $url_Area,
             $ontime_Mon,
             $ontime_Tue,
             $ontime_Wed,
@@ -177,42 +181,48 @@ if ($_SESSION['id_admin'] == "") {
             $closetime_Sun,
             $Access_Status,
             $price_in,
-            $_SESSION['id_admin']
+            $name_typeArea
+
+
         );
+
+
         if ($sql) {
-            // echo "<script>alert('Add Places Success!');</script>";
+            // echo "<script>alert('Add Area Success!');</script>";
             // echo "<script>window.location.href='areaandplacesMG.php'</script>";
-            echo  "<script>
+            echo   "<script>
                 $(document).ready(function() {
                     Swal.fire({
-                        title: 'Add Places Success!',
+                        title: 'Add Area Success!',
                         text: 'กำลังบันทึกข้อมูลสถานที่',
                         icon: 'success',
                         timer: 1000,
                         showConfirmButton: false
                     }).then(() => {
-                        window.location.href = 'areaandplacesMG.php';
+                        window.location.href = 'Areamanagement.php';
                     });
                 });
             </script>";
         } else {
-            // echo "<script>alert('Add Places Failed!');</script>";
-            // echo "<script>window.location.href='addplacesbyAD.php'</script>";
-            echo  "<script>
+            // echo "<script>alert('Add Area Failed!');</script>";
+            // echo "<script>window.location.href='addarea.php'</script>";
+            // echo error_reporting();
+            echo   "<script>
                 $(document).ready(function() {
                     Swal.fire({
-                        title: 'Add Places Failed!',
+                        title: 'Add Area Failed!',
                         text: 'ไม่สามารถเพิ่มสถานที่ได้ โปรดลองอีกครั้ง!',
                         icon: 'error',
-                        timer: 3000,
+                        
                         showConfirmButton: false
                     }).then(() => {
-                        history.back();
+                       history.back();
                     });
                 });
             </script>";
         }
     }
+    //window.location.href = 'addarea.php';
     ?>
 
     <!DOCTYPE html>
@@ -221,7 +231,6 @@ if ($_SESSION['id_admin'] == "") {
     <head>
         <link rel="icon" href="img/icon.png" type="image/ico">
 
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Itim&family=LXGW+WenKai+TC&family=Lily+Script+One&display=swap" rel="stylesheet">
@@ -243,12 +252,7 @@ if ($_SESSION['id_admin'] == "") {
         <link rel="stylesheet" type="text/css" href="./style.css" />
         <script type="module" src="./index.js"></script>
         <script src="https://developers.google.com/maps/get-started"></script>
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-        <title>เพิ่มข้อมูลร้านค้า , ที่พัก</title>
+        <title>เพิ่มข้อมูลสถานที่ท่องเที่ยว</title>
 
         <script>
             (g => {
@@ -276,7 +280,7 @@ if ($_SESSION['id_admin'] == "") {
                 d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
             })
             ({
-                key: "AIzaSyAj-R3UXaISyaM2FVeGi9BCkxcB33bHHdg",
+                key: "AIzaSyADH48Q3EkxO3rtcTAhXj1Fz4XJcge5Ew4",
                 v: "weekly"
             });
         </script>
@@ -488,6 +492,7 @@ if ($_SESSION['id_admin'] == "") {
                 </ul>
             </div>
         </div>
+
         <style>
             b {
                 font-family: "Itim", cursive;
@@ -685,17 +690,13 @@ if ($_SESSION['id_admin'] == "") {
 
 
                 </div>
-
                 <div style="display: flex;">
                     <div>
                         <div class="mb-3" style="border: 10px;">
                             <label for="map" class="form-label">แผนที่ (คลิกซ้ายเพื่อดูข้อมูล)</label>
                             <div id="map" style="height: 500px; width: 500px; border: 3px solid #FFFFFF;"></div>
-                            <div id="placesMessage"></div>
                         </div>
                     </div>
-
-
                     <script>
                         document.addEventListener("DOMContentLoaded", function() {
                             if (typeof google !== "undefined" && google.maps && google.maps.importLibrary) {
@@ -717,32 +718,33 @@ if ($_SESSION['id_admin'] == "") {
                             });
 
                             let marker;
-                            let infoWindow = new google.maps.InfoWindow();
 
+                            // Add a click event listener to the map
                             map.addListener("click", (event) => {
-                                const latitude_Places = event.latLng.lat();
-                                const longitude_Places = event.latLng.lng();
+                                const latitude_Area = event.latLng.lat();
+                                const longitude_Area = event.latLng.lng();
 
+                                // Convert latitude and longitude to address
                                 const geocoder = new google.maps.Geocoder();
 
                                 geocoder.geocode({
                                     location: {
-                                        lat: latitude_Places,
-                                        lng: longitude_Places
+                                        lat: latitude_Area,
+                                        lng: longitude_Area
                                     }
                                 }, (results, status) => {
                                     if (status === "OK") {
                                         const addressComponents = parseAddressComponents(results[0].address_components);
                                         const filteredAddress = filterAddressComponents(results[0].address_components);
-                                        const googleMapLink = `https://www.google.com/maps?q=${latitude_Places},${longitude_Places}`;
+                                        const googleMapLink = `https://www.google.com/maps?q=${latitude_Area},${longitude_Area}`;
 
-                                        document.getElementById("latitude_Places").value = latitude_Places.toFixed(4);
-                                        document.getElementById("longitude_Places").value = longitude_Places.toFixed(4);
+                                        document.getElementById("latitude_Area").value = latitude_Area.toFixed(4);
+                                        document.getElementById("longitude_Area").value = longitude_Area.toFixed(4);
                                         document.getElementById("address").value = filteredAddress;
-                                        document.getElementById("sub_dis_Places").value = addressComponents.subdistrict || "";
-                                        document.getElementById("dis_Places").value = addressComponents.district || "";
-                                        document.getElementById("provi_Places").value = addressComponents.province || "";
-                                        document.getElementById("has_Map").value = googleMapLink;
+                                        document.getElementById("sub_dis_Area").value = addressComponents.subdistrict || "";
+                                        document.getElementById("dis_Area").value = addressComponents.district || "";
+                                        document.getElementById("provi_Area").value = addressComponents.province || "";
+                                        document.getElementById("has_map_Area").value = googleMapLink;
 
                                         const postalCode = results[0].address_components.find(
                                             (component) => component.types.includes("postal_code")
@@ -752,66 +754,21 @@ if ($_SESSION['id_admin'] == "") {
                                             marker.setMap(null);
                                         }
 
+                                        // Add a new marker
                                         marker = new google.maps.Marker({
                                             position: {
-                                                lat: latitude_Places,
-                                                lng: longitude_Places
+                                                lat: latitude_Area,
+                                                lng: longitude_Area
                                             },
                                             map: map,
                                             icon: {
-                                                url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+                                                url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' // Red pin icon
                                             }
                                         });
-
-                                        findNearbyPlaces(latitude_Places, longitude_Places, map, infoWindow);
                                     } else {
                                         console.error("Geocoder failed:", status);
                                     }
                                 });
-                            });
-                        }
-
-                        function findNearbyPlaces(lat, lng, map, infoWindow) {
-                            $.ajax({
-                                type: 'POST',
-                                url: 'get_nearby_places.php',
-                                data: {
-                                    latitude: lat,
-                                    longitude: lng,
-                                    radius: 5000 // Radius in meters (5 km)
-                                },
-                                success: function(response) {
-                                    const places = JSON.parse(response);
-                                    $('#placesMessage').html('');
-
-                                    if (places.length > 0) {
-                                        places.forEach(place => {
-                                            const placeLat = parseFloat(place.latitude_Area);
-                                            const placeLng = parseFloat(place.longitude_Area);
-
-                                            const marker = new google.maps.Marker({
-                                                position: {
-                                                    lat: placeLat,
-                                                    lng: placeLng
-                                                },
-                                                map: map,
-                                                title: place.name_Area,
-                                                icon: {
-                                                    url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
-                                                }
-                                            });
-
-                                            marker.addListener('click', () => {
-                                                infoWindow.setContent(`<div><strong>${place.name_Area}</strong><br>Distance: ${place.distance.toFixed(2)} km</div>`);
-                                                infoWindow.open(map, marker);
-                                            });
-
-                                            $('#placesMessage').append(`<div>${place.name_Area} (Distance: ${place.distance.toFixed(2)} km)</div>`);
-                                        });
-                                    } else {
-                                        $('#placesMessage').html('<div>No nearby places found within 5 km.</div>');
-                                    }
-                                }
                             });
                         }
 
@@ -848,79 +805,54 @@ if ($_SESSION['id_admin'] == "") {
                             return text;
                         }
                     </script>
-                    <script>
-                        $(document).ready(function() {
-                            $('#name_Area').select2({
-                                width: 'resolve',
-                                dropdownAutoWidth: true
-                            });
-
-                            $('#name_Area').change(function() {
-                                var id_Area = $(this).val();
-                                if (id_Area) {
-                                    $.ajax({
-                                        type: 'POST',
-                                        url: 'get_places.php',
-                                        data: {
-                                            id_Area: id_Area
-                                        },
-                                        success: function(response) {
-                                            $('#placesMessage').html(response);
-                                        }
-                                    });
-                                } else {
-                                    $('#placesMessage').html('');
-                                }
-                            });
-                        });
-                    </script>
-
                     <div style="margin-left: 50px; margin-top: 30px; width: 420px;">
-
-
                         <div class="mb-3" style=" width: 425px;">
-                            <label for="has_Map" class="form-label required-label">Link Google Map</label>
-                            <input type="text" class="form-control" id="has_Map" name="has_Map" aria-describedby="ลิ้งค์เเผนที่" required>
+                            <label for="has_map_Area" class="form-label required-label">Link Google Map</label>
+                            <input type="text" class="form-control" id="has_map_Area" name="has_map_Area" aria-describedby="ลิ้งค์เเผนที่" required>
                         </div>
                         <div style="display: flex; width: 425px;">
                             <div class="mb-3" style="margin-right: 30px; width: 300px;">
-                                <label for="latitude_Places" class="form-label required-label">Latitude ของสถานที่</label>
-                                <input type="text" class="form-control" id="latitude_Places" name="latitude_Places" aria-describedby="Latitude ของสถานที่" required>
+                                <label for="latitude_Area" class="form-label required-label">Latitude ของสถานที่</label>
+                                <input type="text" class="form-control " id="latitude_Area" name="latitude_Area" aria-describedby="Latitude ของสถานที่" required>
                             </div>
                             <div class="mb-3" style=" width: 300px;">
-                                <label for="longitude_Places" class="form-label required-label">Longitude ของสถานที่</label>
-                                <input type="text" class="form-control" id="longitude_Places" name="longitude_Places" aria-describedby="Longitude ของสถานที่" required>
+                                <label for="longitude_Area" class="form-label required-label">Longitude ของสถานที่</label>
+                                <input type="text" class="form-control " id="longitude_Area" name="longitude_Area" aria-describedby="Longitude ของสถานที่" required>
                             </div>
+
                         </div>
 
 
                         <div class="mb-3" style="margin-right: 20px; width: 425px;">
+
                             <label for="address" class="form-label">ที่อยู่ เลขที่ ซอย ถนน</label>
                             <input type="text" class="form-control" id="address" name="address" aria-describedby="ที่อยู่ เลขที่">
                         </div>
                         <div style="display: flex; width: 425px;">
                             <div class="mb-3" style="margin-right: 30px; width: 300px;">
-                                <label for="sub_dis_Places" class="form-label required-label">ตำบล</label>
-                                <input type="text" class="form-control" id="sub_dis_Places" name="sub_dis_Places" aria-describedby="ตำบล" required>
+                                <label for="sub_dis_Area" class="form-label required-label">ตำบล</label>
+                                <input type="text" class="form-control" id="sub_dis_Area" name="sub_dis_Area" aria-describedby="ตำบล" required>
                             </div>
                             <div class="mb-3" style=" width: 300px;">
-                                <label for="dis_Places" class="form-label required-label">อำเภอ</label>
-                                <input type="text" class="form-control" id="dis_Places" name="dis_Places" aria-describedby="อำเภอ" required>
+                                <label for="dis_Area" class="form-label required-label">อำเภอ</label>
+                                <input type="text" class="form-control" id="dis_Area" name="dis_Area" aria-describedby="อำเภอ" required>
                             </div>
                         </div>
                         <div style="display: flex; width: 425px;">
                             <div class="mb-3" style="margin-right: 30px; width: 300px;">
-                                <label for="provi_Places" class="form-label required-label">จังหวัด</label>
-                                <input type="text" class="form-control" id="provi_Places" name="provi_Places" aria-describedby="จังหวัด" required>
+                                <label for="provi_Area" class="form-label required-label">จังหวัด</label>
+                                <input type="text" class="form-control" id="provi_Area" name="provi_Area" aria-describedby="จังหวัด" required>
                             </div>
                             <div class="mb-3" style=" width: 300px;">
                                 <label for="post_code" class="form-label required-label">รหัสไปรษณีย์</label>
                                 <input type="text" class="form-control" id="post_code" name="post_code" aria-describedby="รหัสไปรษณีย์" required>
                             </div>
                         </div>
-
+                        <hr>
                     </div>
+
                 </div>
+
 
                 <div style="display: flex; ">
                     <div class="mb-3" style="margin-right: 20px; ">
@@ -1461,7 +1393,7 @@ if ($_SESSION['id_admin'] == "") {
 
             }
         </script>
-
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 

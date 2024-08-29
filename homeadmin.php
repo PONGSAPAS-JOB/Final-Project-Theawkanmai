@@ -36,6 +36,7 @@ if ($_SESSION['id_admin'] == "") {
     <script src="https://developers.google.com/maps/get-started"></script>
     <title>หน้าหลัก admin</title>
   </head>
+
   <style>
     body {
       font-family: "Itim", cursive;
@@ -46,8 +47,6 @@ if ($_SESSION['id_admin'] == "") {
       background-repeat: no-repeat;
       background-attachment: fixed;
       background-size: 100% 100%;
-      overflow: hidden;
-      /* Disable scrolling */
     }
 
     i {
@@ -55,7 +54,7 @@ if ($_SESSION['id_admin'] == "") {
     }
   </style>
 
-  <body>
+  <body onload="init();">
     <style>
       a {
 
@@ -177,24 +176,18 @@ if ($_SESSION['id_admin'] == "") {
       </button>
       <div class="container-fluid ">
         <a class="navbar-brand" href="#">
-          <span class="app-name">Theaw-kan-mai App </span>
-          <span class="app-desc">Location information management application</span>
+          <span class="app-name"><b>Theaw-kan-mai App </b></span>
+          <span class="app-desct">Location information management application</span>
         </a>
-
-
-
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
 
-        <h1 class="navbar-brandcenter  ">
-          HOME
-        </h1>
 
         <form class="d-flex justify-content-end ">
-          <a class="navbar-brand " href="#">Welcome, </a>
+          <a class="navbar-brand " href="#"><b>Welcome, </b></a>
           <a class="navbar-brand" href="#">
-            <span class="app-name"><?php echo $_SESSION['username']; ?></span>
+            <span class="app-name"><b><?php echo $_SESSION['username']; ?></b></span>
             <span class="app-desc">ผู้ดูเเลระบบ</span>
 
           </a>
@@ -251,13 +244,6 @@ if ($_SESSION['id_admin'] == "") {
         </ul>
       </div>
     </div>
-
-    <style>
-      /* .containercard{
-    margin-top: 60px;
-  } */
-    </style>
-
     <style>
       b {
         font-family: "Itim", cursive;
@@ -346,6 +332,214 @@ if ($_SESSION['id_admin'] == "") {
         height: auto;
       }
     </style>
+    <div class="addplace "><a></a></div>
+    <div class="container">
+      <?php
+      include 'test.php';
+
+      // Create an instance of the DB_con class
+      $userdata = new DB_con();
+
+      // Average scores for each cluster
+      $clusters = [
+        0 => [4.747126, 4.097701, 4.316092, 4.436782, 4.568966, 4.488506, 3.908046, 3.770115, 2.787356, 4.902299, 4.758621, 4.798851, 4.793103, 4.839080, 4.775862, 4.867816, 4.856322, 4.586207, 4.896552, 4.557471],
+        1 => [4.460938, 3.875000, 3.773438, 4.007812, 4.273438, 3.992188, 3.500000, 3.609375, 2.726562, 4.578125, 4.093750, 4.351562, 3.984375, 4.250000, 4.015625, 4.203125, 4.140625, 3.750000, 4.453125, 3.859375],
+        2 => [3.910714, 3.571429, 3.392857, 3.607143, 3.821429, 3.678571, 3.285714, 3.428571, 2.696429, 3.946429, 3.071429, 2.910714, 3.232143, 3.214286, 3.178571, 3.607143, 3.482143, 3.392857, 3.607143, 3.232143]
+      ];
+
+      // User ID for analysis
+      $id_member = 2942; // Example user ID
+
+      // Fetch data from eva_form1
+      $sql = "SELECT * FROM eva_form1 WHERE id_member = $id_member";
+      $result1 = $userdata->query($sql);
+      $row1 = $result1->fetch_assoc();
+
+      // Fetch data from eva_form2
+      $sql = "SELECT * FROM eva_form2 WHERE id_member = $id_member";
+      $result2 = $userdata->query($sql);
+      $row2 = $result2->fetch_assoc();
+
+      // User's answers
+      $newAnswers = [
+        $row1["eva_p1_ans1"],
+        $row1["eva_p1_ans2"],
+        $row1["eva_p1_ans3"],
+        $row1["eva_p1_ans4"],
+        $row1["eva_p1_ans5"],
+        $row1["eva_p1_ans6"],
+        $row1["eva_p1_ans7"],
+        $row1["eva_p1_ans8"],
+        $row1["eva_p1_ans9"],
+        $row2["eva_p2_ans1"],
+        $row2["eva_p2_ans10"],
+        $row2["eva_p2_ans11"],
+        $row2["eva_p2_ans12"],
+        $row2["eva_p2_ans13"],
+        $row2["eva_p2_ans14"],
+        $row2["eva_p2_ans15"],
+        $row2["eva_p2_ans16"],
+        $row2["eva_p2_ans17"],
+        $row2["eva_p2_ans18"],
+        $row2["eva_p2_ans19"]
+      ];
+
+      // Find the nearest cluster
+      $nearestCluster = findNearestCluster($newAnswers, $clusters);
+
+      // Define recommendations based on clusters
+      $recommendations = [
+        0 => [
+          "กิจกรรม" => [
+            "เดินป่าในเส้นทางธรรมชาติ",
+            "ปิกนิกในสวนสาธารณะ",
+            "เข้าร่วมกิจกรรมเชิงอนุรักษ์",
+            "นั่งเรือชมวิว"
+          ],
+          "แหล่งท่องเที่ยว" => [
+            "แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ",
+            "แหล่งท่องเที่ยวเชิงเกษตร",
+            "แหล่งท่องเที่ยวเชิงสุขภาพ",
+            "แหล่งท่องเที่ยวเชิงศาสนา"
+          ]
+        ],
+        1 => [
+          "กิจกรรม" => [
+            "เวิร์กช็อปสร้างแรงบันดาลใจ",
+            "การเดินป่าเชิงผจญภัย",
+            "กิจกรรมเรียนรู้วัฒนธรรมท้องถิ่น",
+            "การเข้าร่วมค่ายฝึกอบรมหรือสัมมนา"
+          ],
+          "แหล่งท่องเที่ยว" => [
+            "แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ",
+            "แหล่งท่องเที่ยวเชิงอาหาร",
+            "แหล่งท่องเที่ยวเชิงเทศกาล/งานประเพณี",
+            "แหล่งท่องเที่ยววัฒนธรรม/วิถีชีวิต",
+            "แหล่งท่องเที่ยวเชิงผจญภัย",
+            "แหล่งท่องเที่ยวเชิงสุขภาพ"
+          ]
+        ],
+        2 => [
+          "กิจกรรม" => [
+            "การนวดผ่อนคลายหรือสปา",
+            "การชมวิวและถ่ายภาพ",
+            "การพักผ่อนในรีสอร์ทหรือบ้านพักตากอากาศ",
+            "การเที่ยวชมพิพิธภัณฑ์หรือแกลเลอรี"
+          ],
+          "แหล่งท่องเที่ยว" => [
+            "แหล่งท่องเที่ยวเชิงอาหาร",
+            "แหล่งท่องเที่ยวเชิงเกษตร",
+            "แหล่งท่องเที่ยวเชิงสุขภาพ",
+            "แหล่งท่องเที่ยวเชิงศาสนา"
+          ]
+        ]
+      ];
+
+      // Display the results
+      echo "<h2>คำตอบของผู้ใช้ ID: $id_member</h2>";
+      echo "<h3>ผู้ทำแบบสอบถามนี้ถูกจัดอยู่ในคลัสเตอร์ที่: $nearestCluster</h3>";
+
+      echo "<h4>กิจกรรมแนะนำ:</h4>";
+      echo "<ul>";
+      foreach ($recommendations[$nearestCluster]["กิจกรรม"] as $activity) {
+        echo "<li>$activity</li>";
+      }
+      echo "</ul>";
+
+      echo "<h4>แหล่งท่องเที่ยวแนะนำ:</h4>";
+      echo "<ul>";
+      foreach ($recommendations[$nearestCluster]["แหล่งท่องเที่ยว"] as $attraction) {
+        echo "<li>$attraction</li>";
+      }
+      echo "</ul>";
+
+      // Fetch id_category based on recommended attractions
+      $recommended_attractions = $recommendations[$nearestCluster]["แหล่งท่องเที่ยว"];
+      $id_categories = [];
+
+      foreach ($recommended_attractions as $attraction) {
+        $category_sql = "SELECT id_category FROM area_category WHERE name_category = '$attraction'";
+        $category_result = $userdata->query($category_sql);
+
+        if ($category_result && $category_result->num_rows > 0) {
+          while ($category_row = $category_result->fetch_assoc()) {
+            $id_categories[] = $category_row['id_category'];
+          }
+        }
+      }
+
+      // Fetch id_category based on recommended attractions
+      $recommended_attractions = $recommendations[$nearestCluster]["แหล่งท่องเที่ยว"];
+      $id_categories = [];
+
+      foreach ($recommended_attractions as $attraction) {
+        $category_sql = "SELECT id_category FROM area_category WHERE name_category = '$attraction'";
+        $category_result = $userdata->query($category_sql);
+
+        if ($category_result && $category_result->num_rows > 0) {
+          while ($category_row = $category_result->fetch_assoc()) {
+            $id_categories[] = $category_row['id_category'];
+          }
+        }
+      }
+
+      // Check if $id_categories is not empty before proceeding
+      if (!empty($id_categories)) {
+        // Proceed with the SQL query to get id_type_area
+        $type_area_sql = "SELECT id_type_area FROM group_typearea WHERE id_category IN (" . implode(',', $id_categories) . ")";
+        $type_area_result = $userdata->query($type_area_sql);
+
+        if (!$type_area_result) {
+          die("Error fetching type areas: " . $userdata->error);
+        }
+
+        $id_type_areas = [];
+        while ($type_area_row = $type_area_result->fetch_assoc()) {
+          $id_type_areas[] = $type_area_row['id_type_area'];
+        }
+
+        // Proceed with fetching the name_Area if $id_type_areas is not empty
+        if (!empty($id_type_areas)) {
+          $areas_sql = "SELECT name_Area FROM area_info WHERE id_type_area IN (" . implode(',', $id_type_areas) . ")";
+          $areas_result = $userdata->query($areas_sql);
+
+          if (!$areas_result) {
+            die("Error fetching areas: " . $userdata->error);
+          }
+
+          // Fetch all results into an array
+          $areas = [];
+          while ($area_row = $areas_result->fetch_assoc()) {
+            $areas[] = $area_row['name_Area'];
+          }
+
+          // Shuffle the array to randomize the order
+          shuffle($areas);
+
+          // Display the results
+          echo "<h4>สถานที่ท่องเที่ยวแนะนำ:</h4>";
+          echo "<ul>";
+          foreach ($areas as $area) {
+            echo "<li>" . $area . "</li>";
+          }
+          echo "</ul>";
+        } else {
+          echo "<h4>ไม่มีสถานที่ท่องเที่ยวแนะนำที่ตรงกับหมวดหมู่ที่เลือก</h4>";
+        }
+      } else {
+        echo "<h4>ไม่มีหมวดหมู่ที่ตรงกับคำแนะนำ</h4>";
+      }
+
+      // Close the database connection
+      $userdata->close();
+      ?>
+    </div>
+
+
+
+
+
+
 
 
 
