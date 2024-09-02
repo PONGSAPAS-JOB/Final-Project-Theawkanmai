@@ -103,15 +103,12 @@ if ($_SESSION['Id_manager'] == "") {
               <a class="nav-link active" style="white-space: nowrap;" aria-current="page" href="home.php">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" style="white-space: nowrap;" aria-current="page" href="addplaces.php">Add Places</a>
+              <a class="nav-link active" style="white-space: nowrap;" aria-current="page" href="chooseAdd.php">Add Places</a>
             </li>
             <li class="nav-item">
               <a class="nav-link active" style="white-space: nowrap;" aria-current="page" href="myplaces.php">My Places</a>
             </li>
 
-            <li class="nav-item">
-              <a class="nav-link disabled" style="white-space: nowrap;" href="#" tabindex="-1" aria-disabled="true">Promotion</a>
-            </li>
           </ul>
           <div>
 

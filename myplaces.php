@@ -109,15 +109,13 @@ if ($_SESSION['Id_manager'] == "") {
               <a class="nav-link active" style="white-space: nowrap;" aria-current="page" href="home.php">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" style="white-space: nowrap;" aria-current="page" href="addplaces.php">Add Places</a>
+              <a class="nav-link active" style="white-space: nowrap;" aria-current="page" href="chooseAdd.php">Add Places</a>
             </li>
             <li class="nav-item">
               <a class="nav-link active" style="white-space: nowrap;" aria-current="page" href="myplaces.php">My Places</a>
             </li>
 
-            <li class="nav-item">
-              <a class="nav-link disabled" style="white-space: nowrap;" href="#" tabindex="-1" aria-disabled="true">Promotion</a>
-            </li>
+
           </ul>
           <div>
 
@@ -158,7 +156,7 @@ if ($_SESSION['Id_manager'] == "") {
 
     <div class="addplace ">
       <div style="width: 1000px; padding: 20px; white-space: nowrap; margin-left: 200px;">
-        <h1><b>รายการสถานที่ท่องเที่ยว</b></h1>
+        <h1><b>รายการสถานที่</b></h1>
       </div>
 
 
@@ -174,52 +172,113 @@ if ($_SESSION['Id_manager'] == "") {
 
 
 
-
     <?php
     include_once('functions.php');
-    $fetchdataowner = new DB_con();
-    $sql = $fetchdataowner->fetchdataowner($_SESSION['Id_manager']);
 
+    // Fetch data for places associated with the logged-in manager
+    $fetchdataplaces = new DB_con();
+    $sql = $fetchdataplaces->fetchdataAreaByManager($_SESSION['Id_manager']);
+
+    $index = 1;
+    $index1 = 1;
+
+    // Store the fetched data in an array
+    $rows = [];
+    while ($row = mysqli_fetch_array($sql)) {
+      $rows[] = $row;
+    }
+
+    foreach ($rows as $row) {
+    ?>
+      <div style="display: flex; justify-content: center; gap: 30px;">
+
+        <!-- สถานที่ท่องเที่ยว Section -->
+        <div class="container" style="font-size: 25px; background-color: #ffffff; width: 600px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
+          <b>สถานที่ท่องเที่ยว</b>
+          <div style="margin-top: 20px;">
+            <table class="table table-bordered" style="font-size: 15px;" id="placesTable">
+              <thead>
+                <tr>
+                  <th scope="col">ลำดับสถานที่</th>
+                  <th scope="col">รูปภาพหน้าปก</th>
+                  <th scope="col">รายการสถานที่ท่องเที่ยวหลัก</th>
+                  <th scope="col">แก้ไข</th>
+                  <th scope="col">ลบ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><?php echo $index++; ?></td>
+                  <td><img src="<?php echo $row['img_Area1']; ?>" alt="Image" width="100" height="100" style="border-radius: 10px;"></td>
+                  <td><?php echo $row['name_Area']; ?></td>
+                  <td><a href="updateAreaByMenager.php?id=<?php echo $row['id_Area']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
+                  <td><a href="deleteArea.php?del=<?php echo $row['id_Area']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <?php
+        include_once('functions.php');
+        $fetchdataowner = new DB_con();
+        $sql = $fetchdataowner->fetchdataowner($_SESSION['Id_manager']);
+
+        ?>
+        <!-- ร้านค้า เเละ ที่พัก Section -->
+        <div class="container" style="font-size: 25px; background-color: #ffffff; margin-left: -150px; width: 600px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
+          <b>ร้านค้า เเละ ที่พัก</b>
+          <div style="margin-top: 20px;">
+            <table class="table table-bordered" style="font-size: 15px;">
+              <thead>
+                <tr>
+                  <th scope="col">ลำดับสถานที่</th>
+                  <th scope="col">รูปภาพหน้าปก</th>
+                  <th scope="col">รายการร้านค้า เเละ ที่พักใกล้เคียง</th>
+                  <th scope="col">รายละเอียด</th>
+                  <th scope="col">ใกล้กับสถานที่ท่องเที่ยว</th>
+                  <th scope="col">เเก้ไข</th>
+                  <th scope="col">ลบ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php
+                while ($row = mysqli_fetch_array($sql)) {
+                ?>
+                  <tr>
+                    <td><?php echo $index1 ?></td>
+                    <?php $index1 = $index1 + 1; ?> <!-- Corrected line -->
+                    <td><img src="<?php echo $row['img_Places1']; ?>" alt="Image" width="100" height="100" style="border-radius: 10px;"></td>
+                    <td><?php echo $row['name_places']; ?></td>
+                    <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo $row['details_places']; ?></td>
+                    <?php
+                    // Fetch area name based on id_Area from area_info table
+                    $getAreaName = new DB_con();
+                    $areaInfo = $getAreaName->getAreaName($row['id_Area']);
+                    if ($areaInfo) {
+                      $areaData = mysqli_fetch_assoc($areaInfo);
+                      $areaName = isset($areaData['name_Area']) ? $areaData['name_Area'] : '';
+                    } else {
+                      $areaName = '';
+                    }
+                    ?>
+                    <td><?php echo $areaName; ?></td> <!-- Display area name -->
+                    <td><a href="updateplaces.php?id=<?php echo $row['id_places']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
+                    <td><a href="deleteplaces.php?del=<?php echo $row['id_places']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
+                  </tr>
+                <?php
+                }
+                ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    <?php
+    }
     ?>
 
 
-
-
-    <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px;box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
-      <b>สถานที่ท่องเที่ยว</b>
-      <div style="margin-top: 20px; ">
-        <table class="table table-bordered" style="font-size: 15px;">
-          <thead>
-            <tr>
-              <th scope="col">อยู่ในสถานที่หลัก</th>
-              <th scope="col">ชื่อสถานที่</th>
-              <th scope="col">ข้อมูลสถานที่</th>
-              <th scope="col">ที่อยู่สถานที่</th>
-              <th scope="col">เเก้ไข</th>
-              <th scope="col">ลบ</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            while ($row = mysqli_fetch_array($sql)) {
-            ?>
-              <tr>
-                <td><?php echo $row['id_Area']; ?></td>
-                <td><?php echo $row['name_places']; ?></td>
-                <td><?php echo $row['details_places']; ?></td>
-                <td><?php echo $row['contact_places']; ?></td>
-                <td><a href="updateplaces.php?id=<?php echo $row['id_places']; ?>">แก้ไข</a></td>
-                <td><a href="deleteplaces.php?del=<?php echo $row['id_places']; ?>">ลบ</a></td>
-              </tr>
-            <?php
-            }
-            ?>
-          </tbody>
-
-
-        </table>
-      </div>
-    </div>
   </body>
 
   </html>

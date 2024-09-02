@@ -175,6 +175,7 @@ if ($_SESSION['id_admin'] == "") {
             $Access_Status,
             $price_in,
             $name_typeArea,
+            $_SESSION['id_admin'],
             $id_Area
         );
 

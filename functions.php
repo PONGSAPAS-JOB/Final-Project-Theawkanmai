@@ -61,9 +61,15 @@ class DB_con
         return null;
     }
 
-    public function getinfomanager($id_manager)
+    public function getinfomanager($id_Manager)
     {
-        $getinfo = mysqli_query($this->dbcon, "SELECT email FROM manager WHERE Id_manager = '$id_manager' ");
+        $getinfo = mysqli_query($this->dbcon, "SELECT username FROM manager WHERE Id_manager = '$id_Manager' ");
+        return $getinfo;
+    }
+
+    public function getinfoadmin($id_Admin)
+    {
+        $getinfo = mysqli_query($this->dbcon, "SELECT username FROM admin WHERE id_admin = '$id_Admin' ");
         return $getinfo;
     }
 
@@ -127,26 +133,7 @@ class DB_con
         return $checkarea;
     }
 
-    public function addplaces($name_places, $details_places, $contact_places, $name_Area, $id_manager)
-    {
-        // First, retrieve the id_Area corresponding to the selected name_Area
-        $getAreaIdQuery = "SELECT id_Area FROM area_info WHERE name_Area = '$name_Area'";
-        $result = mysqli_query($this->dbcon, $getAreaIdQuery);
-        if ($result && mysqli_num_rows($result) > 0) {
-            // Fetch the id_Area from the result
-            $row = mysqli_fetch_assoc($result);
-            $id_Area = $row['id_Area'];
-            // Now, insert the place with the retrieved id_Area
-            $adplad = mysqli_query($this->dbcon, "INSERT INTO places_info(name_places, details_places, contact_places, id_Area, id_manager) VALUES ('$name_places', '$details_places', '$contact_places', '$id_Area', '$id_manager')");
-
-            return $adplad;
-        } else {
-
-            // Handle the case when the selected area is not found
-            return false; // or handle the error as needed
-        }
-    }
-    public function addplacesbyadmin(
+    public function addplaces(
         $tag_description,
         $name_Area,
         $name_places,
@@ -158,8 +145,6 @@ class DB_con
         $provi_Places,
         $post_code,
         $details_places,
-        $tour_type_descrip1,
-        $tour_type_descrip2,
         $filename1,
         $filename2,
         $filename3,
@@ -182,43 +167,163 @@ class DB_con
         $closetime_Fri,
         $closetime_Sat,
         $closetime_Sun,
-        $Access_Status,
-        $price_in,
+        $Id_manager
+
+    ) {
+        $getTagIdQuery = "SELECT id_tag FROM places_tag WHERE tag_description = '$tag_description'";
+        $result = mysqli_query($this->dbcon, $getTagIdQuery);
+        if ($result && mysqli_num_rows($result) > 0) {
+            // Fetch the id_Area from the result
+            $row = mysqli_fetch_assoc($result);
+            $id_tag = $row['id_tag'];
+
+            // First, retrieve the id_Area corresponding to the selected name_Area
+
+            // $getAreaIdQuery = "SELECT id_Area FROM area_info WHERE name_Area = '$name_Area'";
+            // $result = mysqli_query($this->dbcon, $getAreaIdQuery);
+            // if ($result && mysqli_num_rows($result) > 0) {
+            //     // Fetch the id_Area from the result
+            //     $row = mysqli_fetch_assoc($result);
+            //     $id_Area = $row['id_Area'];
+
+            // Now, insert the place with the retrieved id_Area
+            $adplad = mysqli_query($this->dbcon, "INSERT INTO places_info(
+                id_tag,
+        id_Area,
+        name_places,
+        latitude_Places,
+        longitude_Places,
+        address_Places,
+        sub_dis_Places,
+        dis_Places,
+        provi_Places,
+        post_code,
+        details_places,
+        img_Places1,
+        img_Places2,
+        img_Places3,
+        img_Places4,
+        has_Map,
+        phonenum_places,
+        email_places,
+        url_places,
+        ontime_Mon,
+        ontime_Tue,
+        ontime_Wed,
+        ontime_Thu,
+        ontime_Fri,
+        ontime_Sat,
+        ontime_Sun,
+        closetime_Mon,
+        closetime_Tue,
+        closetime_Wed,
+        closetime_Thu,
+        closetime_Fri,
+        closetime_Sat,
+        closetime_Sun,
+        Id_manager
+        ) 
+        VALUES (
+        '$id_tag',
+        '$name_Area',
+        '$name_places',
+        '$latitude_Places',
+        '$longitude_Places',
+        '$address_Places',
+        '$sub_dis_Places',
+        '$dis_Places',
+        '$provi_Places',
+        '$post_code', 
+        '$details_places',
+        '$filename1',
+        '$filename2',
+        '$filename3',
+        '$filename4',
+        '$has_Map',
+        '$phonenum_places',
+        '$email_places',
+        '$url_places',
+        '$ontime_Mon',
+        '$ontime_Tue',
+        '$ontime_Wed',
+        '$ontime_Thu',
+        '$ontime_Fri',
+        '$ontime_Sat',
+        '$ontime_Sun',
+        '$closetime_Mon',
+        '$closetime_Tue',
+        '$closetime_Wed',
+        '$closetime_Thu',
+        '$closetime_Fri',
+        '$closetime_Sat',
+        '$closetime_Sun',
+        '$Id_manager'
+        )
+        ");
+
+            return $adplad;
+        } else {
+
+            // Handle the case when the selected area is not found
+            return false; // or handle the error as needed
+        }
+    }
+
+    public function addplacesbyadmin(
+        $tag_description,
+        $name_Area,
+        $name_places,
+        $latitude_Places,
+        $longitude_Places,
+        $address_Places,
+        $sub_dis_Places,
+        $dis_Places,
+        $provi_Places,
+        $post_code,
+        $details_places,
+        $filename1,
+        $filename2,
+        $filename3,
+        $filename4,
+        $has_Map,
+        $phonenum_places,
+        $email_places,
+        $url_places,
+        $ontime_Mon,
+        $ontime_Tue,
+        $ontime_Wed,
+        $ontime_Thu,
+        $ontime_Fri,
+        $ontime_Sat,
+        $ontime_Sun,
+        $closetime_Mon,
+        $closetime_Tue,
+        $closetime_Wed,
+        $closetime_Thu,
+        $closetime_Fri,
+        $closetime_Sat,
+        $closetime_Sun,
         $id_Admin
 
     ) {
-        $getAreatourIdQuery1 = "SELECT tour_type_id FROM tour_type WHERE tour_type_descrip = '$tour_type_descrip1'";
-        $result = mysqli_query($this->dbcon, $getAreatourIdQuery1);
+        $getTagIdQuery = "SELECT id_tag FROM places_tag WHERE tag_description = '$tag_description'";
+        $result = mysqli_query($this->dbcon, $getTagIdQuery);
         if ($result && mysqli_num_rows($result) > 0) {
-            // Fetch the tour_type_id from the result
+            // Fetch the id_Area from the result
             $row = mysqli_fetch_assoc($result);
-            $tour_Type_id_1 = $row['tour_type_id'];
+            $id_tag = $row['id_tag'];
 
-            $getAreatourIdQuery2 = "SELECT tour_type_id FROM tour_type WHERE tour_type_descrip = '$tour_type_descrip2'";
-            $result = mysqli_query($this->dbcon, $getAreatourIdQuery2);
-            if ($result && mysqli_num_rows($result) > 0) {
-                // Fetch the tour_type_id from the result
-                $row = mysqli_fetch_assoc($result);
-                $tour_Type_id_2 = $row['tour_type_id'];
+            // First, retrieve the id_Area corresponding to the selected name_Area
 
-                $getTagIdQuery = "SELECT id_tag FROM places_tag WHERE tag_description = '$tag_description'";
-                $result = mysqli_query($this->dbcon, $getTagIdQuery);
-                if ($result && mysqli_num_rows($result) > 0) {
-                    // Fetch the id_Area from the result
-                    $row = mysqli_fetch_assoc($result);
-                    $id_tag = $row['id_tag'];
+            // $getAreaIdQuery = "SELECT id_Area FROM area_info WHERE name_Area = '$name_Area'";
+            // $result = mysqli_query($this->dbcon, $getAreaIdQuery);
+            // if ($result && mysqli_num_rows($result) > 0) {
+            //     // Fetch the id_Area from the result
+            //     $row = mysqli_fetch_assoc($result);
+            //     $id_Area = $row['id_Area'];
 
-                    // First, retrieve the id_Area corresponding to the selected name_Area
-
-                    // $getAreaIdQuery = "SELECT id_Area FROM area_info WHERE name_Area = '$name_Area'";
-                    // $result = mysqli_query($this->dbcon, $getAreaIdQuery);
-                    // if ($result && mysqli_num_rows($result) > 0) {
-                    //     // Fetch the id_Area from the result
-                    //     $row = mysqli_fetch_assoc($result);
-                    //     $id_Area = $row['id_Area'];
-
-                    // Now, insert the place with the retrieved id_Area
-                    $adplad = mysqli_query($this->dbcon, "INSERT INTO places_info(
+            // Now, insert the place with the retrieved id_Area
+            $adplad = mysqli_query($this->dbcon, "INSERT INTO places_info(
                     id_tag,
             id_Area,
             name_places,
@@ -230,8 +335,6 @@ class DB_con
             provi_Places,
             post_code,
             details_places,
-            tour_Type_id_1,
-            tour_Type_id_2,
             img_Places1,
             img_Places2,
             img_Places3,
@@ -254,8 +357,6 @@ class DB_con
             closetime_Fri,
             closetime_Sat,
             closetime_Sun,
-            Access_Status,
-            price_in,
             id_Admin
             ) 
             VALUES (
@@ -270,8 +371,6 @@ class DB_con
             '$provi_Places',
             '$post_code', 
             '$details_places',
-            '$tour_Type_id_1',
-            '$tour_Type_id_2',
             '$filename1',
             '$filename2',
             '$filename3',
@@ -294,19 +393,15 @@ class DB_con
             '$closetime_Fri',
             '$closetime_Sat',
             '$closetime_Sun',
-            '$Access_Status',
-            '$price_in',
             '$id_Admin'
             )
             ");
 
-                    return $adplad;
-                } else {
+            return $adplad;
+        } else {
 
-                    // Handle the case when the selected area is not found
-                    return false; // or handle the error as needed
-                }
-            }
+            // Handle the case when the selected area is not found
+            return false; // or handle the error as needed
         }
     }
 
@@ -348,8 +443,8 @@ class DB_con
         $closetime_Sun,
         $Access_Status,
         $price_in,
-        $name_typeArea
-
+        $name_typeArea,
+        $id_Admin
 
     ) {
         $getAreatypeIdQuery = "SELECT id_type_area FROM area_type_info WHERE name_typeArea = '$name_typeArea'";
@@ -387,7 +482,7 @@ class DB_con
     ontime_Mon,ontime_Tue,ontime_Wed,ontime_Thu,ontime_Fri,ontime_Sat,ontime_Sun,
     closetime_Mon,closetime_Tue,closetime_Wed,closetime_Thu,closetime_Fri,closetime_Sat,closetime_Sun,
     Access_Status,
-    price_in,id_type_area
+    price_in,id_type_area,id_Admin
     ) 
     VALUE(
         '$name_Area','$latitude_Area', '$longitude_Area', '$address_Area',' $sub_dis_Area','$dis_Area','$provi_Area','$post_code',
@@ -397,7 +492,101 @@ class DB_con
     '$ontime_Mon','$ontime_Tue','$ontime_Wed','$ontime_Thu','$ontime_Fri','$ontime_Sat','$ontime_Sun',
     '$closetime_Mon','$closetime_Tue','$closetime_Wed','$closetime_Thu','$closetime_Fri','$closetime_Sat','$closetime_Sun',
     '$Access_Status',
-    '$price_in','$id_type_area'
+    '$price_in','$id_type_area','$id_Admin'
+    )");
+                    return $addarea;
+                }
+            }
+        }
+    }
+
+    public function addareabymenager(
+        $name_Area,
+        $latitude_Area,
+        $longitude_Area,
+        $address_Area,
+        $sub_dis_Area,
+        $dis_Area,
+        $provi_Area,
+        $post_code,
+        $info_Area,
+        $activityinfo_Area,
+        $tour_type_descrip1,
+        $tour_type_descrip2,
+        $filename1,
+        $filename2,
+        $filename3,
+        $filename4,
+        $has_map_Area,
+        $phonenum_Area,
+        $email_Area,
+        $url_Area,
+        $ontime_Mon,
+        $ontime_Tue,
+        $ontime_Wed,
+        $ontime_Thu,
+        $ontime_Fri,
+        $ontime_Sat,
+        $ontime_Sun,
+        $closetime_Mon,
+        $closetime_Tue,
+        $closetime_Wed,
+        $closetime_Thu,
+        $closetime_Fri,
+        $closetime_Sat,
+        $closetime_Sun,
+        $Access_Status,
+        $price_in,
+        $name_typeArea,
+        $Id_manager
+
+    ) {
+        $getAreatypeIdQuery = "SELECT id_type_area FROM area_type_info WHERE name_typeArea = '$name_typeArea'";
+        $result = mysqli_query($this->dbcon, $getAreatypeIdQuery);
+        if ($result && mysqli_num_rows($result) > 0) {
+            // Fetch the id_type_area from the result
+            $row = mysqli_fetch_assoc($result);
+            $id_type_area = $row['id_type_area'];
+
+
+
+            $getAreatourIdQuery1 = "SELECT tour_type_id FROM tour_type WHERE tour_type_descrip = '$tour_type_descrip1'";
+            $result = mysqli_query($this->dbcon, $getAreatourIdQuery1);
+            if ($result && mysqli_num_rows($result) > 0) {
+                // Fetch the tour_type_id from the result
+                $row = mysqli_fetch_assoc($result);
+                $tour_Type_id_1 = $row['tour_type_id'];
+
+                $getAreatourIdQuery2 = "SELECT tour_type_id FROM tour_type WHERE tour_type_descrip = '$tour_type_descrip2'";
+                $result = mysqli_query($this->dbcon, $getAreatourIdQuery2);
+                if ($result && mysqli_num_rows($result) > 0) {
+                    // Fetch the tour_type_id from the result
+                    $row = mysqli_fetch_assoc($result);
+                    $tour_Type_id_2 = $row['tour_type_id'];
+
+
+
+
+                    $addarea = mysqli_query($this->dbcon, "INSERT INTO area_info(
+            name_Area, latitude_Area, longitude_Area,address_Area,sub_dis_Area,
+        dis_Area,provi_Area,post_code,
+    info_Area,activityinfo_Area,tour_Type_id_1,tour_Type_id_2,
+    img_Area1,img_Area2,img_Area3,img_Area4,
+    has_map_Area,phonenum_Area,email_Area,url_Area,
+    ontime_Mon,ontime_Tue,ontime_Wed,ontime_Thu,ontime_Fri,ontime_Sat,ontime_Sun,
+    closetime_Mon,closetime_Tue,closetime_Wed,closetime_Thu,closetime_Fri,closetime_Sat,closetime_Sun,
+    Access_Status,
+    price_in,id_type_area,id_Manager
+    ) 
+    VALUE(
+        '$name_Area','$latitude_Area', '$longitude_Area', '$address_Area',' $sub_dis_Area','$dis_Area','$provi_Area','$post_code',
+    '$info_Area','$activityinfo_Area',$tour_Type_id_1,$tour_Type_id_2,
+    '$filename1','$filename2','$filename3','$filename4'
+    ,'$has_map_Area','$phonenum_Area','$email_Area','$url_Area',
+    '$ontime_Mon','$ontime_Tue','$ontime_Wed','$ontime_Thu','$ontime_Fri','$ontime_Sat','$ontime_Sun',
+    '$closetime_Mon','$closetime_Tue','$closetime_Wed','$closetime_Thu','$closetime_Fri','$closetime_Sat','$closetime_Sun',
+    '$Access_Status',
+    '$price_in','$id_type_area','$Id_manager'
     )");
                     return $addarea;
                 }
@@ -411,6 +600,14 @@ class DB_con
         $result = mysqli_query($this->dbcon, "SELECT * FROM area_info");
         return $result;
     }
+
+    public function fetchdataAreaByManager($id_manager)
+    {
+        $sql = "SELECT * FROM area_info WHERE id_manager = '$id_manager'";
+        $result = $this->dbcon->query($sql);
+        return $result;
+    }
+
 
 
     public function fetchdataareapage($start_from, $results_per_page)
@@ -515,18 +712,7 @@ class DB_con
 
 
 
-    public function updateplaces($name_places, $details_places, $contact_places, $id_places)
-    {
-        $result = mysqli_query($this->dbcon, "UPDATE places_info SET 
-                    name_places = '$name_places',
-                    details_places = '$details_places',
-                    contact_places = '$contact_places'
-                    WHERE id_places = '$id_places'
-                    ");
-        return $result;
-    }
-
-    public function updateplacesbyAD(
+    public function updateplaces(
         $tag_description,
         $name_Area,
         $name_places,
@@ -538,8 +724,6 @@ class DB_con
         $provi_Places,
         $post_code,
         $details_places,
-        $tour_type_descrip1,
-        $tour_type_descrip2,
         $filename1,
         $filename2,
         $filename3,
@@ -562,21 +746,12 @@ class DB_con
         $closetime_Fri,
         $closetime_Sat,
         $closetime_Sun,
-        $Access_Status,
-        $price_in,
-        $id_Admin,
+        $Id_manager,
         $id_places
     ) {
-        $getTagIdQuery = "SELECT id_tag FROM places_tag WHERE tag_description = '$tag_description'";
-        $result = mysqli_query($this->dbcon, $getTagIdQuery);
-        if ($result && mysqli_num_rows($result) > 0) {
-            // Fetch the id_Area from the result
-            $row = mysqli_fetch_assoc($result);
-            $id_tag = $row['id_tag'];
 
-
-            $updateQuery = "UPDATE places_info SET
-                            id_tag = '$id_tag', 
+        $updateQuery = "UPDATE places_info SET
+                            id_tag = '$tag_description', 
                             id_Area = '$name_Area',
                             name_places = '$name_places',
                             latitude_Places = '$latitude_Places',
@@ -587,8 +762,6 @@ class DB_con
                             provi_Places = '$provi_Places',
                             post_code = '$post_code',
                             details_places = '$details_places',
-                            tour_Type_id_1 = '$tour_type_descrip1',
-                            tour_Type_id_2 = '$tour_type_descrip2',
                             img_Places1 = '$filename1',
                             img_Places2 = '$filename2',
                             img_Places3 = '$filename3',
@@ -611,18 +784,99 @@ class DB_con
                             closetime_Fri = '$closetime_Fri',
                             closetime_Sat = '$closetime_Sat',
                             closetime_Sun = '$closetime_Sun',
-                            Access_Status = '$Access_Status',
-                            price_in = '$price_in',
+                            Id_manager = '$Id_manager'
+                            WHERE id_places = '$id_places'";
+
+        $result = mysqli_query($this->dbcon, $updateQuery);
+        if ($result) {
+            return true;
+        } else {
+            // Error occurred during the update
+            die('Error: ' . mysqli_error($this->dbcon));
+        }
+    }
+
+    public function updateplacesbyAD(
+        $tag_description,
+        $name_Area,
+        $name_places,
+        $latitude_Places,
+        $longitude_Places,
+        $address_Places,
+        $sub_dis_Places,
+        $dis_Places,
+        $provi_Places,
+        $post_code,
+        $details_places,
+        $filename1,
+        $filename2,
+        $filename3,
+        $filename4,
+        $has_Map,
+        $phonenum_places,
+        $email_places,
+        $url_places,
+        $ontime_Mon,
+        $ontime_Tue,
+        $ontime_Wed,
+        $ontime_Thu,
+        $ontime_Fri,
+        $ontime_Sat,
+        $ontime_Sun,
+        $closetime_Mon,
+        $closetime_Tue,
+        $closetime_Wed,
+        $closetime_Thu,
+        $closetime_Fri,
+        $closetime_Sat,
+        $closetime_Sun,
+        $id_Admin,
+        $id_places
+    ) {
+
+        $updateQuery = "UPDATE places_info SET
+                            id_tag = '$tag_description', 
+                            id_Area = '$name_Area',
+                            name_places = '$name_places',
+                            latitude_Places = '$latitude_Places',
+                            longitude_Places = '$longitude_Places',
+                            address_Places = '$address_Places',
+                            sub_dis_Places = '$sub_dis_Places',
+                            dis_Places = '$dis_Places',
+                            provi_Places = '$provi_Places',
+                            post_code = '$post_code',
+                            details_places = '$details_places',
+                            img_Places1 = '$filename1',
+                            img_Places2 = '$filename2',
+                            img_Places3 = '$filename3',
+                            img_Places4 = '$filename4',
+                            has_Map = '$has_Map',
+                            phonenum_places = '$phonenum_places',
+                            email_places = '$email_places',
+                            url_places = '$url_places',
+                            ontime_Mon = '$ontime_Mon',
+                            ontime_Tue = '$ontime_Tue',
+                            ontime_Wed = '$ontime_Wed',
+                            ontime_Thu = '$ontime_Thu',
+                            ontime_Fri = '$ontime_Fri',
+                            ontime_Sat = '$ontime_Sat',
+                            ontime_Sun = '$ontime_Sun',
+                            closetime_Mon = '$closetime_Mon',
+                            closetime_Tue = '$closetime_Tue',
+                            closetime_Wed = '$closetime_Wed',
+                            closetime_Thu = '$closetime_Thu',
+                            closetime_Fri = '$closetime_Fri',
+                            closetime_Sat = '$closetime_Sat',
+                            closetime_Sun = '$closetime_Sun',
                             id_Admin = '$id_Admin'
                             WHERE id_places = '$id_places'";
 
-            $result = mysqli_query($this->dbcon, $updateQuery);
-            if ($result) {
-                return true;
-            } else {
-                // Error occurred during the update
-                die('Error: ' . mysqli_error($this->dbcon));
-            }
+        $result = mysqli_query($this->dbcon, $updateQuery);
+        if ($result) {
+            return true;
+        } else {
+            // Error occurred during the update
+            die('Error: ' . mysqli_error($this->dbcon));
         }
     }
 
@@ -671,6 +925,7 @@ class DB_con
         $Access_Status,
         $price_in,
         $name_typeArea,
+        $id_Admin,
         $id_Area
     ) {
         $result = mysqli_query($this->dbcon, "UPDATE area_info SET 
@@ -710,11 +965,99 @@ class DB_con
                     closetime_Sun = '$closetime_Sun',
                     Access_Status = '$Access_Status',
                     price_in = '$price_in',
-                    id_type_area = '$name_typeArea'
+                    id_type_area = '$name_typeArea',
+                    id_Admin = '$id_Admin'
                     WHERE id_Area = '$id_Area'
                     ");
         return $result;
     }
+
+    public function updateAreabymenager(
+        $name_Area,
+        $latitude_Area,
+        $longitude_Area,
+        $address_Area,
+        $sub_dis_Area,
+        $dis_Area,
+        $provi_Area,
+        $post_code,
+        $info_Area,
+        $activityinfo_Area,
+        $tour_type_descrip1,
+        $tour_type_descrip2,
+        $filename1,
+        $filename2,
+        $filename3,
+        $filename4,
+        $has_map_Area,
+        $phonenum_Area,
+        $email_Area,
+        $url_Area,
+        $ontime_Mon,
+        $ontime_Tue,
+        $ontime_Wed,
+        $ontime_Thu,
+        $ontime_Fri,
+        $ontime_Sat,
+        $ontime_Sun,
+        $closetime_Mon,
+        $closetime_Tue,
+        $closetime_Wed,
+        $closetime_Thu,
+        $closetime_Fri,
+        $closetime_Sat,
+        $closetime_Sun,
+        $Access_Status,
+        $price_in,
+        $name_typeArea,
+        $Id_manager,
+        $id_Area
+    ) {
+        $result = mysqli_query($this->dbcon, "UPDATE area_info SET 
+                    name_Area = '$name_Area',
+                    latitude_Area = '$latitude_Area',
+                    longitude_Area = '$longitude_Area',
+                    address_Area = '$address_Area',
+                    sub_dis_Area = '$sub_dis_Area',
+                    dis_Area = '$dis_Area',
+                    provi_Area = '$provi_Area',
+                    post_code = '$post_code',
+                    info_Area = '$info_Area',
+                    activityinfo_Area = '$activityinfo_Area',
+                    tour_Type_id_1 = '$tour_type_descrip1',
+                    tour_Type_id_2 = '$tour_type_descrip2',
+                    img_Area1 = '$filename1',
+                    img_Area2 = '$filename2',
+                    img_Area3 = '$filename3',
+                    img_Area4 = '$filename4',
+                    has_map_Area = '$has_map_Area',
+                    phonenum_Area = '$phonenum_Area',
+                    email_Area = '$email_Area',
+                    url_Area = '$url_Area',
+                    ontime_Mon = '$ontime_Mon',
+                    ontime_Tue = '$ontime_Tue',
+                    ontime_Wed = '$ontime_Wed',
+                    ontime_Thu = '$ontime_Thu',
+                    ontime_Fri = '$ontime_Fri',
+                    ontime_Sat = '$ontime_Sat',
+                    ontime_Sun = '$ontime_Sun',
+                    closetime_Mon = '$closetime_Mon',
+                    closetime_Tue = '$closetime_Tue',
+                    closetime_Wed = '$closetime_Wed',
+                    closetime_Thu = '$closetime_Thu',
+                    closetime_Fri = '$closetime_Fri',
+                    closetime_Sat = '$closetime_Sat',
+                    closetime_Sun = '$closetime_Sun',
+                    Access_Status = '$Access_Status',
+                    price_in = '$price_in',
+                    id_type_area = '$name_typeArea',
+                    Id_manager = '$Id_manager'
+                    WHERE id_Area = '$id_Area'
+                    ");
+        return $result;
+    }
+
+
 
 
 

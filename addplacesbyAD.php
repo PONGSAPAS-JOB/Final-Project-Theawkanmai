@@ -14,23 +14,18 @@ if ($_SESSION['id_admin'] == "") {
     <?php
     include_once('functions.php');
     $userdata = new DB_con();
-
     if (isset($_POST['insert'])) {
-
+        $tag_description = $_POST['tag_description'];
         $name_Area = $_POST['name_Area'];
-        $latitude_Area = $_POST['latitude_Area'];
-        $longitude_Area = $_POST['longitude_Area'];
-        $address_Area = $_POST['address'];
-        $sub_dis_Area = $_POST['sub_dis_Area'];
-        $dis_Area = $_POST['dis_Area'];
-        $provi_Area = $_POST['provi_Area'];
+        $name_places = $_POST['name_places'];
+        $latitude_Places = $_POST['latitude_Places'];
+        $longitude_Places = $_POST['longitude_Places'];
+        $address_Places = $_POST['address'];
+        $sub_dis_Places = $_POST['sub_dis_Places'];
+        $dis_Places = $_POST['dis_Places'];
+        $provi_Places = $_POST['provi_Places'];
         $post_code = $_POST['post_code'];
-        $info_Area = $_POST['info_Area'];
-        $activityinfo_Area = $_POST['activityinfo_Area'];
-
-        $tour_type_descrip1 = $_POST['tour_type_descrip1'];
-        $tour_type_descrip2 = $_POST['tour_type_descrip2'];
-
+        $details_places = $_POST['details_places'];
 
 
         //รูปภาพที่ 1
@@ -45,19 +40,19 @@ if ($_SESSION['id_admin'] == "") {
         //รูปภาพที่ 4
         $filename4 = $_POST["uploadfile4"];
 
-        $has_map_Area = $_POST['has_map_Area'];
-        $phonenum_Area = $_POST['phonenum_Area'];
+        $has_Map = $_POST['has_Map'];
+        $phonenum_places = $_POST['phonenum_places'];
 
-        if (isset($_POST['email_Area'])) {
-            $email_Area = $_POST['email_Area'];
+        if (isset($_POST['email_places'])) {
+            $email_places = $_POST['email_places'];
         } else {
-            $email_Area = '';
+            $email_places = '';
         }
 
-        if (isset($_POST['url_Area'])) {
-            $url_Area = $_POST['url_Area'];
+        if (isset($_POST['url_places'])) {
+            $url_places = $_POST['url_places'];
         } else {
-            $url_Area = '';
+            $url_places = '';
         }
         //เวลาเปิด
         if (isset($_POST['ontime_Mon'])) {
@@ -132,39 +127,28 @@ if ($_SESSION['id_admin'] == "") {
             $closetime_Sun = '';
         }
 
-        $Access_Status = $_POST['Access_Status'];
-
-        if (isset($_POST['price_in'])) {
-            $price_in = $_POST['price_in'];
-        } else {
-            $price_in = '';
-        }
-
-        $name_typeArea = $_POST['name_typeArea'];
 
 
-
-        $sql = $userdata->addarea(
+        $sql = $userdata->addplacesbyadmin(
+            $tag_description,
             $name_Area,
-            $latitude_Area,
-            $longitude_Area,
-            $address_Area,
-            $sub_dis_Area,
-            $dis_Area,
-            $provi_Area,
+            $name_places,
+            $latitude_Places,
+            $longitude_Places,
+            $address_Places,
+            $sub_dis_Places,
+            $dis_Places,
+            $provi_Places,
             $post_code,
-            $info_Area,
-            $activityinfo_Area,
-            $tour_type_descrip1,
-            $tour_type_descrip2,
+            $details_places,
             $filename1,
             $filename2,
             $filename3,
             $filename4,
-            $has_map_Area,
-            $phonenum_Area,
-            $email_Area,
-            $url_Area,
+            $has_Map,
+            $phonenum_places,
+            $email_places,
+            $url_places,
             $ontime_Mon,
             $ontime_Tue,
             $ontime_Wed,
@@ -179,52 +163,44 @@ if ($_SESSION['id_admin'] == "") {
             $closetime_Fri,
             $closetime_Sat,
             $closetime_Sun,
-            $Access_Status,
-            $price_in,
-            $name_typeArea
 
-
+            $_SESSION['id_admin']
         );
-
-
         if ($sql) {
-            // echo "<script>alert('Add Area Success!');</script>";
+            // echo "<script>alert('Add Places Success!');</script>";
             // echo "<script>window.location.href='areaandplacesMG.php'</script>";
-            echo   "<script>
+            echo  "<script>
                 $(document).ready(function() {
                     Swal.fire({
-                        title: 'Add Area Success!',
+                        title: 'Add Places Success!',
                         text: 'กำลังบันทึกข้อมูลสถานที่',
                         icon: 'success',
                         timer: 1000,
                         showConfirmButton: false
                     }).then(() => {
-                        window.location.href = 'Areamanagement.php';
+                        window.location.href = 'areaandplacesMG.php';
                     });
                 });
             </script>";
         } else {
-            // echo "<script>alert('Add Area Failed!');</script>";
-            // echo "<script>window.location.href='addarea.php'</script>";
-            // echo error_reporting();
-            echo   "<script>
+            // echo "<script>alert('Add Places Failed!');</script>";
+            // echo "<script>window.location.href='addplacesbyAD.php'</script>";
+            echo  "<script>
                 $(document).ready(function() {
                     Swal.fire({
-                        title: 'Add Area Failed!',
+                        title: 'Add Places Failed!',
                         text: 'ไม่สามารถเพิ่มสถานที่ได้ โปรดลองอีกครั้ง!',
                         icon: 'error',
-                        
+                        timer: 3000,
                         showConfirmButton: false
                     }).then(() => {
-                       history.back();
+                        history.back();
                     });
                 });
             </script>";
         }
     }
-    //window.location.href = 'addarea.php';
     ?>
-
     <!DOCTYPE html>
     <html lang="en">
 
@@ -721,30 +697,30 @@ if ($_SESSION['id_admin'] == "") {
 
                             // Add a click event listener to the map
                             map.addListener("click", (event) => {
-                                const latitude_Area = event.latLng.lat();
-                                const longitude_Area = event.latLng.lng();
+                                const latitude_Places = event.latLng.lat();
+                                const longitude_Places = event.latLng.lng();
 
                                 // Convert latitude and longitude to address
                                 const geocoder = new google.maps.Geocoder();
 
                                 geocoder.geocode({
                                     location: {
-                                        lat: latitude_Area,
-                                        lng: longitude_Area
+                                        lat: latitude_Places,
+                                        lng: longitude_Places
                                     }
                                 }, (results, status) => {
                                     if (status === "OK") {
                                         const addressComponents = parseAddressComponents(results[0].address_components);
                                         const filteredAddress = filterAddressComponents(results[0].address_components);
-                                        const googleMapLink = `https://www.google.com/maps?q=${latitude_Area},${longitude_Area}`;
+                                        const googleMapLink = `https://www.google.com/maps?q=${latitude_Places},${longitude_Places}`;
 
-                                        document.getElementById("latitude_Area").value = latitude_Area.toFixed(4);
-                                        document.getElementById("longitude_Area").value = longitude_Area.toFixed(4);
+                                        document.getElementById("latitude_Places").value = latitude_Places.toFixed(4);
+                                        document.getElementById("longitude_Places").value = longitude_Places.toFixed(4);
                                         document.getElementById("address").value = filteredAddress;
-                                        document.getElementById("sub_dis_Area").value = addressComponents.subdistrict || "";
-                                        document.getElementById("dis_Area").value = addressComponents.district || "";
-                                        document.getElementById("provi_Area").value = addressComponents.province || "";
-                                        document.getElementById("has_map_Area").value = googleMapLink;
+                                        document.getElementById("sub_dis_Places").value = addressComponents.subdistrict || "";
+                                        document.getElementById("dis_Places").value = addressComponents.district || "";
+                                        document.getElementById("provi_Places").value = addressComponents.province || "";
+                                        document.getElementById("has_Map").value = googleMapLink;
 
                                         const postalCode = results[0].address_components.find(
                                             (component) => component.types.includes("postal_code")
@@ -757,8 +733,8 @@ if ($_SESSION['id_admin'] == "") {
                                         // Add a new marker
                                         marker = new google.maps.Marker({
                                             position: {
-                                                lat: latitude_Area,
-                                                lng: longitude_Area
+                                                lat: latitude_Places,
+                                                lng: longitude_Places
                                             },
                                             map: map,
                                             icon: {
@@ -807,17 +783,17 @@ if ($_SESSION['id_admin'] == "") {
                     </script>
                     <div style="margin-left: 50px; margin-top: 30px; width: 420px;">
                         <div class="mb-3" style=" width: 425px;">
-                            <label for="has_map_Area" class="form-label required-label">Link Google Map</label>
-                            <input type="text" class="form-control" id="has_map_Area" name="has_map_Area" aria-describedby="ลิ้งค์เเผนที่" required>
+                            <label for="has_Map" class="form-label required-label">Link Google Map</label>
+                            <input type="text" class="form-control" id="has_Map" name="has_Map" aria-describedby="ลิ้งค์เเผนที่" required>
                         </div>
                         <div style="display: flex; width: 425px;">
                             <div class="mb-3" style="margin-right: 30px; width: 300px;">
-                                <label for="latitude_Area" class="form-label required-label">Latitude ของสถานที่</label>
-                                <input type="text" class="form-control " id="latitude_Area" name="latitude_Area" aria-describedby="Latitude ของสถานที่" required>
+                                <label for="latitude_Places" class="form-label required-label">Latitude ของสถานที่</label>
+                                <input type="text" class="form-control " id="latitude_Places" name="latitude_Places" aria-describedby="Latitude ของสถานที่" required>
                             </div>
                             <div class="mb-3" style=" width: 300px;">
-                                <label for="longitude_Area" class="form-label required-label">Longitude ของสถานที่</label>
-                                <input type="text" class="form-control " id="longitude_Area" name="longitude_Area" aria-describedby="Longitude ของสถานที่" required>
+                                <label for="longitude_Places" class="form-label required-label">Longitude ของสถานที่</label>
+                                <input type="text" class="form-control " id="longitude_Places" name="longitude_Places" aria-describedby="Longitude ของสถานที่" required>
                             </div>
 
                         </div>
@@ -830,18 +806,18 @@ if ($_SESSION['id_admin'] == "") {
                         </div>
                         <div style="display: flex; width: 425px;">
                             <div class="mb-3" style="margin-right: 30px; width: 300px;">
-                                <label for="sub_dis_Area" class="form-label required-label">ตำบล</label>
-                                <input type="text" class="form-control" id="sub_dis_Area" name="sub_dis_Area" aria-describedby="ตำบล" required>
+                                <label for="sub_dis_Places" class="form-label required-label">ตำบล</label>
+                                <input type="text" class="form-control" id="sub_dis_Places" name="sub_dis_Places" aria-describedby="ตำบล" required>
                             </div>
                             <div class="mb-3" style=" width: 300px;">
-                                <label for="dis_Area" class="form-label required-label">อำเภอ</label>
-                                <input type="text" class="form-control" id="dis_Area" name="dis_Area" aria-describedby="อำเภอ" required>
+                                <label for="dis_Places" class="form-label required-label">อำเภอ</label>
+                                <input type="text" class="form-control" id="dis_Places" name="dis_Places" aria-describedby="อำเภอ" required>
                             </div>
                         </div>
                         <div style="display: flex; width: 425px;">
                             <div class="mb-3" style="margin-right: 30px; width: 300px;">
-                                <label for="provi_Area" class="form-label required-label">จังหวัด</label>
-                                <input type="text" class="form-control" id="provi_Area" name="provi_Area" aria-describedby="จังหวัด" required>
+                                <label for="provi_Places" class="form-label required-label">จังหวัด</label>
+                                <input type="text" class="form-control" id="provi_Places" name="provi_Places" aria-describedby="จังหวัด" required>
                             </div>
                             <div class="mb-3" style=" width: 300px;">
                                 <label for="post_code" class="form-label required-label">รหัสไปรษณีย์</label>
@@ -880,100 +856,6 @@ if ($_SESSION['id_admin'] == "") {
                     </textarea>
                 </div>
 
-
-                <?php
-                include_once('functions.php');
-                $fetchdataTypetour = new DB_con();
-                $sqlTypetour = $fetchdataTypetour->fetchdataTypetour();
-                $tourTypes = [];
-                while ($rowTypetour = mysqli_fetch_array($sqlTypetour)) {
-                    $tourTypes[] = $rowTypetour['tour_type_descrip'];
-                }
-                ?>
-                <div style="display: flex; ">
-                    <div class="mb-3" style="margin-right: 50px; width: 400px;">
-                        <label for="tour_type_descrip1" class="form-label required-label">กลุ่มนักท่องเที่ยวเป้าหมาย กลุ่มที่ 1</label>
-                        <select class="form-select" id="tour_type_descrip1" name="tour_type_descrip1" aria-describedby="ประเภท" required>
-                            <option value="" disabled selected>โปรดเลือกกลุ่มนักท่องเที่ยว</option>
-                            <?php foreach ($tourTypes as $type) { ?>
-                                <option value='<?php echo $type; ?>'><?php echo $type; ?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-
-                    <div class="mb-3" style=" width: 400px;">
-                        <label for="tour_type_descrip2" class="form-label required-label">กลุ่มนักท่องเที่ยวเป้าหมาย กลุ่มที่ 2</label>
-                        <select class="form-select" id="tour_type_descrip2" name="tour_type_descrip2" aria-describedby="ประเภท" required>
-                            <option value="" disabled selected>โปรดเลือกกลุ่มนักท่องเที่ยว</option>
-                            <?php foreach ($tourTypes as $type) { ?>
-                                <option value='<?php echo $type; ?>'><?php echo $type; ?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                    <button id="addtypetourButton" class="btnaddtt rounded"><i class="fa fa-plus"></i></button>
-
-                    <script>
-                        $(document).ready(function() {
-                            $('#addtypetourButton').click(function() {
-                                Swal.fire({
-                                    title: 'คุณต้องการเพิ่มประเภทของนักท่องเที่ยวหรือไม่?',
-                                    text: "กำลังจะเข้าสู่หน้าเพิ่มประเภทของนักท่องเที่ยว ข้อมูลที่กรอกไว้จะต้องเริ่มต้นกรอกใหม่",
-                                    icon: 'warning',
-                                    showCancelButton: true,
-                                    confirmButtonColor: '#3085d6',
-                                    cancelButtonColor: '#d33',
-                                    confirmButtonText: 'ใช่ฉันต้องการเพิ่ม!',
-                                    cancelButtonText: 'ยังก่อน'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        Swal.fire({
-                                            title: 'กำลังเข้าสู่หน้าเพิ่มประเภทของนักท่องเที่ยว',
-
-                                            icon: 'success',
-                                            timer: 1000,
-                                            showConfirmButton: false
-                                        }).then(() => {
-                                            window.location.href = 'tourtypeMG.php';
-                                        });
-
-                                    }
-                                });
-                            });
-                        });
-                    </script>
-
-                </div>
-
-
-                <script>
-                    document.getElementById('tour_type_descrip1').addEventListener('change', function() {
-                        var selectedValue = this.value;
-                        var tourType2 = document.getElementById('tour_type_descrip2');
-                        var options = tourType2.querySelectorAll('option');
-
-                        options.forEach(function(option) {
-                            if (option.value === selectedValue) {
-                                option.style.display = 'none';
-                            } else {
-                                option.style.display = 'block';
-                            }
-                        });
-                    });
-
-                    document.getElementById('tour_type_descrip2').addEventListener('change', function() {
-                        var selectedValue = this.value;
-                        var tourType1 = document.getElementById('tour_type_descrip1');
-                        var options = tourType1.querySelectorAll('option');
-
-                        options.forEach(function(option) {
-                            if (option.value === selectedValue) {
-                                option.style.display = 'none';
-                            } else {
-                                option.style.display = 'block';
-                            }
-                        });
-                    });
-                </script>
 
                 <hr>
                 <h2 class="mt-3 mb-4">เวลาที่เปิด - ปิด</h2>
@@ -1220,38 +1102,9 @@ if ($_SESSION['id_admin'] == "") {
 
                 <hr>
 
-                <div style="display: flex;">
-                    <div class="mb-3" style="margin-right: 30px;">
-                        <label class="form-label required-label">การเรียกเก็บค่าเข้าใช้บริการ</label><br>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="Access_Status" id="access_status_free" value="ไม่มีค่าเข้าชม" onclick="showpaidInput()">
-                            <label class="form-check-label" for="access_status_free">ไม่มีค่าเข้าชม</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="Access_Status" id="access_status_paid" value="มีค่าเข้าใช้บริการ" onclick="showpaidInput()">
-                            <label class="form-check-label" for="access_status_paid">มีค่าเข้าใช้บริการ</label>
-                        </div>
-                    </div>
-                    <script>
-                        function showpaidInput() {
-                            var selectBox = document.getElementById('access_status_paid');
-                            var otherInput = document.getElementById('price_input'); // Change 'price_in' to 'price_input'
-                            if (selectBox.checked) {
-                                otherInput.style.display = 'block';
-                            } else {
-                                otherInput.style.display = 'none';
-                            }
-                        }
-                    </script>
-
-                    <div class="mb-3" style="display: none;" id="price_input">
-                        <label for="price_in" class="form-label required-label">ค่าเข้าใช้บริการ (ถ้ามี)</label>
-                        <input type="text" class="form-control" id="price_in" name="price_in" aria-describedby="ค่าเข้าใช้บริการ">
-                    </div>
-                </div>
 
                 <div>
-                    <hr>
+
                     <style>
                         .clear-button {
                             position: absolute;
@@ -1271,7 +1124,6 @@ if ($_SESSION['id_admin'] == "") {
                         }
                     </style>
                     <h2 class="mt-3">เพิ่มรูปภาพ</h2>
-
                     <script>
                         let imageError = false;
 
@@ -1288,39 +1140,42 @@ if ($_SESSION['id_admin'] == "") {
                             return url; // Return the original URL if it doesn't match the Google Drive format
                         }
 
-                        function showPreview(url, previewId) {
+                        function showPreview(url, previewId, inputId) {
                             const imgPreview = document.getElementById(previewId);
                             const directUrl = convertGoogleDriveLink(url);
+                            const inputField = document.getElementById(inputId);
+                            console.log('Direct URL:', directUrl); // Log the direct URL
                             if (url) {
                                 imgPreview.src = directUrl;
-                                imgPreview.style.display = 'block'; // แสดงภาพตัวอย่าง
-                                // reset ค่าของ imageError เมื่อมีการโหลดภาพใหม่
+                                imgPreview.style.display = 'block'; // Show the preview image
+                                inputField.value = directUrl; // Update the input field with the direct URL
+                                console.log('Updated Input Value:', inputField.value); // Log the updated input value
                                 imageError = false;
                             } else {
                                 imgPreview.src = '';
-                                imgPreview.style.display = 'none'; // ซ่อนภาพตัวอย่างหากไม่มี URL
+                                imgPreview.style.display = 'none'; // Hide the preview image if there's no URL
                             }
 
                             imgPreview.onerror = () => {
                                 console.log('Image loading error for URL:', directUrl); // Log the error URL
                                 imgPreview.src = '';
                                 imgPreview.alt = 'Link นี้ไม่ใช่ Link ของรูปภาพ!.';
-                                // เมื่อเกิด error ในการโหลดรูปภาพ กำหนดค่าของ imageError เป็น true
                                 imageError = true;
-                                // ปิดการใช้งานปุ่ม submit เมื่อเกิด error
                                 document.getElementById('submitBtn').disabled = true;
                             };
 
                             imgPreview.onload = () => {
                                 imgPreview.alt = 'Preview will be displayed here.';
-                                // เปิดการใช้งานปุ่ม submit เมื่อโหลดรูปภาพเสร็จสมบูรณ์
                                 document.getElementById('submitBtn').disabled = false;
+                                imageError = false; // Reset imageError on successful load
                             };
                         }
 
-                        // เพิ่มฟังก์ชันสำหรับการตรวจสอบสถานะของ error เพื่อปิดการใช้งานปุ่ม submit
                         function checkSubmit() {
-                            // หากเกิด error ในการโหลดรูปภาพ imageError จะมีค่าเป็น true และจะไม่ให้ submit
+                            const uploadfile1 = document.getElementById('uploadfile1').value;
+                            console.log('uploadfile1 Value:', uploadfile1); // Log the value of uploadfile1
+
+                            // If an error occurs while loading the image, imageError will be true, preventing the submit
                             if (imageError) {
                                 alert('ไม่สามารถ Submit ได้ เนื่องจากมี Link รูปภาพที่ไม่ถูกต้อง');
                                 return false;
@@ -1331,47 +1186,44 @@ if ($_SESSION['id_admin'] == "") {
                         function clearInput(inputId, previewId) {
                             const inputField = document.getElementById(inputId);
                             inputField.value = '';
-                            showPreview('', previewId); // เคลียร์ภาพตัวอย่าง
+                            showPreview('', previewId, inputId); // Clear the preview image
                         }
                     </script>
+
                     <div id="content">
                         <div class="form-group mb-3">
                             <label for="uploadfile1" class="form-label required-label">รูปภาพที่ 1 (รูปภาพหน้าปก)</label>
                             <div style="position: relative;" class="input-group">
-                                <input class="form-control" type="text" id="uploadfile1" name="uploadfile1" required oninput="showPreview(this.value, 'imgPreview1')">
+                                <input class="form-control" type="text" id="uploadfile1" name="uploadfile1" required oninput="showPreview(this.value, 'imgPreview1', 'uploadfile1')">
                                 <button class="input-group-text" type="button" onclick="clearInput('uploadfile1', 'imgPreview1')">x</button>
                             </div>
                             <img id="imgPreview1" class="img-preview" src="" alt="Preview 1 will be displayed here.">
                         </div>
-
                         <div class="form-group mb-3">
                             <label for="uploadfile2" class="form-label">รูปภาพที่ 2 (รูปภาพเพิ่มเติม)</label>
                             <div style="position: relative;" class="input-group">
-                                <input class="form-control" type="text" id="uploadfile2" name="uploadfile2" oninput="showPreview(this.value, 'imgPreview2')">
+                                <input class="form-control" type="text" id="uploadfile2" name="uploadfile2" oninput="showPreview(this.value, 'imgPreview2', 'uploadfile2')">
                                 <button class="input-group-text" type="button" onclick="clearInput('uploadfile2', 'imgPreview2')">x</button>
                             </div>
                             <img id="imgPreview2" class="img-preview" src="" alt="Preview 2 will be displayed here.">
                         </div>
-
                         <div class="form-group mb-3">
                             <label for="uploadfile3" class="form-label">รูปภาพที่ 3 (รูปภาพเพิ่มเติม)</label>
                             <div style="position: relative;" class="input-group">
-                                <input class="form-control" type="text" id="uploadfile3" name="uploadfile3" oninput="showPreview(this.value, 'imgPreview3')">
+                                <input class="form-control" type="text" id="uploadfile3" name="uploadfile3" oninput="showPreview(this.value, 'imgPreview3', 'uploadfile3')">
                                 <button class="input-group-text" type="button" onclick="clearInput('uploadfile3', 'imgPreview3')">x</button>
                             </div>
                             <img id="imgPreview3" class="img-preview" src="" alt="Preview 3 will be displayed here.">
                         </div>
-
                         <div class="form-group">
                             <label for="uploadfile4" class="form-label">รูปภาพที่ 4 (รูปภาพเพิ่มเติม)</label>
                             <div style="position: relative;" class="input-group">
-                                <input class="form-control" type="text" id="uploadfile4" name="uploadfile4" oninput="showPreview(this.value, 'imgPreview4')">
+                                <input class="form-control" type="text" id="uploadfile4" name="uploadfile4" oninput="showPreview(this.value, 'imgPreview4', 'uploadfile4')">
                                 <button class="input-group-text" type="button" onclick="clearInput('uploadfile4', 'imgPreview4')">x</button>
                             </div>
                             <img id="imgPreview4" class="img-preview" src="" alt="Preview 4 will be displayed here.">
                         </div>
                     </div>
-
 
 
                     <button type="submit" name="insert" id="insert" class="mt-5 mb-5 btn btn-warning" style="float: right;">เพิ่มข้อมูลร้านค้าหรือที่พักใหม่</button>

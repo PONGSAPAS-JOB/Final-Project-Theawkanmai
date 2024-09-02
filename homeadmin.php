@@ -348,7 +348,7 @@ if ($_SESSION['id_admin'] == "") {
       ];
 
       // User ID for analysis
-      $id_member = 2942; // Example user ID
+      $id_member = 78; // Example user ID
 
       // Fetch data from eva_form1
       $sql = "SELECT * FROM eva_form1 WHERE id_member = $id_member";
