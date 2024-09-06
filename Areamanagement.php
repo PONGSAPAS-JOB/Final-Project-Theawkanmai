@@ -182,7 +182,7 @@ if ($_SESSION['id_admin'] == "") {
 
                 <form class="d-flex justify-content-end ">
                     <a class="navbar-brand " href="#"><b>Welcome, </b></a>
-                    <a class="navbar-brand" href="#">
+                    <a class="navbar-brand" href="ProfileAdmin.php">
                         <span class="app-name"><b><?php echo $_SESSION['username']; ?></b></span>
                         <span class="app-desc">ผู้ดูเเลระบบ</span>
 
@@ -372,7 +372,7 @@ if ($_SESSION['id_admin'] == "") {
                         ?>
                             <tr>
                                 <td><?php echo $index++; ?></td>
-                                <td><img src="<?php echo $row['img_Area1']; ?>" alt="Image" width="100" height="100" style="border-radius: 10px;"></td>
+                                <td><img src="<?php echo $row['img_Area1']; ?>" alt="Image" width="100" height="100" style="border-radius: 10px; object-fit: cover;"></td>
                                 <td><?php echo $row['name_Area']; ?></td>
                                 <td><?php echo $row['phonenum_Area']; ?></td>
                                 <td><?php echo $row['has_map_Area']; ?></td>
@@ -430,7 +430,7 @@ if ($_SESSION['id_admin'] == "") {
                 </nav>
             </div>
         </div>
-        </div>
+
         <script>
             function updateResultsPerPage() {
                 const select = document.getElementById('resultsPerPage');

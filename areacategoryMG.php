@@ -215,7 +215,7 @@ if ($_SESSION['id_admin'] == "") {
 
                 <form class="d-flex justify-content-end ">
                     <a class="navbar-brand " href="#">Welcome, </a>
-                    <a class="navbar-brand" href="#">
+                    <a class="navbar-brand" href="ProfileAdmin.php">
                         <span class="app-name"><?php echo $_SESSION['username']; ?></span>
                         <span class="app-desc">ผู้ดูเเลระบบ</span>
 

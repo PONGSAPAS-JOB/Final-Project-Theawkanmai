@@ -31,7 +31,7 @@ if ($_SESSION['id_admin'] == "") {
         <link rel="stylesheet" type="text/css" href="./style.css" />
         <script type="module" src="./index.js"></script>
         <script src="https://developers.google.com/maps/get-started"></script>
-        <title>รายการผู้ที่ทำเเบบสอบถามเกี่ยวกับสถานที่ท่องเที่ยวเเล้ว</title>
+        <title>การจัดการผู้ใช้งาน</title>
     </head>
     <style>
         body {
@@ -183,9 +183,7 @@ if ($_SESSION['id_admin'] == "") {
                 <form class="d-flex justify-content-end ">
                     <a class="navbar-brand " href="#"><b>Welcome, </b></a>
                     <a class="navbar-brand" href="ProfileAdmin.php">
-                        <span class="app-name"><b>
-                                <?php echo $_SESSION['username']; ?>
-                            </b></span>
+                        <span class="app-name"><b><?php echo $_SESSION['username']; ?></b></span>
                         <span class="app-desc">ผู้ดูเเลระบบ</span>
 
                     </a>
@@ -260,8 +258,11 @@ if ($_SESSION['id_admin'] == "") {
 
 
         <div class="addplace ">
-            <div style="width: 1000px; padding: 20px; white-space: nowrap;">
-                <h1><b>รายการผู้ที่ทำเเบบสอบถามเกี่ยวกับสถานที่เเล้ว</b></h1>
+            <div style="margin-left: 20px; width: 100px; padding: 20px; white-space: nowrap;">
+                <h1><b>รายชื่อผู้ใช้งาน</b></h1>
+            </div>
+            <div style="width: 300px; padding: 20px; margin-left: 130px; white-space: nowrap; margin-top: 7px;">
+                <a href="ManagerMG.php" class="btn btn-warning">รายชื่อเจ้าของสถานที่</a>
             </div>
 
 
@@ -307,157 +308,69 @@ if ($_SESSION['id_admin'] == "") {
             }
         </style>
 
+
         <?php
         include_once('functions.php');
+        $fetchdataMember = new DB_con();
 
-        $fetchDataFormMotivation = new DB_con(); // สร้างอินสแตนซ์ของคลาส DB_con
-        $result = $fetchDataFormMotivation->fetchDataFormMotivation(); // เรียกใช้ฟังก์ชันจากคลาส
-        $results_per_page = isset($_GET['results_per_page']) ? (int)$_GET['results_per_page'] : 10;
-
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        if ($page < 1) {
-            $page = 1;
+        // Example function to fetch all members; replace with your actual method
+        try {
+            $sql = $fetchdataMember->fetchAllMembers(); // Ensure this returns a PDOStatement object
+        } catch (Exception $e) {
+            echo 'Error: ' . $e->getMessage();
+            exit;
         }
 
-        // Determine the SQL LIMIT starting number for the results on the displaying page
-        $start_from = ($page - 1) * $results_per_page;
-
-        // Fetch the data with LIMIT
-        $sql = $fetchDataFormMotivation->fetchDataFormMotivationpage($start_from, $results_per_page);
-
-        $all_data_sql = $fetchDataFormMotivation->fetchDataFormMotivationpage(0, PHP_INT_MAX); // Fetch all records
-
-        // Get the total number of records to calculate the number of pages needed
-        $total_results = $fetchDataFormMotivation->countTotalFormMotivation();
-        $total_pages = ceil($total_results / $results_per_page);
-
-        $index = $start_from + 1;
-
+        $index = 1;
         ?>
 
-
-        <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15);">
-            <b style="margin-left: 20px;">รายชื่อผู้ตอบเเบบสอบถาม</b>
+        <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
+            <b>รายชื่อ ผู้ใช้งานทั่วไป</b>
             <div style="margin-top: 20px;">
-                <div class="container" style=" margin-bottom: 20px;">
-                    <input type="text" id="searchInput" class="form-control" placeholder="ค้นหาชื่อผู้ใช้งาน..." onkeyup="filterTable()">
+                <div class="container" style="margin-bottom: 20px;">
+                    <input type="text" id="searchInput" class="form-control" placeholder="ค้นหาชื่อ..." onkeyup="filterTable()">
                 </div>
-                <table class="table table-bordered" style="font-size: 15px;  text-align: center;" id="placesTable">
+                <table class="table table-bordered" style="font-size: 15px;" id="placesTable">
                     <thead>
                         <tr>
                             <th scope="col">ลำดับ</th>
-                            <th scope="col">ไอดีผู้ใช้งาน</th>
-                            <th scope="col">ชื่อผู้ใช้งาน</th>
+                            <th scope="col">รายชื่อ Username </th>
                             <th scope="col">E-mail ของผู้ใช้งาน</th>
                             <th scope="col">เบอร์โทรศัพท์</th>
-                            <th scope="col">ดูรายละเอียด</th>
+                            <th scope="col">วันเกิด</th>
+                            <th scope="col">สถานะของการทำเเบบสอบถาม</th>
                             <th scope="col">แก้ไข</th>
                             <th scope="col">ลบ</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php
-                        if ($result && mysqli_num_rows($result) > 0) {
-
-                            while ($row = mysqli_fetch_array($result)) {
+                        <?php while ($row = mysqli_fetch_array($sql)) {
+                            $survey_completed = $fetchdataMember->checkSurveyStatus($row['id_member']);
                         ?>
-                                <tr>
-                                    <td style="width: 50px;"><?php echo $index; ?></td>
-                                    <?php $index++; ?>
-                                    <td style="width: 70px;"><?php echo $row['id_member']; ?></td>
-                                    <td style="width: 200px;"><?php echo htmlspecialchars($row['username']); ?></td>
-                                    <td style="width: 200px;"><?php echo htmlspecialchars($row['email']); ?></td>
-                                    <td style="width: 100px;"><?php echo htmlspecialchars($row['phone']); ?></td>
-                                    <td style="width: 50px;"><a href="viewDetailsformcatagory.php?id=<?php echo $row['id_member']; ?>"><img src="img/resume.png" alt="รายละเอียด" width="30" height="30"></a></td>
-                                    <td style="width: 50px;"><a href="updateformcatagory.php?id=<?php echo $row['id_member']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
-                                    <td style="width: 50px;"><a href="deleteformcatagory.php?del=<?php echo $row['id_member']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
-                                </tr>
-
-                        <?php
-                            }
-                        } else {
-                            echo "<tr><td colspan='8'>ไม่มีข้อมูล</td></tr>";
-                        }
-                        ?>
+                            <tr>
+                                <td><?php echo $index++; ?></td>
+                                <td><?php echo htmlspecialchars($row['username']); ?></td>
+                                <td><?php echo htmlspecialchars($row['email']); ?></td>
+                                <td><?php echo htmlspecialchars($row['phone']); ?></td>
+                                <td><?php echo htmlspecialchars($row['birthday_user']); ?></td>
+                                <td>
+                                    <?php if ($survey_completed) { ?>
+                                        <img src="img/check.png" alt="Completed" width="30" height="30">
+                                    <?php } else { ?>
+                                        <img src="img/close.png" alt="Not Completed" width="30" height="30">
+                                    <?php } ?>
+                                </td>
+                                <td><a href="ProfileMember.php?id=<?php echo $row['id_member']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
+                                <td><a href="deletemember.php?del=<?php echo $row['id_member']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
+                            </tr>
+                        <?php } ?>
                     </tbody>
-
                 </table>
-
-
-                <div style="display: flex;">
-                    <div style="margin-bottom: 20px; margin-left: 20px; font-size: 25px; display: flex; width: 200px;">
-
-                        <label for="resultsPerPage" style=" font-size: 20px; width: 200px;" class="form-label">ผลลัพธ์ต่อหน้า:</label>
-                        <select id="resultsPerPage" class="form-control" style="  width: 60px;" onchange="updateResultsPerPage()">
-                            <option value="5" <?php echo $results_per_page == 5 ? 'selected' : ''; ?>>5</option>
-                            <option value="10" <?php echo $results_per_page == 10 ? 'selected' : ''; ?>>10</option>
-                            <option value="15" <?php echo $results_per_page == 15 ? 'selected' : ''; ?>>15</option>
-                            <option value="25" <?php echo $results_per_page == 25 ? 'selected' : ''; ?>>25</option>
-                            <option value="50" <?php echo $results_per_page == 50 ? 'selected' : ''; ?>>50</option>
-                            <option value="100" <?php echo $results_per_page == 100 ? 'selected' : ''; ?>>100</option>
-                        </select>
-                    </div>
-
-                    <!-- Pagination controls -->
-                    <nav aria-label="Page navigation example" style=" margin-left: 170px; font-size: 15px; ">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item <?php if ($page <= 1) {
-                                                        echo 'disabled';
-                                                    } ?>">
-                                <a class="page-link" href="<?php if ($page > 1) {
-                                                                echo " ?page=" . ($page - 1);
-                                                            } ?>" tabindex="-1" aria-disabled="true">หน้าเเรก</a>
-                            </li>
-                            <?php for ($i = 1; $i <= $total_pages; $i++) { ?>
-                                <li class="page-item <?php if ($i == $page) {
-                                                            echo 'active';
-                                                        } ?>">
-                                    <a class="page-link" href="?page=<?php echo $i; ?>">
-                                        <?php echo $i; ?>
-                                    </a>
-                                </li>
-                            <?php } ?>
-                            <li class="page-item <?php if ($page >= $total_pages) {
-                                                        echo 'disabled';
-                                                    } ?>">
-                                <a class="page-link" href="<?php if ($page < $total_pages) {
-                                                                echo " ?page=" . ($page + 1);
-                                                            } ?>">หน้าต่อไป</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
             </div>
         </div>
-        <script>
-            function updateResultsPerPage() {
-                const select = document.getElementById('resultsPerPage');
-                const resultsPerPage = select.value;
-                const urlParams = new URLSearchParams(window.location.search);
-                urlParams.set('results_per_page', resultsPerPage);
-                window.location.search = urlParams.toString();
-            }
 
 
-            function filterTable() {
-                const input = document.getElementById('searchInput');
-                const filter = input.value.toUpperCase();
-                const table = document.getElementById('placesTable');
-                const tr = table.getElementsByTagName('tr');
 
-                for (let i = 0; i < tr.length; i++) {
-                    const td = tr[i].getElementsByTagName('td')[3]; // Column with place names
-                    if (td) {
-                        const textValue = td.textContent || td.innerText;
-                        if (textValue.toUpperCase().indexOf(filter) > -1) {
-                            tr[i].style.display = '';
-                        } else {
-                            tr[i].style.display = 'none';
-                        }
-                    }
-                }
-            }
-        </script>
 
 
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

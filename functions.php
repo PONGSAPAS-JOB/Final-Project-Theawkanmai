@@ -74,6 +74,280 @@ class DB_con
     }
 
 
+    public function updateProfilemanager(
+        $filename1,
+        $username,
+        $email,
+        $phone,
+        $Id_manager
+    ) {
+
+        // คำสั่ง SQL สำหรับอัปเดตข้อมูลในตาราง manager
+        $updateQuery = "UPDATE manager SET
+                            img_manager = '$filename1',
+                            username = '$username',
+                            email = '$email',
+                            phone = '$phone'
+                        WHERE Id_manager = '$Id_manager'";
+
+        // ดำเนินการคำสั่ง SQL
+        $result = mysqli_query($this->dbcon, $updateQuery);
+
+        // ตรวจสอบว่าการอัปเดตสำเร็จหรือไม่
+        if ($result) {
+            return true;
+        } else {
+            // แสดงข้อผิดพลาดหากเกิดปัญหา
+            die('Error: ' . mysqli_error($this->dbcon));
+        }
+    }
+
+    public function updateProfileAdmin(
+        $filename1,
+        $username,
+        $email,
+        $phone,
+        $id_admin
+    ) {
+
+        // คำสั่ง SQL สำหรับอัปเดตข้อมูลในตาราง admin
+        $updateQuery = "UPDATE admin SET
+                            img_admin = '$filename1',
+                            username = '$username',
+                            email = '$email',
+                            phone = '$phone'
+                        WHERE id_admin = '$id_admin'";
+
+        // ดำเนินการคำสั่ง SQL
+        $result = mysqli_query($this->dbcon, $updateQuery);
+
+        // ตรวจสอบว่าการอัปเดตสำเร็จหรือไม่
+        if ($result) {
+            return true;
+        } else {
+            // แสดงข้อผิดพลาดหากเกิดปัญหา
+            die('Error: ' . mysqli_error($this->dbcon));
+        }
+    }
+
+    public function updateProfileMember(
+        $id_member,
+        $username,
+        $email,
+        $phone,
+        $birthday_user
+    ) {
+
+
+        $updateQuery = "UPDATE member SET
+                           
+                            username = '$username',
+                            email = '$email',
+                            phone = '$phone',
+                            birthday_user ='$birthday_user'
+                        WHERE id_member = '$id_member'";
+
+        $result = mysqli_query($this->dbcon, $updateQuery);
+
+        // ตรวจสอบว่าการอัปเดตสำเร็จหรือไม่
+        if ($result) {
+            return true;
+        } else {
+            // แสดงข้อผิดพลาดหากเกิดปัญหา
+            die('Error: ' . mysqli_error($this->dbcon));
+        }
+    }
+
+    public function fetchmemberonerecord($id_member)
+    {
+        $result = mysqli_query($this->dbcon, "SELECT * FROM member WHERE id_member = '$id_member' ");
+        return $result;
+    }
+
+
+    public function fetchAllMembers()
+    {
+        $query = "SELECT * FROM member"; // Adjust your query
+        $stmt = mysqli_prepare($this->dbcon, $query);
+
+        if (!$stmt) {
+            echo "Failed to prepare statement: " . mysqli_error($this->dbcon);
+            exit();
+        }
+
+        if (!mysqli_stmt_execute($stmt)) {
+            echo "Failed to execute statement: " . mysqli_stmt_error($stmt);
+            exit();
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+
+        if (!$result) {
+            echo "Failed to get result: " . mysqli_error($this->dbcon);
+            exit();
+        }
+
+        return $result;
+    }
+
+
+    public function fetchAllManager()
+    {
+        $query = "SELECT * FROM manager"; // Adjust your query
+        $stmt = mysqli_prepare($this->dbcon, $query);
+
+        if (!$stmt) {
+            echo "Failed to prepare statement: " . mysqli_error($this->dbcon);
+            exit();
+        }
+
+        if (!mysqli_stmt_execute($stmt)) {
+            echo "Failed to execute statement: " . mysqli_stmt_error($stmt);
+            exit();
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+
+        if (!$result) {
+            echo "Failed to get result: " . mysqli_error($this->dbcon);
+            exit();
+        }
+
+        return $result;
+    }
+
+
+    public function checkSurveyStatus($id_member)
+    {
+        $query = "SELECT COUNT(*) as count FROM eva_form1 WHERE id_member = '$id_member'";
+        $result = mysqli_query($this->dbcon, $query);
+        $row = mysqli_fetch_assoc($result);
+        return $row['count'] > 0;
+    }
+
+    public function deletemember($id_member)
+    {
+        $deletemember = mysqli_query($this->dbcon, "DELETE FROM member WHERE id_member = '$id_member'");
+        return $deletemember;
+    }
+
+
+
+    // Method to count total areas
+    public function countTotalMembers()
+    {
+        try {
+            $query = "SELECT COUNT(*) AS total FROM members";
+            $stmt = $this->dbcon->prepare($query);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return (int)$row['total']; // Ensure it returns an integer
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return 0; // Return 0 in case of an error
+        }
+    }
+    public function countOwnedArea($id_manager)
+    {
+        // SQL query to count the number of places owned by a manager
+        $query = "SELECT COUNT(*) AS area_count 
+                  FROM area_info 
+                  WHERE area_info.id_manager = ?";
+
+        // Prepare the SQL statement
+        $stmt = $this->dbcon->prepare($query);
+
+        if (!$stmt) {
+            // Handle error if prepare fails
+            echo "Error preparing statement: " . $this->dbcon->error;
+            return false;
+        }
+
+        // Bind the parameter
+        if (!$stmt->bind_param("i", $id_manager)) {
+            // Handle error if bind_param fails
+            echo "Error binding parameters: " . $stmt->error;
+            return false;
+        }
+
+        // Execute the statement
+        if (!$stmt->execute()) {
+            // Handle error if execute fails
+            echo "Error executing statement: " . $stmt->error;
+            return false;
+        }
+
+        // Get the result
+        $result = $stmt->get_result();
+        if (!$result) {
+            // Handle error if get_result fails
+            echo "Error getting result: " . $stmt->error;
+            return false;
+        }
+
+        // Fetch the row
+        $row = $result->fetch_assoc();
+        if (!$row) {
+            // Handle error if fetch_assoc fails
+            echo "Error fetching result: " . $stmt->error;
+            return false;
+        }
+
+        // Return the place count
+        return $row['area_count'];
+    }
+
+    public function countOwnedPlaces($id_manager)
+    {
+        // SQL query to count the number of places owned by a manager
+        $query = "SELECT COUNT(*) AS places_count 
+                  FROM places_info 
+                  WHERE places_info.id_manager = ?";
+
+        // Prepare the SQL statement
+        $stmt = $this->dbcon->prepare($query);
+
+        if (!$stmt) {
+            // Handle error if prepare fails
+            echo "Error preparing statement: " . $this->dbcon->error;
+            return false;
+        }
+
+        // Bind the parameter
+        if (!$stmt->bind_param("i", $id_manager)) {
+            // Handle error if bind_param fails
+            echo "Error binding parameters: " . $stmt->error;
+            return false;
+        }
+
+        // Execute the statement
+        if (!$stmt->execute()) {
+            // Handle error if execute fails
+            echo "Error executing statement: " . $stmt->error;
+            return false;
+        }
+
+        // Get the result
+        $result = $stmt->get_result();
+        if (!$result) {
+            // Handle error if get_result fails
+            echo "Error getting result: " . $stmt->error;
+            return false;
+        }
+
+        // Fetch the row
+        $row = $result->fetch_assoc();
+        if (!$row) {
+            // Handle error if fetch_assoc fails
+            echo "Error fetching result: " . $stmt->error;
+            return false;
+        }
+
+        // Return the place count
+        return $row['places_count'];
+    }
+
+
 
     //สถานที่
 
@@ -500,7 +774,7 @@ class DB_con
         }
     }
 
-    public function addareabymenager(
+    public function addareabymanager(
         $name_Area,
         $latitude_Area,
         $longitude_Area,
@@ -622,6 +896,23 @@ class DB_con
     {
         $conn = $this->dbcon; // Assuming you have a method to get the DB connection
         $query = "SELECT COUNT(*) AS total FROM area_info";
+        $result = mysqli_query($conn, $query);
+        $row = mysqli_fetch_assoc($result);
+        return (int)$row['total']; // Ensure it returns an integer
+    }
+
+    public function fetchdataplacespage($start_from, $results_per_page)
+    {
+        $conn = $this->dbcon; // Assuming you have a method to get the DB connection
+        $query = "SELECT * FROM places_info LIMIT $start_from, $results_per_page";
+        return mysqli_query($conn, $query);
+    }
+
+    // Method to count total places
+    public function countTotalplaces()
+    {
+        $conn = $this->dbcon; // Assuming you have a method to get the DB connection
+        $query = "SELECT COUNT(*) AS total FROM places_info";
         $result = mysqli_query($conn, $query);
         $row = mysqli_fetch_assoc($result);
         return (int)$row['total']; // Ensure it returns an integer
@@ -972,7 +1263,7 @@ class DB_con
         return $result;
     }
 
-    public function updateAreabymenager(
+    public function updateAreabymanager(
         $name_Area,
         $latitude_Area,
         $longitude_Area,
@@ -1119,7 +1410,10 @@ class DB_con
     {
         $conn = $this->dbcon; // Assuming you have a method to get the DB connection
         $query = "SELECT * FROM ans_interest LIMIT $start_from, $results_per_page";
-        return mysqli_query($conn, $query);
+        $result = mysqli_query($conn, $query);
+        if (!$result) {
+            die("Query Failed: " . mysqli_error($conn));
+        }
     }
 
     // Method to count total areas
@@ -1703,5 +1997,123 @@ class DB_con
             }
         }
         return $nearestCluster;
+    }
+
+    public function fetchCommentsByArea($id_Area)
+    {
+        $query = "SELECT c.comment_details, c.star, c.date, m.username, c.id_comment
+                  FROM comment c
+                  JOIN member m ON c.id_member = m.id_member
+                  WHERE c.id_Area = ?";
+
+        $stmt = $this->dbcon->prepare($query);
+
+        if (!$stmt) {
+            // Error preparing the statement
+            die("Error preparing the statement: " . $this->dbcon->error);
+        }
+
+        $stmt->bind_param("i", $id_Area);
+        $stmt->execute();
+        return $stmt->get_result();
+    }
+
+
+
+    public function fetchUsernameById($id_member)
+    {
+        $getinfo = mysqli_query($this->dbcon, "SELECT username FROM member WHERE id_member = '$id_member' ");
+        return $getinfo;
+    }
+
+    // Method to fetch total views for an area
+    public function getTotalViews($id_Area)
+    {
+        $query = "SELECT total_views FROM area_info WHERE id_Area = ?";
+        $stmt = $this->dbcon->prepare($query);
+        $stmt->bind_param("i", $id_Area);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        return $row['total_views'] ?? 0;
+    }
+
+    // Method to count number of likes for an area
+    public function getNumberOfLikes($id_Area)
+    {
+        $query = "SELECT COUNT(*) as likes FROM favorit_places WHERE id_Area = ?";
+        $stmt = $this->dbcon->prepare($query);
+        $stmt->bind_param("i", $id_Area);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        return $row['likes'] ?? 0;
+    }
+
+    // Method to calculate average rating for an area
+    public function getAverageRating($id_Area)
+    {
+        $query = "SELECT AVG(star) as avg_rating FROM comment WHERE id_Area = ?";
+        $stmt = $this->dbcon->prepare($query);
+        $stmt->bind_param("i", $id_Area);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        return $row['avg_rating'] ?? 0;
+    }
+
+    public function deleteCommentArea($id_comment)
+    {
+        $deleteCommentArea = mysqli_query($this->dbcon, "DELETE FROM comment WHERE id_comment = '$id_comment'");
+        return $deleteCommentArea;
+    }
+
+
+    public function fetchCommentsByPlaces($id_places)
+    {
+        $query = "SELECT c.detail_comment, c.star, c.date, m.username, c.id_comment_p 
+                  FROM comment_places c
+                  JOIN member m ON c.id_member = m.id_member
+                  WHERE c.id_places = ?";
+
+        $stmt = $this->dbcon->prepare($query);
+
+        if (!$stmt) {
+            // Error preparing the statement
+            die("Error preparing the statement: " . $this->dbcon->error);
+        }
+
+        $stmt->bind_param("i", $id_places);
+        $stmt->execute();
+        return $stmt->get_result();
+    }
+
+    public function getTotalViewsplaces($id_places)
+    {
+        $query = "SELECT total_views FROM places_info WHERE id_places = ?";
+        $stmt = $this->dbcon->prepare($query);
+        $stmt->bind_param("i", $id_places);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        return $row['total_views'] ?? 0;
+    }
+
+    public function getAverageRatingplaces($id_places)
+    {
+        $query = "SELECT AVG(star) as avg_rating FROM comment_places WHERE id_places = ?";
+        $stmt = $this->dbcon->prepare($query);
+        $stmt->bind_param("i", $id_places);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        return $row['avg_rating'] ?? 0;
+    }
+
+    public function deleteCommentPlaces($id_comment_p)
+    {
+        $id_comment_p = mysqli_real_escape_string($this->dbcon, $id_comment_p);
+        $deleteCommentPlaces = mysqli_query($this->dbcon, "DELETE FROM comment_places WHERE id_comment_p = '$id_comment_p'");
+        return $deleteCommentPlaces;
     }
 }

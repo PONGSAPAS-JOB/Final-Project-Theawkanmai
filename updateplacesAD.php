@@ -112,7 +112,7 @@ if ($_SESSION['id_admin'] == "") {
                     timer: 1000,
                     showConfirmButton: false
                 }).then(() => {
-                    window.location.href = 'myplaces.php';
+                    window.location.href = 'areaandplacesMG.php';
                 });
             });
         </script>";
@@ -340,7 +340,7 @@ if ($_SESSION['id_admin'] == "") {
 
                 <form class="d-flex justify-content-end ">
                     <a class="navbar-brand " href="#"><b>Welcome, </b></a>
-                    <a class="navbar-brand" href="#">
+                    <a class="navbar-brand" href="ProfileAdmin.php">
                         <span class="app-name"><b><?php echo $_SESSION['username']; ?></b></span>
                         <span class="app-desc">ผู้ดูเเลระบบ</span>
 

@@ -349,9 +349,9 @@ if ($_SESSION['Id_manager'] == "") {
 
             <form class="d-flex justify-content-end ">
               <a class="navbar-brand " href="#">Welcome, </a>
-              <a class="navbar-brand" href="#">
-                <span class="app-name"><?php echo $_SESSION['username']; ?></span>
-                <span class="app-desc">เจ้าของสถานที่</span>
+              <a class="navbar-brand" href="ProfileManager.php">
+                <span class="app-name"><b><?php echo $_SESSION['username']; ?></b></span>
+                <span class="app-desc">ผู้ที่เกี่ยวข้องกับสถานที่</span>
 
               </a>
               <img src="img/pro.jpg" class="rounded-circle " alt="...">

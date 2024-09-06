@@ -278,26 +278,27 @@ if ($_SESSION['Id_manager'] == "") {
 
     <body onload="init();">
         <style>
-            a {
-
-                font-family: "LXGW WenKai TC", cursive;
+            @font-face {
+                font-family: 'Lily Script One';
+                src: url('path_to_font_files/linly-script.woff2') format('woff2'),
+                    url('path_to_font_files/linly-script.woff') format('woff');
 
             }
 
-            .navbar {
+            a {
+                font-family: 'Lily Script One', cursive;
+            }
+
+            nav.navbar {
                 position: fixed;
                 top: 0;
-                width: 100%;
-                height: 11%;
-                /* Ensures the navbar spans the full width of the viewport */
+                left: 0;
+                right: 0;
                 z-index: 1000;
-                /* Ensure the navbar appears above other content */
-                overflow: hidden;
             }
 
-
             .navbar-nav {
-                margin-left: 15%;
+                margin-left: 21%;
                 flex-grow: 1;
                 justify-content: center;
 
@@ -305,91 +306,41 @@ if ($_SESSION['Id_manager'] == "") {
 
             .navbar-nav .nav-item {
                 margin-left: 10%;
-                align-items: center;
-                justify-content: center;
 
             }
 
             .collapse .navbar-collapse {
-                margin-left: 4%;
+                margin-left: 10%;
                 align-items: center;
-
+                justify-content: center;
             }
 
             .navbar-brand {
-                margin-left: 1%;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
             }
 
             .navbar-brand .app-name {
-                font-family: "LXGW WenKai TC", cursive;
                 margin-bottom: -5px;
-                font-size: 25px;
             }
 
             .navbar-brand .app-desc {
-                font-family: "Itim", cursive;
                 font-size: 12px;
-            }
-
-            .navbar-brand .app-desct {
-                font-family: "LXGW WenKai TC", cursive;
-
-                font-size: 12px;
-            }
-
-            .dropdown-item {
-                font-size: 20px;
             }
 
             .rounded-circle {
-                width: 5%;
-                height: 5%;
-                margin-right: 3%;
-                margin-bottom: -10%;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                object-fit: cover;
+                margin-right: 10px;
+                margin-bottom: -10px;
 
-            }
-
-            .sidebar {
-                height: 100vh;
-                width: 250px;
-                position: fixed;
-                top: 0;
-                left: 0;
-                background-color: #f8f9fa;
-                padding-top: 20px;
-                border-right: 1px solid #dee2e6;
-            }
-
-            .sidebar .nav-link {
-                font-weight: bold;
-                color: #000;
-                /* Set font color to black */
-            }
-
-            .sidebar .nav-link:hover {
-                background-color: #ffc107;
-                /* Change background color to warning on hover */
-                color: white;
-                /* Optional: Change font color to white on hover */
-            }
-
-            .content {
-                margin-left: 250px;
-                padding: 20px;
-            }
-
-            .custom-margin-left {
-                margin-left: 20px;
-                /* Custom left margin */
-            }
-
-            .btn .btn-success {
-                font-family: "Itim", cursive;
             }
         </style>
+
+
 
         <nav class="navbar navbar-expand-lg navbar-light bg-warning " style="position: fixed;">
             <div class="container-fluid">
@@ -411,26 +362,27 @@ if ($_SESSION['Id_manager'] == "") {
                         <li class="nav-item">
                             <a class="nav-link active" style="white-space: nowrap;" aria-current="page" href="myplaces.php">My Places</a>
                         </li>
+
+
                     </ul>
                     <div>
 
                         <form class="d-flex justify-content-end ">
                             <a class="navbar-brand " href="#">Welcome, </a>
-                            <a class="navbar-brand" href="#">
+                            <a class="navbar-brand" href="ProfileManager.php">
                                 <span class="app-name"><?php echo $_SESSION['username']; ?></span>
-                                <span class="app-desc">เจ้าของสถานที่</span>
+                                <span class="app-desc">ผู้ที่เกี่ยวข้องกับสถานที่</span>
 
                             </a>
                             <img src="img/pro.jpg" class="rounded-circle " alt="...">
 
 
-                            <a class="btn btn-success" type="submit" href="logout.php">ออกจากระบบ</a>
+                            <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
                         </form>
                     </div>
                 </div>
             </div>
         </nav>
-
 
         <style>
             b {

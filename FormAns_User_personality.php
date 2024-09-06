@@ -182,7 +182,7 @@ if ($_SESSION['id_admin'] == "") {
 
                 <form class="d-flex justify-content-end ">
                     <a class="navbar-brand " href="#"><b>Welcome, </b></a>
-                    <a class="navbar-brand" href="#">
+                    <a class="navbar-brand" href="ProfileAdmin.php">
                         <span class="app-name"><b>
                                 <?php echo $_SESSION['username']; ?>
                             </b></span>
@@ -321,17 +321,12 @@ if ($_SESSION['id_admin'] == "") {
 
         // Determine the SQL LIMIT starting number for the results on the displaying page
         $start_from = ($page - 1) * $results_per_page;
-
-        // Fetch the data with LIMIT
-        $sql = $fetchDataFormMembers->fetchDataFormMemberspage($start_from, $results_per_page);
-
-        $all_data_sql = $fetchDataFormMembers->fetchDataFormMemberspage(0, PHP_INT_MAX); // Fetch all records
-
-        // Get the total number of records to calculate the number of pages needed
         $total_results = $fetchDataFormMembers->countTotalFormMembers();
         $total_pages = ceil($total_results / $results_per_page);
-
         $index = $start_from + 1;
+
+        // ดึงข้อมูลตามหน้า
+        $sql = $fetchDataFormMembers->fetchDataFormMemberspage($start_from, $results_per_page);
 
         ?>
 
@@ -382,78 +377,88 @@ if ($_SESSION['id_admin'] == "") {
                     </tbody>
 
                 </table>
-
-
-                <div style="display: flex;">
-                    <div style="margin-bottom: 20px; margin-left: 20px; font-size: 25px; display: flex; width: 200px;">
-
-                        <label for="resultsPerPage" style=" font-size: 20px; width: 200px;" class="form-label">ผลลัพธ์ต่อหน้า:</label>
-                        <select id="resultsPerPage" class="form-control" style="  width: 60px;" onchange="updateResultsPerPage()">
-                            <option value="5" <?php echo $results_per_page == 5 ? 'selected' : ''; ?>>5</option>
-                            <option value="10" <?php echo $results_per_page == 10 ? 'selected' : ''; ?>>10</option>
-                            <option value="15" <?php echo $results_per_page == 15 ? 'selected' : ''; ?>>15</option>
-                            <option value="25" <?php echo $results_per_page == 25 ? 'selected' : ''; ?>>25</option>
-                            <option value="50" <?php echo $results_per_page == 50 ? 'selected' : ''; ?>>50</option>
-                            <option value="100" <?php echo $results_per_page == 100 ? 'selected' : ''; ?>>100</option>
-                        </select>
-                    </div>
-
-                    <!-- Pagination controls -->
-                    <nav aria-label="Page navigation example" style=" margin-left: 170px; font-size: 15px; ">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item <?php if ($page <= 1) {
-                                                        echo 'disabled';
-                                                    } ?>">
-                                <a class="page-link" href="<?php if ($page > 1) {
-                                                                echo " ?page=" . ($page - 1);
-                                                            } ?>" tabindex="-1" aria-disabled="true">หน้าเเรก</a>
-                            </li>
-                            <?php for ($i = 1; $i <= $total_pages; $i++) { ?>
-                                <li class="page-item <?php if ($i == $page) {
-                                                            echo 'active';
-                                                        } ?>">
-                                    <a class="page-link" href="?page=<?php echo $i; ?>">
-                                        <?php echo $i; ?>
-                                    </a>
-                                </li>
-                            <?php } ?>
-                            <li class="page-item <?php if ($page >= $total_pages) {
-                                                        echo 'disabled';
-                                                    } ?>">
-                                <a class="page-link" href="<?php if ($page < $total_pages) {
-                                                                echo " ?page=" . ($page + 1);
-                                                            } ?>">หน้าต่อไป</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
             </div>
+
+            <div style="display: flex;">
+                <div style="margin-bottom: 20px; margin-left: 20px; font-size: 25px; display: flex; width: 200px;">
+
+                    <label for="resultsPerPage" style=" font-size: 20px; width: 200px;" class="form-label">ผลลัพธ์ต่อหน้า:</label>
+                    <select id="resultsPerPage" class="form-control" style="  width: 60px;" onchange="updateResultsPerPage()">
+                        <option value="25" <?php echo $results_per_page == 25 ? 'selected' : ''; ?>>25</option>
+                        <option value="50" <?php echo $results_per_page == 50 ? 'selected' : ''; ?>>50</option>
+                        <option value="100" <?php echo $results_per_page == 100 ? 'selected' : ''; ?>>100</option>
+                    </select>
+                </div>
+
+                <!-- Pagination controls -->
+                <nav aria-label="Page navigation example" style=" margin-left: 170px; font-size: 15px; ">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item <?php if ($page <= 1) {
+                                                    echo 'disabled';
+                                                } ?>">
+                            <a class="page-link" href="<?php if ($page > 1) {
+                                                            echo " ?page=" . ($page - 1);
+                                                        } ?>" tabindex="-1" aria-disabled="true">หน้าเเรก</a>
+                        </li>
+                        <?php for ($i = 1; $i <= $total_pages; $i++) { ?>
+                            <li class="page-item <?php if ($i == $page) {
+                                                        echo 'active';
+                                                    } ?>">
+                                <a class="page-link" href="?page=<?php echo $i; ?>">
+                                    <?php echo $i; ?>
+                                </a>
+                            </li>
+                        <?php } ?>
+                        <li class="page-item <?php if ($page >= $total_pages) {
+                                                    echo 'disabled';
+                                                } ?>">
+                            <a class="page-link" href="<?php if ($page < $total_pages) {
+                                                            echo " ?page=" . ($page + 1);
+                                                        } ?>">หน้าต่อไป</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
         </div>
         <script>
             function updateResultsPerPage() {
                 const select = document.getElementById('resultsPerPage');
                 const resultsPerPage = select.value;
-                const urlParams = new URLSearchParams(window.location.search);
-                urlParams.set('results_per_page', resultsPerPage);
-                window.location.search = urlParams.toString();
+                // Get the current URL without query parameters
+                const url = new URL(window.location.href);
+
+                // Set the "results_per_page" query parameter
+                url.searchParams.set('results_per_page', resultsPerPage);
+
+                // Reset the page parameter to 1 when changing results per page
+                url.searchParams.set('page', 1);
+
+                // Redirect to the updated URL
+                window.location.href = url.toString();
             }
 
-
             function filterTable() {
-                const input = document.getElementById('searchInput');
-                const filter = input.value.toUpperCase();
-                const table = document.getElementById('placesTable');
-                const tr = table.getElementsByTagName('tr');
+                let input = document.getElementById("searchInput");
+                let filter = input.value.toLowerCase();
+                let table = document.getElementById("placesTable");
+                let tr = table.getElementsByTagName("tr");
 
-                for (let i = 0; i < tr.length; i++) {
-                    const td = tr[i].getElementsByTagName('td')[3]; // Column with place names
-                    if (td) {
-                        const textValue = td.textContent || td.innerText;
-                        if (textValue.toUpperCase().indexOf(filter) > -1) {
-                            tr[i].style.display = '';
-                        } else {
-                            tr[i].style.display = 'none';
+                for (let i = 1; i < tr.length; i++) { // start from 1 to skip table header
+                    let td = tr[i].getElementsByTagName("td");
+                    let found = false;
+                    for (let j = 0; j < td.length; j++) {
+                        if (td[j]) {
+                            if (td[j].innerText.toLowerCase().includes(filter)) {
+                                found = true;
+                                break;
+                            }
                         }
+                    }
+                    if (found) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
                     }
                 }
             }

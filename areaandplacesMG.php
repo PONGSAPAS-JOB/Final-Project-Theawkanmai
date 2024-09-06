@@ -182,7 +182,7 @@ if ($_SESSION['id_admin'] == "") {
 
         <form class="d-flex justify-content-end ">
           <a class="navbar-brand " href="#"><b>Welcome, </b></a>
-          <a class="navbar-brand" href="#">
+          <a class="navbar-brand" href="ProfileAdmin.php">
             <span class="app-name"><b><?php echo $_SESSION['username']; ?></b></span>
             <span class="app-desc">ผู้ดูเเลระบบ</span>
 
@@ -288,86 +288,146 @@ if ($_SESSION['id_admin'] == "") {
 
     $index = 1;
 
-    // Fetch data from your query and loop through the rows
-    while ($row = mysqli_fetch_array($sql)) {
-      // Check if id_manager is set and not null
-      if (isset($row['id_manager']) && $row['id_manager'] !== null) {
-        // Get manager info for each row
-        $getinfomanager = new DB_con();
-        $info = $getinfomanager->getinfomanager($row['id_manager']);
-        // Check if manager info is fetched successfully
-        if ($info) {
-          $manager_info = mysqli_fetch_assoc($info);
-          $manager_email = isset($manager_info['email']) ? $manager_info['email'] : 'admin';
-        } else {
-          // Handle error when manager info is not fetched
-          $manager_email = 'admin';
-        }
-      } else {
-        // Handle case where id_manager is not set or null
-        $manager_email = 'admin';
-      }
+
+    // กำหนดค่าเริ่มต้น
+    $results_per_page = isset($_GET['results_per_page']) ? (int)$_GET['results_per_page'] : 10;
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    if ($page < 1) {
+      $page = 1;
+    }
+    $start_from = ($page - 1) * $results_per_page;
+    $total_results = $fetchdataplaces->countTotalplaces();
+    $total_pages = ceil($total_results / $results_per_page);
+    $index = $start_from + 1;
+
+    // ดึงข้อมูลตามหน้า
+    $sql = $fetchdataplaces->fetchdataplacespage($start_from, $results_per_page);
     ?>
 
-      <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px;box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
-        <b>สถานที่ท่องเที่ยว</b>
-        <div style="margin-top: 20px; ">
-          <table class="table table-bordered" style="font-size: 15px; ">
-            <thead>
-              <tr>
-                <th scope="col">ลำดับสถานที่</th>
-                <th scope="col">รูปภาพหน้าปก</th>
-                <th scope="col">รายการร้านค้า เเละ ที่พักใกล้เคียง</th>
-                <th scope="col">รายละเอียด</th>
-                <th scope="col">ใกล้กับสถานที่ท่องเที่ยว</th>
-                <th scope="col">เจ้าของสถานที่</th>
-                <th scope="col">เเก้ไข</th>
-                <th scope="col">ลบ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              while ($row = mysqli_fetch_array($sql)) {
-              ?>
-                <tr>
-                  <td><?php echo $index ?></td>
-                  <?php $index = $index + 1; ?> <!-- Corrected line -->
-                  <td><img src="<?php echo $row['img_Places1']; ?>" alt="Image" width="100" height="100" style="border-radius: 10px;"></td>
-                  <td><?php echo $row['name_places']; ?></td>
-                  <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo $row['details_places']; ?></td>
-                  <?php
-                  // Fetch area name based on id_Area from area_info table
-                  $getAreaName = new DB_con();
-                  $areaInfo = $getAreaName->getAreaName($row['id_Area']);
-                  if ($areaInfo) {
-                    $areaData = mysqli_fetch_assoc($areaInfo);
-                    $areaName = isset($areaData['name_Area']) ? $areaData['name_Area'] : '';
-                  } else {
-                    $areaName = '';
-                  }
-                  ?>
-                  <td><?php echo $areaName; ?></td> <!-- Display area name -->
-                  <td><?php echo $manager_email; ?></td> <!-- Display 'admin' if manager info is not available -->
-                  <td><a href="updateplacesAD.php?id=<?php echo $row['id_places']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
-                  <td><a href="deleteplacesAD.php?del=<?php echo $row['id_places']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
-                </tr>
-              <?php
+    <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px;box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
+      <b>สถานที่ท่องเที่ยว</b>
+      <div style="margin-top: 20px; ">
+        <table class="table table-bordered" style="font-size: 15px; ">
+          <thead>
+            <tr>
+              <th scope="col">ลำดับสถานที่</th>
+              <th scope="col">รูปภาพหน้าปก</th>
+              <th scope="col">รายการร้านค้า เเละ ที่พักใกล้เคียง</th>
+              <th scope="col">รายละเอียด</th>
+              <th scope="col">ใกล้กับสถานที่ท่องเที่ยว</th>
+              <th scope="col">เจ้าของสถานที่</th>
+              <th scope="col">เเก้ไข</th>
+              <th scope="col">ลบ</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <?php
+            while ($row = mysqli_fetch_array($sql)) {
+              $owner_info = 'ไม่ทราบข้อมูล'; // กำหนดค่าเริ่มต้น
+
+              // ตรวจสอบว่า id_Manager ถูกตั้งค่าแล้วและไม่ใช่ null
+              if (isset($row['id_Manager']) && $row['id_Manager'] !== null) {
+                $info = $fetchdataarea->getinfomanager($row['id_Manager']);
+                if ($info) {
+                  $manager_info = mysqli_fetch_assoc($info);
+                  $owner_info = isset($manager_info['username']) ? $manager_info['username'] : 'ไม่ทราบข้อมูลเจ้าของสถานที่';
+                }
               }
-              ?>
-            </tbody>
-          <?php
-        }
-          ?>
-          </table>
-        </div>
+              // ตรวจสอบว่า id_Admin ถูกตั้งค่าแล้วและไม่ใช่ null
+              elseif (isset($row['id_Admin']) && $row['id_Admin'] !== null) {
+                $info = $fetchdataarea->getinfoadmin($row['id_Admin']);
+                if ($info) {
+                  $admin_info = mysqli_fetch_assoc($info);
+                  $owner_info = isset($admin_info['username']) ? 'Admin: ' . $admin_info['username'] : 'ไม่ทราบข้อมูลเเอดมิน';
+                }
+              } else {
+                $owner_info = 'ไม่ทราบข้อมูล';
+              }
+            ?>
+              <tr>
+                <td><?php echo $index ?></td>
+                <?php $index = $index + 1; ?> <!-- Corrected line -->
+                <td><img src="<?php echo $row['img_Places1']; ?>" alt="Image" width="100" height="100" style="border-radius: 10px; object-fit: cover;"></td>
+                <td><?php echo $row['name_places']; ?></td>
+                <td style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo $row['details_places']; ?></td>
+                <?php
+                // Fetch area name based on id_Area from area_info table
+                $getAreaName = new DB_con();
+                $areaInfo = $getAreaName->getAreaName($row['id_Area']);
+                if ($areaInfo) {
+                  $areaData = mysqli_fetch_assoc($areaInfo);
+                  $areaName = isset($areaData['name_Area']) ? $areaData['name_Area'] : '';
+                } else {
+                  $areaName = '';
+                }
+                ?>
+                <td><?php echo $areaName; ?></td> <!-- Display area name -->
+                <td><?php echo $owner_info; ?></td> <!-- Display 'admin' if manager info is not available -->
+                <td><a href="updateplacesAD.php?id=<?php echo $row['id_places']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
+                <td><a href="deleteplacesAD.php?del=<?php echo $row['id_places']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
+              </tr>
+            <?php
+            }
+            ?>
+          </tbody>
+
+
+
+        </table>
       </div>
 
+      <div style="display: flex;">
+        <div style="margin-bottom: 20px; margin-left: 20px; font-size: 25px; display: flex; width: 200px;">
+
+          <label for="resultsPerPage" style=" font-size: 20px; width: 200px;" class="form-label">ผลลัพธ์ต่อหน้า:</label>
+          <select id="resultsPerPage" class="form-control" style="  width: 60px;" onchange="updateResultsPerPage()">
+            <option value="5" <?php echo $results_per_page == 5 ? 'selected' : ''; ?>>5</option>
+            <option value="10" <?php echo $results_per_page == 10 ? 'selected' : ''; ?>>10</option>
+            <option value="15" <?php echo $results_per_page == 15 ? 'selected' : ''; ?>>15</option>
+            <option value="25" <?php echo $results_per_page == 25 ? 'selected' : ''; ?>>25</option>
+            <option value="50" <?php echo $results_per_page == 50 ? 'selected' : ''; ?>>50</option>
+            <option value="100" <?php echo $results_per_page == 100 ? 'selected' : ''; ?>>100</option>
+          </select>
+        </div>
+
+        <!-- Pagination controls -->
+        <nav aria-label="Page navigation example" style=" margin-left: 170px; font-size: 15px; ">
+          <ul class="pagination justify-content-center">
+            <li class="page-item <?php if ($page <= 1) {
+                                    echo 'disabled';
+                                  } ?>">
+              <a class="page-link" href="<?php if ($page > 1) {
+                                            echo "?page=" . ($page - 1);
+                                          } ?>" tabindex="-1" aria-disabled="true">หน้าก่อนหน้า</a>
+            </li>
+            <?php for ($i = 1; $i <= $total_pages; $i++) { ?>
+              <li class="page-item <?php if ($i == $page) {
+                                      echo 'active';
+                                    } ?>">
+                <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+              </li>
+            <?php } ?>
+            <li class="page-item <?php if ($page >= $total_pages) {
+                                    echo 'disabled';
+                                  } ?>">
+              <a class="page-link" href="<?php if ($page < $total_pages) {
+                                            echo "?page=" . ($page + 1);
+                                          } ?>">หน้าต่อไป</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+    </div>
 
 
 
-      <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 
 
   </body>

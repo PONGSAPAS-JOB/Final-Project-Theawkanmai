@@ -74,10 +74,13 @@ if ($_SESSION['Id_manager'] == "") {
         }
 
         .rounded-circle {
-            width: 8%;
-            height: 8%;
-            margin-right: 3%;
-            margin-bottom: -10%;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            margin-bottom: -10px;
+
         }
 
         .background-container {
@@ -167,12 +170,12 @@ if ($_SESSION['Id_manager'] == "") {
                     <div>
                         <form class="d-flex justify-content-end ">
                             <a class="navbar-brand " href="#">Welcome, </a>
-                            <a class="navbar-brand" href="#">
+                            <a class="navbar-brand" href="ProfileManager.php">
                                 <span class="app-name"><?php echo $_SESSION['username']; ?></span>
-                                <span class="app-desc">เจ้าของสถานที่</span>
+                                <span class="app-desc">ผู้ที่เกี่ยวข้องกับสถานที่</span>
                             </a>
                             <img src="img/pro.jpg" class="rounded-circle " alt="...">
-                            <a class="btn btn-success" type="submit" href="logout.php">ออกจากระบบ</a>
+                            <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
                         </form>
                     </div>
                 </div>
