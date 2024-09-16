@@ -287,6 +287,9 @@ if (empty($_SESSION['id_admin'])) {
                             <li><a class="dropdown-item mt-2" href="FormAns_Motivation.php">Form tourist attraction Motivation</a></li>
                         </ul>
                     </li>
+                    <li class="nav-item mt-2">
+                        <a class="dropdown-item" href="Recommend_train_page.php">Recommend System Management</a>
+                    </li>
                 </ul>
             </div>
         </div>

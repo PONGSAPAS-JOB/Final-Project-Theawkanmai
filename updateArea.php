@@ -8,6 +8,20 @@ if ($_SESSION['id_admin'] == "") {
     header("location: signin.php");
 } else {
 
+
+    // Include the DB_con class
+    include 'functions.php';
+
+    // Create an instance of the DB_con class
+    $db = new DB_con();
+
+    $id_admin = $_SESSION['id_admin'];
+    $img_admin = $db->getAdminProfilePicture($id_admin);
+
+    // Close the database connection (optional, as it will close automatically at the end of the script)
+    $db->dbcon->close();
+
+
 ?>
     <?php
     include_once('functions.php');
@@ -356,6 +370,7 @@ if ($_SESSION['id_admin'] == "") {
             .rounded-circle {
                 width: 5%;
                 height: 5%;
+                margin-top: 1%;
                 margin-right: 3%;
                 margin-bottom: -10%;
 
@@ -471,6 +486,9 @@ if ($_SESSION['id_admin'] == "") {
                             <li><a class="dropdown-item mt-2" href="FormAns_User_personality.php">Form User personality</a></li>
                             <li><a class="dropdown-item mt-2" href="FormAns_Motivation.php">Form tourist attraction Motivation</a></li>
                         </ul>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <a class="dropdown-item" href="Recommend_train_page.php">Recommend System Management</a>
                     </li>
                 </ul>
             </div>

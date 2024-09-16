@@ -8,6 +8,20 @@ if ($_SESSION['id_admin'] == "") {
     header("location: signin.php");
 } else {
 
+
+
+    // Include the DB_con class
+    include 'functions.php';
+
+    // Create an instance of the DB_con class
+    $db = new DB_con();
+
+    $id_admin = $_SESSION['id_admin'];
+    $img_admin = $db->getAdminProfilePicture($id_admin);
+
+    // Close the database connection (optional, as it will close automatically at the end of the script)
+    $db->dbcon->close();
+
 ?>
     <?php
     include_once('functions.php');
@@ -65,7 +79,16 @@ if ($_SESSION['id_admin'] == "") {
 
     <head>
         <link rel="icon" href="img/icon.png" type="image/ico">
-        <script type="text/javascript" src="https://api.longdo.com/map/?key=5f0cf4be3ba02be29c4136aca052b5fd"></script>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Itim&family=LXGW+WenKai+TC&family=Lily+Script+One&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <!-- <script type="text/javascript" src="https://api.longdo.com/map/?key=5f0cf4be3ba02be29c4136aca052b5fd"></script> -->
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -75,10 +98,16 @@ if ($_SESSION['id_admin'] == "") {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Lily+Script+One&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="./style.css" />
+        <script type="module" src="./index.js"></script>
+        <script src="https://developers.google.com/maps/get-started"></script>
         <title>เพิ่มกลุ่มของนักท่องเที่ยว</title>
     </head>
     <style>
         body {
+            font-family: "Itim", cursive;
+            font-weight: 400;
+            font-style: normal;
             margin-top: 0px;
             background-image: url('img/img4.png');
             background-repeat: no-repeat;
@@ -93,21 +122,17 @@ if ($_SESSION['id_admin'] == "") {
 
     <body onload="init();">
         <style>
-            @font-face {
-                font-family: 'Lily Script One';
-                src: url('path_to_font_files/linly-script.woff2') format('woff2'),
-                    url('path_to_font_files/linly-script.woff') format('woff');
-
-            }
-
             a {
-                font-family: 'Lily Script One', cursive;
+
+                font-family: "LXGW WenKai TC", cursive;
+
             }
 
             .navbar {
                 position: fixed;
                 top: 0;
                 width: 100%;
+                height: 11%;
                 /* Ensures the navbar spans the full width of the viewport */
                 z-index: 1000;
                 /* Ensure the navbar appears above other content */
@@ -143,10 +168,19 @@ if ($_SESSION['id_admin'] == "") {
             }
 
             .navbar-brand .app-name {
+                font-family: "LXGW WenKai TC", cursive;
                 margin-bottom: -5px;
+                font-size: 25px;
             }
 
             .navbar-brand .app-desc {
+                font-family: "Itim", cursive;
+                font-size: 12px;
+            }
+
+            .navbar-brand .app-desct {
+                font-family: "LXGW WenKai TC", cursive;
+
                 font-size: 12px;
             }
 
@@ -157,6 +191,7 @@ if ($_SESSION['id_admin'] == "") {
             .rounded-circle {
                 width: 5%;
                 height: 5%;
+                margin-top: 1%;
                 margin-right: 3%;
                 margin-bottom: -10%;
 
@@ -195,6 +230,11 @@ if ($_SESSION['id_admin'] == "") {
                 margin-left: 20px;
                 /* Custom left margin */
             }
+
+            .btn .btn-danger {
+                margin-top: 1%;
+                font-family: "Itim", cursive;
+            }
         </style>
 
 
@@ -204,8 +244,8 @@ if ($_SESSION['id_admin'] == "") {
             </button>
             <div class="container-fluid ">
                 <a class="navbar-brand" href="#">
-                    <span class="app-name">Theaw-kan-mai App </span>
-                    <span class="app-desc">Location information management application</span>
+                    <span class="app-name"><b>Theaw-kan-mai App </b></span>
+                    <span class="app-desct">Location information management application</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -213,16 +253,17 @@ if ($_SESSION['id_admin'] == "") {
 
 
                 <form class="d-flex justify-content-end ">
-                    <a class="navbar-brand " href="#">Welcome, </a>
+                    <a class="navbar-brand " href="#"><b>Welcome, </b></a>
                     <a class="navbar-brand" href="ProfileAdmin.php">
-                        <span class="app-name"><?php echo $_SESSION['username']; ?></span>
+                        <span class="app-name"><b><?php echo $_SESSION['username']; ?></b></span>
                         <span class="app-desc">ผู้ดูเเลระบบ</span>
 
                     </a>
-                    <img src="img/pro.jpg" class="rounded-circle " alt="...">
+                    <img src="<?php echo htmlspecialchars($img_admin, ENT_QUOTES, 'UTF-8'); ?>" class="rounded-circle" alt="Admin Profile Picture">
 
 
-                    <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
+
+                    <a class="btn btn-danger" type="submit" href="logout.php" style="margin-top: 1%;">ออกจากระบบ</a>
                 </form>
             </div>
             </div>
@@ -269,11 +310,19 @@ if ($_SESSION['id_admin'] == "") {
                             <li><a class="dropdown-item mt-2" href="FormAns_Motivation.php">Form tourist attraction Motivation</a></li>
                         </ul>
                     </li>
+                    <li class="nav-item mt-2">
+                        <a class="dropdown-item" href="Recommend_train_page.php">Recommend System Management</a>
+                    </li>
                 </ul>
             </div>
         </div>
 
         <style>
+            b {
+                font-family: "Itim", cursive;
+
+            }
+
             .container {
                 margin-top: 40px;
                 width: 100%;
@@ -338,7 +387,7 @@ if ($_SESSION['id_admin'] == "") {
         <div class="addplace "><a></a></div>
         <div class="container">
             <div style="display: flex; ">
-                <h1 class="mt-3" style="width: 700px; "> จัดการประเภทของนักท่องเที่ยว </h1>
+                <h1 class="mt-3" style="width: 800px; "> จัดการประเภทของนักท่องเที่ยว </h1>
                 <div style="width: 300px; padding: 20px; margin-left: 300px; margin-top: 3px; ">
                     <a href="addarea.php" class="btn btn-warning"> เพิ่มสถานที่หลัก -></a>
                 </div>

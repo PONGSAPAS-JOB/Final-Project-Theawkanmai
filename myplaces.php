@@ -5,6 +5,18 @@ if ($_SESSION['Id_manager'] == "") {
   header("location: signin.php");
   exit();
 } else {
+  // Include the DB_con class
+  include 'functions.php';
+
+  // Create an instance of the DB_con class
+  $db = new DB_con();
+
+  $Id_manager = $_SESSION['Id_manager'];
+  $img_manager = $db->getManagerProfilePicture($Id_manager);
+
+  // Close the database connection (optional, as it will close automatically at the end of the script)
+  $db->dbcon->close();
+
 ?>
   <!DOCTYPE html>
   <html lang="en">
@@ -81,7 +93,7 @@ if ($_SESSION['Id_manager'] == "") {
         border-radius: 50%;
         object-fit: cover;
         margin-right: 10px;
-        margin-bottom: -10px;
+        margin-bottom: 5px;
       }
 
       .addplace {
@@ -123,7 +135,7 @@ if ($_SESSION['Id_manager'] == "") {
                 <span class="app-name"><?php echo $_SESSION['username']; ?></span>
                 <span class="app-desc">ผู้ที่เกี่ยวข้องกับสถานที่</span>
               </a>
-              <img src="img/pro.jpg" class="rounded-circle" alt="Profile Image">
+              <img src="<?php echo htmlspecialchars($img_manager, ENT_QUOTES, 'UTF-8'); ?>" class="rounded-circle" alt="Manager Profile Picture">
               <a class="btn btn-danger" href="logout.php">ออกจากระบบ</a>
             </form>
           </div>

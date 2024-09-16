@@ -1,3 +1,5 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <?php
 
 session_start();
@@ -37,7 +39,7 @@ if ($_SESSION['id_admin'] == "") {
         <link rel="stylesheet" type="text/css" href="./style.css" />
         <script type="module" src="./index.js"></script>
         <script src="https://developers.google.com/maps/get-started"></script>
-        <title>หน้าหลัก admin</title>
+        <title>หน้าการจัดการระบบเเนะนำ</title>
     </head>
 
     <style>
@@ -128,6 +130,7 @@ if ($_SESSION['id_admin'] == "") {
             .rounded-circle {
                 width: 5%;
                 height: 5%;
+                margin-top: 1%;
                 margin-right: 3%;
                 margin-bottom: -10%;
 
@@ -288,217 +291,242 @@ if ($_SESSION['id_admin'] == "") {
                 min-height: 150px;
                 border: 1px solid #ccc;
             }
-
-            .switch {
-                display: flex;
-                justify-content: center;
-                margin-bottom: 20px;
-            }
-
-            .switch button {
-                padding: 10px 20px;
-                margin: 0 10px;
-                border: 1px solid #ccc;
-                background-color: #f1f1f1;
-                cursor: pointer;
-            }
-
-            .switch button.active {
-                background-color: #ffcc00;
-                color: #fff;
-            }
         </style>
 
         </head>
 
-        <body>
-            <div class="addplace">
-                <div style="width: 500px; padding: 20px; white-space: nowrap;">
-                    <h1><b>🌻รายชื่อสถานที่ทั้งหมด</b></h1>
-                </div>
-            </div>
 
-            <div class="switch">
-                <button id="touristButton" class="active" onclick="showSection('tourist')">สถานที่ท่องเที่ยว</button>
-                <button id="shopButton" onclick="showSection('shop')">ร้านค้า และ ที่พัก</button>
+        <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            th,
+            td {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+
+            th {
+                background-color: #f4f4f4;
+                text-align: left;
+            }
+
+            .table-container {
+                padding: 20px;
+            }
+        </style>
+        <?php
+        // Include the database connection file
+        include_once('functions.php');
+
+        // Create a new instance of the DB_con class
+        $db = new DB_con();
+
+        // Handle form submission
+        $selectedId = isset($_POST['update_id']) ? $_POST['update_id'] : null;
+
+        // Fetch the distinct update IDs for the dropdown
+        $updateIds = $db->fetchUpdateTimes();
+
+        // Fetch the data based on the selected update ID
+        $data = $db->fetchvaluecluster($selectedId);
+        ?>
+
+        <div class="addplace">
+            <div style="width: 500px; padding: 20px; white-space: nowrap;">
+                <h1><b>🌻การคำนวณค่า Cluster ในระบบ Recommend System</b></h1>
             </div>
+        </div>
+
+        <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
+            <form method="post" action="">
+                <label for="update_id">เลือก ID Update:</label>
+                <select id="update_id" name="update_id" onchange="this.form.submit()">
+                    <option value="">เลือก ID Update</option>
+                    <?php while ($row = mysqli_fetch_assoc($updateIds)): ?>
+                        <option value="<?php echo htmlspecialchars($row['id_update_cluster']); ?>" <?php echo $selectedId == $row['id_update_cluster'] ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($row['id_update_cluster']); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </form>
+
             <div style="display: flex;">
-                <div id="touristSection" class="containerbg" style="width: 800px; padding: 20px; margin-left: 130px;">
-                    <input type="text" style="width: 300px;" id="searchTourist" onkeyup="filterTable('touristTable', 'searchTourist')" placeholder="🔎ค้นหา สถานที่ท่องเที่ยว">
-                    <table id="touristTable" class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>ลำดับ</th>
-                                <th>ชื่อสถานที่</th>
-                                <th>ยอดเข้าชม</th>
-                                <th>จำนวนกดถูกใจ</th>
-                                <th>คะเเนนโหวต</th>
-                                <th>รายละเอียด</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            include_once('functions.php');
-
-                            // Fetch data for places associated with the logged-in manager
-                            $fetchdataplaces = new DB_con();
-                            $sql = $fetchdataplaces->fetchdataarea();
-
-                            $count = 1;
-                            while ($row = mysqli_fetch_array($sql)) {
-                                $img_Area1 = !empty($row['img_Area1']) ? $row['img_Area1'] : 'img/default-placeholder.png';
-                                $total_views = $row['total_views']; // Replace with your column name
-                                $likes_count = $fetchdataplaces->getNumberOfLikes($row['id_Area']); // Replace with your function to count likes
-                                $average_rating = $fetchdataplaces->getAverageRating($row['id_Area']); // Replace with your function to get average rating
-                            ?>
-                                <tr>
-                                    <td><?php echo $count++; ?></td>
-                                    <td><?php echo htmlspecialchars($row['name_Area']); ?></td>
-                                    <td><?php echo htmlspecialchars($total_views); ?></td>
-                                    <td><?php echo htmlspecialchars($likes_count); ?></td>
-                                    <td><?php echo htmlspecialchars($average_rating); ?></td>
-                                    <td>
-                                        <button class="btn btn-info" onclick="showComments(<?php echo $row['id_Area']; ?>)">ดูรายละเอียด</button>
-                                    </td>
-                                </tr>
-                            <?php
-                            }
-                            ?>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div id="shopSection" class="containerbg" style="display: none; width: 800px; padding: 20px; margin-left: 130px;">
-                    <input type="text" id="searchShop" style="width: 300px;" onkeyup="filterTable('shopTable', 'searchShop')" placeholder="🔎ค้นหา ร้านค้า หรือ ที่พัก">
-                    <table id="shopTable" class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>ลำดับ</th>
-                                <th>ชื่อสถานที่</th>
-                                <th>ยอดเข้าชม</th>
-                                <th>คะเเนนโหวต</th>
-                                <th>รายละเอียด</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $sql = $fetchdataplaces->fetchdataplaces();
-
-                            $count = 1;
-                            while ($row = mysqli_fetch_array($sql)) {
-                                $img_Places1 = !empty($row['img_Places1']) ? $row['img_Places1'] : 'img/default-placeholder.png';
-                                $total_views = $row['total_views']; // Replace with your column name
-
-                                $average_rating = $fetchdataplaces->getAverageRating($row['id_places']); // Replace with your function to get average rating
-                            ?>
-                                <tr>
-                                    <td><?php echo $count++; ?></td>
-                                    <td><?php echo htmlspecialchars($row['name_places']); ?></td>
-                                    <td><?php echo htmlspecialchars($total_views); ?></td>
-                                    <td><?php echo htmlspecialchars($average_rating); ?></td>
-                                    <td>
-                                        <button class="btn btn-info" onclick="showCommentsPlaces(<?php echo $row['id_places']; ?>)">ดูรายละเอียด</button>
-                                    </td>
-                                </tr>
-                            <?php
-                            }
-                            ?>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="containerbg" style="width: 450px;  margin-left: -120px;">
-                    <div id="dashboard" style="display: none;">
-                        <!-- Dashboard content will be loaded here -->
-                    </div>
-                </div>
+                <b style="margin-left: 50px;">📑ค่า จากการ จัด Cluster ปัจจุบัน</b>
             </div>
+            <div class="table-container">
+                <table class="table table-bordered" style="font-size: 10px;" id="placesTable">
+                    <thead>
+                        <tr style='background-color: #ffcc00;'>
+                            <th>ID Cluster</th>
+                            <?php for ($i = 1; $i <= 20; $i++): ?>
+                                <th>Value<?php echo $i; ?></th>
+                            <?php endfor; ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        // Display the data in table rows
+                        while ($row = mysqli_fetch_assoc($data)) {
+                            echo "<tr>";
+                            echo "<td>{$row['id_cluster']}</td>";
+                            for ($i = 1; $i <= 20; $i++) {
+                                echo "<td>{$row["value$i"]}</td>";
+                            }
+                            echo "</tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+            <style>
+                .container {
+                    /* margin-left: 20px;
+                    margin-right: 20px;
+                    padding: 20px;
+                    border: 1px solid #ddd; */
+                    border-radius: 8px;
+                }
+
+                img {
+                    max-width: 100%;
+                }
+
+                .table-container {
+                    margin-top: 20px;
+                }
+
+                .hidden {
+                    display: none;
+                }
+
+                #clusterTable {
+                    font-size: 10px;
+                    margin-top: 20px;
+                }
+
+                #clusterTable th {
+                    background-color: #ffcc00;
+                }
+            </style>
+            <div class="container">
+                <button id="addtypeButton" style="margin-left:50px;" class="btn-warning rounded" type="button">
+                    <img src="img/team.png" alt="..." width="30px" height="30px"> หาค่า K ที่เหมาะสมในการจัดกลุ่ม
+                </button>
+
+                <div id="elbowGraph" style="width: 800px; margin-top:50px;"></div>
+
+                <button id="customKButton" style="margin-left:50px; margin-top:20px;" class="btn-warning rounded" type="button">
+                    กรอกจำนวนกลุ่มที่ต้องการจัด
+                </button>
+
+                <div id="customKForm" style="display: none; margin-top: 20px;">
+                    <input type="number" id="customKInput" placeholder="จำนวนกลุ่ม" style="font-size: 16px; padding: 5px;">
+                    <button id="submitCustomK" class="btn-warning rounded" type="button">ตกลง</button>
+                </div>
+
+                <div id="clusterResult" style="margin-top: 50px;"></div>
+
+                <button id="saveClustersButton" style="margin-left:50px; margin-top:20px; display: none;" class="btn-warning rounded" type="button">
+                    บันทึกค่า Cluster ใหม่
+                </button>
+            </div>
+
 
             <script>
-                function showSection(section) {
-                    var touristSection = document.getElementById('touristSection');
-                    var shopSection = document.getElementById('shopSection');
-                    var touristButton = document.getElementById('touristButton');
-                    var shopButton = document.getElementById('shopButton');
+                document.getElementById('addtypeButton').addEventListener('click', function() {
+                    fetch('calculate_kmeans.php')
+                        .then(response => response.json())
+                        .then(data => {
+                            const optimalKs = data.optimal_k;
+                            const imageUrl = data.graph_path;
 
-                    if (section === 'tourist') {
-                        touristSection.style.display = 'block';
-                        shopSection.style.display = 'none';
-                        touristButton.classList.add('active');
-                        shopButton.classList.remove('active');
-                    } else if (section === 'shop') {
-                        touristSection.style.display = 'none';
-                        shopSection.style.display = 'block';
-                        touristButton.classList.remove('active');
-                        shopButton.classList.add('active');
-                    }
-                }
+                            // Display the graph and optimal K values
+                            const graphContainer = document.getElementById('elbowGraph');
+                            graphContainer.innerHTML = `
+                    <h2>Optimal K Values: ${optimalKs.join(', ')}</h2>
+                    <img src="${imageUrl}" alt="Elbow Method Graph">
+                `;
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
 
-                function filterTable(tableId, searchInputId) {
-                    var input, filter, table, tr, td, i, txtValue;
-                    input = document.getElementById(searchInputId);
-                    filter = input.value.toUpperCase();
-                    table = document.getElementById(tableId);
-                    tr = table.getElementsByTagName("tr");
+                document.getElementById('customKButton').addEventListener('click', function() {
+                    document.getElementById('customKForm').style.display = 'block';
+                });
 
-                    for (i = 1; i < tr.length; i++) {
-                        tr[i].style.display = "none"; // Initially hide the row
-                        td = tr[i].getElementsByTagName("td")[1]; // Index 1 for the name column
-                        if (td) {
-                            txtValue = td.textContent || td.innerText;
-                            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                                tr[i].style.display = "";
+                document.getElementById('submitCustomK').addEventListener('click', function() {
+                    const customK = document.getElementById('customKInput').value;
+                    fetch(`calculate_custom_kmeans.php?k=${customK}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const clusters = data.clusters;
+                            const clusterResult = document.getElementById('clusterResult');
+                            let clusterHtml = '<h2>ผลการจัดกลุ่ม K = ' + customK + '</h2>';
+                            clusterHtml += '<table class="table table-bordered" style="font-size: 10px;" id="clusterTable">';
+                            clusterHtml += '<thead><tr style="background-color: #ffcc00;"><th>ID Cluster</th>';
+                            for (let i = 1; i <= 20; i++) {
+                                clusterHtml += '<th>Value' + i + '</th>';
                             }
-                        }
-                    }
-                }
+                            clusterHtml += '</tr></thead><tbody>';
 
-                function showComments(id_Area) {
-                    console.log("Loading comments for Area ID: " + id_Area);
+                            for (const [clusterId, clusterValues] of Object.entries(clusters)) {
+                                clusterHtml += '<tr>';
+                                clusterHtml += '<td>' + clusterId + '</td>';
+                                clusterValues.forEach(value => {
+                                    clusterHtml += '<td>' + value.toFixed(6) + '</td>';
+                                });
+                                clusterHtml += '</tr>';
+                            }
+                            clusterHtml += '</tbody></table>';
+                            clusterResult.innerHTML = clusterHtml;
 
-                    document.getElementById('dashboard').style.display = 'block';
+                            // Show the Save Clusters button
+                            document.getElementById('saveClustersButton').style.display = 'block';
 
-                    const xhr = new XMLHttpRequest();
-                    xhr.open("POST", "fetch_comments_Admin.php", true);
-                    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                    xhr.onload = function() {
-                        if (this.status === 200) {
-                            console.log("AJAX response received");
-                            document.getElementById("dashboard").innerHTML = this.responseText;
-                        } else {
-                            console.error("Error loading comments: " + this.status);
-                        }
-                    };
-                    xhr.onerror = function() {
-                        console.error("Request failed");
-                    };
-                    xhr.send("id_Area=" + id_Area);
-                }
+                            // Store the clusters data for saving later
+                            window.currentClusters = clusters;
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
 
-                function showCommentsPlaces(id_places) {
-                    console.log("Loading comments for places ID: " + id_places);
+                document.getElementById('saveClustersButton').addEventListener('click', function() {
+                    const clusters = window.currentClusters; // Use the stored clusters data
 
-                    document.getElementById('dashboard').style.display = 'block';
-
-                    const xhr = new XMLHttpRequest();
-                    xhr.open("POST", "fetch_comments_places_Admin.php", true);
-                    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                    xhr.onload = function() {
-                        if (this.status === 200) {
-                            console.log("AJAX response received");
-                            document.getElementById("dashboard").innerHTML = this.responseText;
-                        } else {
-                            console.error("Error loading comments: " + this.status);
-                        }
-                    };
-                    xhr.onerror = function() {
-                        console.error("Request failed");
-                    };
-                    xhr.send("id_places=" + id_places);
-                }
+                    fetch('save_clusters.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(clusters)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: 'Clusters saved successfully'
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Error: ' + data.message
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error: ' + error.message
+                            });
+                        });
+                });
             </script>
-
-            <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 
 
@@ -508,11 +536,9 @@ if ($_SESSION['id_admin'] == "") {
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 
 
-        </body>
+    </body>
 
     </html>
-
-
 <?php
 }
 ?>

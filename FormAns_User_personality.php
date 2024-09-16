@@ -6,6 +6,18 @@ if ($_SESSION['id_admin'] == "") {
     header("location: signin.php");
 } else {
 
+    // Include the DB_con class
+    include 'functions.php';
+
+    // Create an instance of the DB_con class
+    $db = new DB_con();
+
+    $id_admin = $_SESSION['id_admin'];
+    $img_admin = $db->getAdminProfilePicture($id_admin);
+
+    // Close the database connection (optional, as it will close automatically at the end of the script)
+    $db->dbcon->close();
+
 ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -183,13 +195,11 @@ if ($_SESSION['id_admin'] == "") {
                 <form class="d-flex justify-content-end ">
                     <a class="navbar-brand " href="#"><b>Welcome, </b></a>
                     <a class="navbar-brand" href="ProfileAdmin.php">
-                        <span class="app-name"><b>
-                                <?php echo $_SESSION['username']; ?>
-                            </b></span>
+                        <span class="app-name"><b><?php echo $_SESSION['username']; ?></b></span>
                         <span class="app-desc">ผู้ดูเเลระบบ</span>
 
                     </a>
-                    <img src="img/pro.jpg" class="rounded-circle " alt="...">
+                    <img src="<?php echo htmlspecialchars($img_admin, ENT_QUOTES, 'UTF-8'); ?>" class="rounded-circle" alt="Admin Profile Picture">
 
 
                     <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
@@ -238,6 +248,9 @@ if ($_SESSION['id_admin'] == "") {
                             <li><a class="dropdown-item mt-2" href="FormAns_User_personality.php">Form User personality</a></li>
                             <li><a class="dropdown-item mt-2" href="FormAns_Motivation.php">Form tourist attraction Motivation</a></li>
                         </ul>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <a class="dropdown-item" href="Recommend_train_page.php">Recommend System Management</a>
                     </li>
                 </ul>
             </div>
@@ -310,8 +323,7 @@ if ($_SESSION['id_admin'] == "") {
         <?php
         include_once('functions.php');
 
-        $fetchDataFormMembers = new DB_con(); // สร้างอินสแตนซ์ของคลาส DB_con
-        $result = $fetchDataFormMembers->fetchDataFormMembers(); // เรียกใช้ฟังก์ชันจากคลาส
+        $fetchDataFormMembers = new DB_con();
         $results_per_page = isset($_GET['results_per_page']) ? (int)$_GET['results_per_page'] : 10;
 
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -319,25 +331,21 @@ if ($_SESSION['id_admin'] == "") {
             $page = 1;
         }
 
-        // Determine the SQL LIMIT starting number for the results on the displaying page
         $start_from = ($page - 1) * $results_per_page;
         $total_results = $fetchDataFormMembers->countTotalFormMembers();
         $total_pages = ceil($total_results / $results_per_page);
         $index = $start_from + 1;
 
-        // ดึงข้อมูลตามหน้า
-        $sql = $fetchDataFormMembers->fetchDataFormMemberspage($start_from, $results_per_page);
-
+        $result = $fetchDataFormMembers->fetchDataFormMemberspage($start_from, $results_per_page);
         ?>
-
 
         <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15);">
             <b style="margin-left: 20px;">รายชื่อผู้ตอบเเบบสอบถาม</b>
             <div style="margin-top: 20px;">
-                <div class="container" style=" margin-bottom: 20px;">
+                <div class="container" style="margin-bottom: 20px;">
                     <input type="text" id="searchInput" class="form-control" placeholder="ค้นหาชื่อผู้ใช้งาน..." onkeyup="filterTable()">
                 </div>
-                <table class="table table-bordered" style="font-size: 15px;  text-align: center;" id="placesTable">
+                <table class="table table-bordered" style="font-size: 15px; text-align: center;" id="placesTable">
                     <thead>
                         <tr>
                             <th scope="col">ลำดับ</th>
@@ -346,14 +354,12 @@ if ($_SESSION['id_admin'] == "") {
                             <th scope="col">E-mail ของผู้ใช้งาน</th>
                             <th scope="col">เบอร์โทรศัพท์</th>
                             <th scope="col">ดูรายละเอียด</th>
-                            <th scope="col">แก้ไข</th>
                             <th scope="col">ลบ</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
                         if ($result && mysqli_num_rows($result) > 0) {
-
                             while ($row = mysqli_fetch_array($result)) {
                         ?>
                                 <tr>
@@ -364,10 +370,8 @@ if ($_SESSION['id_admin'] == "") {
                                     <td style="width: 200px;"><?php echo htmlspecialchars($row['email']); ?></td>
                                     <td style="width: 100px;"><?php echo htmlspecialchars($row['phone']); ?></td>
                                     <td style="width: 50px;"><a href="viewDetailsform.php?id=<?php echo $row['id_member']; ?>"><img src="img/resume.png" alt="รายละเอียด" width="30" height="30"></a></td>
-                                    <td style="width: 50px;"><a href="updateformMember.php?id=<?php echo $row['id_member']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
                                     <td style="width: 50px;"><a href="deleteformMember.php?del=<?php echo $row['id_member']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
                                 </tr>
-
                         <?php
                             }
                         } else {
@@ -375,52 +379,79 @@ if ($_SESSION['id_admin'] == "") {
                         }
                         ?>
                     </tbody>
-
                 </table>
             </div>
 
             <div style="display: flex;">
                 <div style="margin-bottom: 20px; margin-left: 20px; font-size: 25px; display: flex; width: 200px;">
-
-                    <label for="resultsPerPage" style=" font-size: 20px; width: 200px;" class="form-label">ผลลัพธ์ต่อหน้า:</label>
-                    <select id="resultsPerPage" class="form-control" style="  width: 60px;" onchange="updateResultsPerPage()">
+                    <label for="resultsPerPage" style="font-size: 20px; width: 200px;" class="form-label">ผลลัพธ์ต่อหน้า:</label>
+                    <select id="resultsPerPage" class="form-control" style="width: 60px;" onchange="updateResultsPerPage()">
                         <option value="25" <?php echo $results_per_page == 25 ? 'selected' : ''; ?>>25</option>
                         <option value="50" <?php echo $results_per_page == 50 ? 'selected' : ''; ?>>50</option>
                         <option value="100" <?php echo $results_per_page == 100 ? 'selected' : ''; ?>>100</option>
                     </select>
                 </div>
+                <style>
+                    .pagination .dropdown-menu {
+                        max-height: 300px;
+                        overflow-y: auto;
+                    }
+                </style>
 
-                <!-- Pagination controls -->
-                <nav aria-label="Page navigation example" style=" margin-left: 170px; font-size: 15px; ">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item <?php if ($page <= 1) {
-                                                    echo 'disabled';
-                                                } ?>">
-                            <a class="page-link" href="<?php if ($page > 1) {
-                                                            echo " ?page=" . ($page - 1);
-                                                        } ?>" tabindex="-1" aria-disabled="true">หน้าเเรก</a>
+
+                <nav aria-label="Page navigation example" style="margin-left: 170px; font-size: 15px;">
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <li class="page-item <?php if ($page <= 1) echo 'disabled'; ?>">
+                            <a class="page-link" href="<?php if ($page > 1) echo "?page=" . ($page - 1); ?>" tabindex="-1" aria-disabled="true">หน้าเเรก</a>
                         </li>
-                        <?php for ($i = 1; $i <= $total_pages; $i++) { ?>
-                            <li class="page-item <?php if ($i == $page) {
-                                                        echo 'active';
-                                                    } ?>">
-                                <a class="page-link" href="?page=<?php echo $i; ?>">
-                                    <?php echo $i; ?>
-                                </a>
-                            </li>
-                        <?php } ?>
-                        <li class="page-item <?php if ($page >= $total_pages) {
-                                                    echo 'disabled';
-                                                } ?>">
-                            <a class="page-link" href="<?php if ($page < $total_pages) {
-                                                            echo " ?page=" . ($page + 1);
-                                                        } ?>">หน้าต่อไป</a>
+                        <?php
+                        if ($total_pages <= 7) {
+                            for ($i = 1; $i <= $total_pages; $i++) {
+                                echo '<li class="page-item';
+                                if ($i == $page) echo ' active';
+                                echo '"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
+                            }
+                        } else {
+                            if ($page <= 4) {
+                                for ($i = 1; $i <= 5; $i++) {
+                                    echo '<li class="page-item';
+                                    if ($i == $page) echo ' active';
+                                    echo '"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
+                                }
+                                echo '<li class="page-item"><a class="page-link" href="javascript:void(0);" id="pagination-ellipsis">...</a></li>';
+                                echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . '">' . $total_pages . '</a></li>';
+                            } elseif ($page > 4 && $page < $total_pages - 3) {
+                                echo '<li class="page-item"><a class="page-link" href="?page=1">1</a></li>';
+                                echo '<li class="page-item"><a class="page-link" href="javascript:void(0);" id="pagination-ellipsis-start">...</a></li>';
+                                for ($i = $page - 1; $i <= $page + 1; $i++) {
+                                    echo '<li class="page-item';
+                                    if ($i == $page) echo ' active';
+                                    echo '"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
+                                }
+                                echo '<li class="page-item"><a class="page-link" href="javascript:void(0);" id="pagination-ellipsis-end">...</a></li>';
+                                echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . '">' . $total_pages . '</a></li>';
+                            } else {
+                                echo '<li class="page-item"><a class="page-link" href="?page=1">1</a></li>';
+                                echo '<li class="page-item"><a class="page-link" href="javascript:void(0);" id="pagination-ellipsis">...</a></li>';
+                                for ($i = $total_pages - 4; $i <= $total_pages; $i++) {
+                                    echo '<li class="page-item';
+                                    if ($i == $page) echo ' active';
+                                    echo '"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
+                                }
+                            }
+                        }
+                        ?>
+                        <li class="page-item <?php if ($page >= $total_pages) echo 'disabled'; ?>">
+                            <a class="page-link" href="<?php if ($page < $total_pages) echo "?page=" . ($page + 1); ?>">หน้าต่อไป</a>
                         </li>
                     </ul>
                 </nav>
+
             </div>
         </div>
-        </div>
+
+
+
         <script>
             function updateResultsPerPage() {
                 const select = document.getElementById('resultsPerPage');
@@ -463,6 +494,7 @@ if ($_SESSION['id_admin'] == "") {
                 }
             }
         </script>
+
 
 
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

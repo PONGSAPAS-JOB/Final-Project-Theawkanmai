@@ -5,8 +5,15 @@ session_start();
 if ($_SESSION['id_admin'] == "") {
     header("location: signin.php");
 } else {
+
     include_once('functions.php');
     $fetchdataManager = new DB_con();
+    $db = new DB_con();
+
+
+    $id_admin = $_SESSION['id_admin'];
+    $img_admin = $db->getAdminProfilePicture($id_admin);
+
 
     // Use the DB_con class to get the connection
     $dbcon = $fetchdataManager->dbcon; // Assuming dbcon is a public property in your class
@@ -201,7 +208,7 @@ if ($_SESSION['id_admin'] == "") {
                         <span class="app-desc">ผู้ดูเเลระบบ</span>
 
                     </a>
-                    <img src="img/pro.jpg" class="rounded-circle " alt="...">
+                    <img src="<?php echo htmlspecialchars($img_admin, ENT_QUOTES, 'UTF-8'); ?>" class="rounded-circle" alt="Admin Profile Picture">
 
 
                     <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
@@ -250,6 +257,9 @@ if ($_SESSION['id_admin'] == "") {
                             <li><a class="dropdown-item mt-2" href="FormAns_User_personality.php">Form User personality</a></li>
                             <li><a class="dropdown-item mt-2" href="FormAns_Motivation.php">Form tourist attraction Motivation</a></li>
                         </ul>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <a class="dropdown-item" href="Recommend_train_page.php">Recommend System Management</a>
                     </li>
                 </ul>
             </div>
@@ -327,7 +337,7 @@ if ($_SESSION['id_admin'] == "") {
             <b>รายชื่อ ผู้ที่เกี่ยวข้องกับสถานที่</b>
             <div style="margin-top: 20px;">
                 <div class="container" style="margin-bottom: 20px;">
-                    <input type="text" id="searchInput" class="form-control" placeholder="ค้นหาชื่อ..." onkeyup="filterTable()">
+                    <input type="text" id="searchInput" placeholder="ค้นหา" onkeyup="searchTable()" style="font-size: 15px; padding: 10px; width: 50%;">
                 </div>
                 <table class="table table-bordered" style="font-size: 15px;" id="placesTable">
                     <thead>
@@ -356,7 +366,7 @@ if ($_SESSION['id_admin'] == "") {
                                 <td><?php echo htmlspecialchars($row['phone']); ?></td>
                                 <td><?php echo htmlspecialchars($area_count); ?></td>
                                 <td><?php echo htmlspecialchars($places_count); ?></td>
-                                <td><a href="ProfileManager.php?id=<?php echo $row['id_manager']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
+                                <td><a href="EditProfileManagerByadmin.php?id=<?php echo $row['id_manager']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
                                 <td><a href="deleteManager.php?del=<?php echo $row['id_manager']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
                             </tr>
                         <?php } ?>
@@ -365,7 +375,28 @@ if ($_SESSION['id_admin'] == "") {
             </div>
         </div>
 
+        <script>
+            function searchTable() {
+                const input = document.getElementById('searchInput');
+                const filter = input.value.toUpperCase();
+                const table = document.getElementById('placesTable');
+                const tr = table.getElementsByTagName('tr');
 
+                for (let i = 1; i < tr.length; i++) {
+                    tr[i].style.display = 'none';
+                    const tdArray = tr[i].getElementsByTagName('td');
+                    for (let j = 0; j < tdArray.length; j++) {
+                        const td = tdArray[j];
+                        if (td) {
+                            if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                                tr[i].style.display = '';
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
 
 
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

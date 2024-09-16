@@ -338,15 +338,48 @@ if ($_SESSION['id_admin'] == "") {
       // Create an instance of the DB_con class
       $userdata = new DB_con();
 
-      // Average scores for each cluster
-      $clusters = [
-        0 => [4.747126, 4.097701, 4.316092, 4.436782, 4.568966, 4.488506, 3.908046, 3.770115, 2.787356, 4.902299, 4.758621, 4.798851, 4.793103, 4.839080, 4.775862, 4.867816, 4.856322, 4.586207, 4.896552, 4.557471],
-        1 => [4.460938, 3.875000, 3.773438, 4.007812, 4.273438, 3.992188, 3.500000, 3.609375, 2.726562, 4.578125, 4.093750, 4.351562, 3.984375, 4.250000, 4.015625, 4.203125, 4.140625, 3.750000, 4.453125, 3.859375],
-        2 => [3.910714, 3.571429, 3.392857, 3.607143, 3.821429, 3.678571, 3.285714, 3.428571, 2.696429, 3.946429, 3.071429, 2.910714, 3.232143, 3.214286, 3.178571, 3.607143, 3.482143, 3.392857, 3.607143, 3.232143]
-      ];
+      // Fetch the latest id_update_cluster
+      $sql = "SELECT MAX(id_update_cluster) as latest_id_update_cluster FROM cluster_value";
+      $result = $userdata->query($sql);
+      $row = $result->fetch_assoc();
+      $latest_id_update_cluster = $row['latest_id_update_cluster'];
+
+      // Display the id_update_cluster value
+      echo "<h3>id_update_cluster ที่ใช้: $latest_id_update_cluster</h3>";
+
+      // Fetch cluster data for the latest id_update_cluster
+      $sql = "SELECT * FROM cluster_value WHERE id_update_cluster = $latest_id_update_cluster";
+      $result = $userdata->query($sql);
+
+      $clusters = [];
+      while ($row = $result->fetch_assoc()) {
+        $id_cluster = $row['id_cluster'];
+        $clusters[$id_cluster] = [
+          $row['value1'],
+          $row['value2'],
+          $row['value3'],
+          $row['value4'],
+          $row['value5'],
+          $row['value6'],
+          $row['value7'],
+          $row['value8'],
+          $row['value9'],
+          $row['value10'],
+          $row['value11'],
+          $row['value12'],
+          $row['value13'],
+          $row['value14'],
+          $row['value15'],
+          $row['value16'],
+          $row['value17'],
+          $row['value18'],
+          $row['value19'],
+          $row['value20']
+        ];
+      }
 
       // User ID for analysis
-      $id_member = 78; // Example user ID
+      $id_member = 1805; // Example user ID
 
       // Fetch data from eva_form1
       $sql = "SELECT * FROM eva_form1 WHERE id_member = $id_member";
@@ -387,7 +420,7 @@ if ($_SESSION['id_admin'] == "") {
 
       // Define recommendations based on clusters
       $recommendations = [
-        0 => [
+        1 => [
           "กิจกรรม" => [
             "เดินป่าในเส้นทางธรรมชาติ",
             "ปิกนิกในสวนสาธารณะ",
@@ -401,7 +434,7 @@ if ($_SESSION['id_admin'] == "") {
             "แหล่งท่องเที่ยวเชิงศาสนา"
           ]
         ],
-        1 => [
+        2 => [
           "กิจกรรม" => [
             "เวิร์กช็อปสร้างแรงบันดาลใจ",
             "การเดินป่าเชิงผจญภัย",
@@ -417,7 +450,7 @@ if ($_SESSION['id_admin'] == "") {
             "แหล่งท่องเที่ยวเชิงสุขภาพ"
           ]
         ],
-        2 => [
+        3 => [
           "กิจกรรม" => [
             "การนวดผ่อนคลายหรือสปา",
             "การชมวิวและถ่ายภาพ",
@@ -522,17 +555,15 @@ if ($_SESSION['id_admin'] == "") {
           }
           echo "</ul>";
         } else {
-          echo "<h4>ไม่มีสถานที่ท่องเที่ยวแนะนำที่ตรงกับหมวดหมู่ที่เลือก</h4>";
+          // Handle the case where there are no id_type_areas
+          echo "<p>No recommended areas found.</p>";
         }
       } else {
-        echo "<h4>ไม่มีหมวดหมู่ที่ตรงกับคำแนะนำ</h4>";
+        // Handle the case where there are no id_categories
+        echo "<p>No recommended areas found.</p>";
       }
-
-      // Close the database connection
-      $userdata->close();
       ?>
     </div>
-
 
 
 

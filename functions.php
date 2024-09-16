@@ -61,6 +61,51 @@ class DB_con
         return null;
     }
 
+    // Function to fetch admin's profile picture URL
+    public function getAdminProfilePicture($id_admin)
+    {
+        $sql = "SELECT img_admin FROM admin WHERE id_admin = ?";
+        $stmt = $this->dbcon->prepare($sql);
+        if ($stmt === false) {
+            die('Prepare failed: ' . $this->dbcon->error);
+        }
+        $stmt->bind_param("i", $id_admin);
+        $stmt->execute();
+        $stmt->bind_result($img_admin);
+        $stmt->fetch();
+        $stmt->close();
+
+        // Set a default image if img_admin is empty
+        if (empty($img_admin)) {
+            $img_admin = "img/pro.jpg"; // Path to default image
+        }
+
+        return $img_admin;
+    }
+
+    // Function to fetch admin's profile picture URL
+    public function getManagerProfilePicture($Id_manager)
+    {
+        $sql = "SELECT img_manager FROM manager WHERE Id_manager = ?";
+        $stmt = $this->dbcon->prepare($sql);
+        if ($stmt === false) {
+            die('Prepare failed: ' . $this->dbcon->error);
+        }
+        $stmt->bind_param("i", $Id_manager);
+        $stmt->execute();
+        $stmt->bind_result($img_manager);
+        $stmt->fetch();
+        $stmt->close();
+
+        // Set a default image if img_admin is empty
+        if (empty($img_manager)) {
+            $img_manager = "img/pro.jpg"; // Path to default image
+        }
+
+        return $img_manager;
+    }
+
+
     public function getinfomanager($id_Manager)
     {
         $getinfo = mysqli_query($this->dbcon, "SELECT username FROM manager WHERE Id_manager = '$id_Manager' ");
@@ -190,6 +235,59 @@ class DB_con
         return $result;
     }
 
+    public function fetchMembersPage($start_from, $results_per_page)
+    {
+        $query = "SELECT * FROM member LIMIT ?, ?";
+        $stmt = mysqli_prepare($this->dbcon, $query);
+
+        if (!$stmt) {
+            echo "Failed to prepare statement: " . mysqli_error($this->dbcon);
+            exit();
+        }
+
+        mysqli_stmt_bind_param($stmt, "ii", $start_from, $results_per_page);
+
+        if (!mysqli_stmt_execute($stmt)) {
+            echo "Failed to execute statement: " . mysqli_stmt_error($stmt);
+            exit();
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+
+        if (!$result) {
+            echo "Failed to get result: " . mysqli_error($this->dbcon);
+            exit();
+        }
+
+        return $result;
+    }
+
+    public function countTotalMemberspage()
+    {
+        $query = "SELECT COUNT(*) as total FROM member";
+        $stmt = mysqli_prepare($this->dbcon, $query);
+
+        if (!$stmt) {
+            echo "Failed to prepare statement: " . mysqli_error($this->dbcon);
+            exit();
+        }
+
+        if (!mysqli_stmt_execute($stmt)) {
+            echo "Failed to execute statement: " . mysqli_stmt_error($stmt);
+            exit();
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+
+        if (!$result) {
+            echo "Failed to get result: " . mysqli_error($this->dbcon);
+            exit();
+        }
+
+        $row = mysqli_fetch_assoc($result);
+        return $row['total'];
+    }
+
 
     public function fetchAllManager()
     {
@@ -231,6 +329,12 @@ class DB_con
         return $deletemember;
     }
 
+
+    public function deleteManager($id_manager)
+    {
+        $deleteManager = mysqli_query($this->dbcon, "DELETE FROM manager WHERE id_manager = '$id_manager'");
+        return $deleteManager;
+    }
 
 
     // Method to count total areas
@@ -875,6 +979,12 @@ class DB_con
         return $result;
     }
 
+    public function fetchdataareaonerecord($id_Area)
+    {
+        $result = mysqli_query($this->dbcon, "SELECT * FROM area_info WHERE id_Area = '$id_Area'");
+        return $result;
+    }
+
     public function fetchdataAreaByManager($id_manager)
     {
         $sql = "SELECT * FROM area_info WHERE id_manager = '$id_manager'";
@@ -1381,7 +1491,6 @@ class DB_con
     }
 
     //=================เกี่ยวกับเเบบสอบถาม=================================================================================================
-
     public function fetchDataFormMembers()
     {
         $query = "
@@ -1393,7 +1502,6 @@ class DB_con
         $result = mysqli_query($this->dbcon, $query);
 
         if (!$result) {
-            // จัดการข้อผิดพลาด
             die("Query failed: " . mysqli_error($this->dbcon));
         }
 
@@ -1408,22 +1516,23 @@ class DB_con
 
     public function fetchDataFormMemberspage($start_from, $results_per_page)
     {
-        $conn = $this->dbcon; // Assuming you have a method to get the DB connection
-        $query = "SELECT * FROM ans_interest LIMIT $start_from, $results_per_page";
-        $result = mysqli_query($conn, $query);
-        if (!$result) {
-            die("Query Failed: " . mysqli_error($conn));
-        }
+        $sql = "
+        SELECT ans_interest.id_member, member.username, member.email, member.phone
+        FROM ans_interest
+        INNER JOIN member ON ans_interest.id_member = member.id_member
+        LIMIT $start_from, $results_per_page
+    ";
+        $result = mysqli_query($this->dbcon, $sql);
+        return $result;
     }
 
-    // Method to count total areas
     public function countTotalFormMembers()
     {
-        $conn = $this->dbcon; // Assuming you have a method to get the DB connection
+        $conn = $this->dbcon;
         $query = "SELECT COUNT(*) AS total FROM ans_interest";
         $result = mysqli_query($conn, $query);
         $row = mysqli_fetch_assoc($result);
-        return (int)$row['total']; // Ensure it returns an integer
+        return (int)$row['total'];
     }
 
 
@@ -2115,5 +2224,236 @@ class DB_con
         $id_comment_p = mysqli_real_escape_string($this->dbcon, $id_comment_p);
         $deleteCommentPlaces = mysqli_query($this->dbcon, "DELETE FROM comment_places WHERE id_comment_p = '$id_comment_p'");
         return $deleteCommentPlaces;
+    }
+
+    /////////////////////////Recommend system////////////////////////////////////////////////////////////////
+
+
+    public function fetchUpdateTimes()
+    {
+        $query = "SELECT DISTINCT id_update_cluster FROM cluster_value ORDER BY id_update_cluster DESC"; // Adjust as necessary
+        $stmt = mysqli_prepare($this->dbcon, $query);
+
+        if (!$stmt) {
+            echo "Failed to prepare statement: " . mysqli_error($this->dbcon);
+            exit();
+        }
+
+        if (!mysqli_stmt_execute($stmt)) {
+            echo "Failed to execute statement: " . mysqli_stmt_error($stmt);
+            exit();
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+
+        if (!$result) {
+            echo "Failed to get result: " . mysqli_error($this->dbcon);
+            exit();
+        }
+
+        return $result;
+    }
+
+
+    public function fetchvaluecluster($updateId = null)
+    {
+        // If no updateId is provided, fetch the latest id_update_cluster
+        if (!$updateId) {
+            $query = "SELECT id_update_cluster FROM cluster_value ORDER BY day_update DESC LIMIT 1";
+            $stmt = mysqli_prepare($this->dbcon, $query);
+
+            if (!$stmt) {
+                echo "Failed to prepare statement: " . mysqli_error($this->dbcon);
+                exit();
+            }
+
+            if (!mysqli_stmt_execute($stmt)) {
+                echo "Failed to execute statement: " . mysqli_stmt_error($stmt);
+                exit();
+            }
+
+            $result = mysqli_stmt_get_result($stmt);
+
+            if (!$result) {
+                echo "Failed to get result: " . mysqli_error($this->dbcon);
+                exit();
+            }
+
+            $row = mysqli_fetch_assoc($result);
+            $updateId = $row['id_update_cluster'];
+        }
+
+        // Fetch data for the specified or latest id_update_cluster
+        $query = "SELECT * FROM cluster_value WHERE id_update_cluster = ?";
+        $stmt = mysqli_prepare($this->dbcon, $query);
+
+        if (!$stmt) {
+            echo "Failed to prepare statement: " . mysqli_error($this->dbcon);
+            exit();
+        }
+
+        mysqli_stmt_bind_param($stmt, "i", $updateId);
+
+        if (!mysqli_stmt_execute($stmt)) {
+            echo "Failed to execute statement: " . mysqli_stmt_error($stmt);
+            exit();
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+
+        if (!$result) {
+            echo "Failed to get result: " . mysqli_error($this->dbcon);
+            exit();
+        }
+
+        return $result;
+    }
+
+
+
+
+    function getClusterRecommendations()
+    {
+        $sql = "SELECT id_cluster, activity_cluster, group_cluster_dis FROM summarize_cluster";
+        $result = $this->dbcon->query($sql);
+        $recommendations = [];
+
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $cluster = $row['id_cluster'];
+                $activities = explode(',', $row['activity_cluster']); // Assuming activities are comma-separated
+                $attractions = explode(',', $row['group_cluster_dis']); // Assuming attractions are comma-separated
+                $recommendations[$cluster] = [
+                    "กิจกรรม" => $activities,
+                    "แหล่งท่องเที่ยว" => $attractions
+                ];
+            }
+        }
+        return $recommendations;
+    }
+
+    //////////cal//////////////
+
+    // Fetch data from eva_form1 and eva_form2 for a specific member
+    // ฟังก์ชันดึงข้อมูลจากทุก id_member
+    public function fetchAllEvaluationData()
+    {
+        $query = "
+            SELECT eva_p1_ans1, eva_p1_ans2, eva_p1_ans3, eva_p1_ans4, eva_p1_ans5, 
+                   eva_p1_ans6, eva_p1_ans7, eva_p1_ans8, eva_p1_ans9, 
+                   eva_p2_ans1, eva_p2_ans10, eva_p2_ans11, eva_p2_ans12, 
+                   eva_p2_ans13, eva_p2_ans14, eva_p2_ans15, eva_p2_ans16, 
+                   eva_p2_ans17, eva_p2_ans18, eva_p2_ans19
+            FROM eva_form1
+            LEFT JOIN eva_form2 ON eva_form1.id_member = eva_form2.id_member
+        ";
+        return $this->dbcon->query($query);
+    }
+
+
+    // Calculate optimal K using Elbow Method
+    public function calculateOptimalK()
+    {
+        $data = [];
+        $query = "SELECT * FROM eva_form1 UNION SELECT * FROM eva_form2";
+        $result = mysqli_query($this->dbcon, $query);
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $data[] = [
+                $row["eva_p1_ans1"],
+                $row["eva_p1_ans2"],
+                $row["eva_p1_ans3"],
+                $row["eva_p1_ans4"],
+                $row["eva_p1_ans5"],
+                $row["eva_p1_ans6"],
+                $row["eva_p1_ans7"],
+                $row["eva_p1_ans8"],
+                $row["eva_p1_ans9"],
+                $row["eva_p2_ans1"],
+                $row["eva_p2_ans10"],
+                $row["eva_p2_ans11"],
+                $row["eva_p2_ans12"],
+                $row["eva_p2_ans13"],
+                $row["eva_p2_ans14"],
+                $row["eva_p2_ans15"],
+                $row["eva_p2_ans16"],
+                $row["eva_p2_ans17"],
+                $row["eva_p2_ans18"],
+                $row["eva_p2_ans19"]
+            ];
+        }
+
+        // Implement the Elbow Method here
+        // Use Python for K-means clustering and plot the Elbow graph
+        // You need to set up Python environment with required libraries and execute the script
+
+        // Example: using exec() to run a Python script
+        $output = [];
+        exec("python3 calculate_kmeans.py", $output);
+
+        return $output;
+    }
+
+    // Example Python script (calculate_kmeans.py)
+    // Make sure to install necessary libraries: pip install numpy pandas sklearn matplotlib
+    /*
+import numpy as np
+import pandas as pd
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+# Assuming data is passed as a CSV file
+data = pd.read_csv('data.csv')
+
+# Elbow method to find the optimal k
+sse = []
+k_range = range(1, 11)
+for k in k_range:
+    kmeans = KMeans(n_clusters=k)
+    kmeans.fit(data)
+    sse.append(kmeans.inertia_)
+
+# Plotting the Elbow Method graph
+plt.figure(figsize=(10, 6))
+plt.plot(k_range, sse, marker='o')
+plt.title('Elbow Method for Optimal K')
+plt.xlabel('Number of clusters')
+plt.ylabel('SSE')
+plt.savefig('elbow_method.png')
+
+# Print the optimal K value
+optimal_k = sse.index(min(sse)) + 1
+print(optimal_k)
+*/
+
+    public function saveNewClusterValues($clusters)
+    {
+        $conn = $this->dbcon;
+
+        // Get the latest id_update_cluster
+        $result = $conn->query("SELECT MAX(id_update_cluster) AS max_id FROM cluster_value");
+        if ($result === false) {
+            return "Error querying max id_update_cluster: " . $conn->error;
+        }
+        $row = $result->fetch_assoc();
+        $next_id_update_cluster = $row['max_id'] + 1;
+
+        foreach ($clusters as $clusterId => $clusterValues) {
+            // Prepare the query
+            $query = "INSERT INTO cluster_value (id_cluster, id_update_cluster, value1, value2, value3, value4, value5, value6, value7, value8, value9, value10, value11, value12, value13, value14, value15, value16, value17, value18, value19, value20)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            // Prepare and bind
+            if ($stmt = $conn->prepare($query)) {
+                $stmt->bind_param("ii" . str_repeat("d", 20), $clusterId, $next_id_update_cluster, ...$clusterValues);
+                if (!$stmt->execute()) {
+                    return "Error executing statement: " . $stmt->error;
+                }
+                $stmt->close();
+            } else {
+                return "Error preparing statement: " . $conn->error;
+            }
+        }
+        return "Clusters saved successfully";
     }
 }

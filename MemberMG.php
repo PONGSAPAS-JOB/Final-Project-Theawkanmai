@@ -5,6 +5,17 @@ session_start();
 if ($_SESSION['id_admin'] == "") {
     header("location: signin.php");
 } else {
+    // Include the DB_con class
+    include 'functions.php';
+
+    // Create an instance of the DB_con class
+    $db = new DB_con();
+
+    $id_admin = $_SESSION['id_admin'];
+    $img_admin = $db->getAdminProfilePicture($id_admin);
+
+    // Close the database connection (optional, as it will close automatically at the end of the script)
+    $db->dbcon->close();
 
 ?>
     <!DOCTYPE html>
@@ -187,7 +198,7 @@ if ($_SESSION['id_admin'] == "") {
                         <span class="app-desc">ผู้ดูเเลระบบ</span>
 
                     </a>
-                    <img src="img/pro.jpg" class="rounded-circle " alt="...">
+                    <img src="<?php echo htmlspecialchars($img_admin, ENT_QUOTES, 'UTF-8'); ?>" class="rounded-circle" alt="Admin Profile Picture">
 
 
                     <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
@@ -236,6 +247,9 @@ if ($_SESSION['id_admin'] == "") {
                             <li><a class="dropdown-item mt-2" href="FormAns_User_personality.php">Form User personality</a></li>
                             <li><a class="dropdown-item mt-2" href="FormAns_Motivation.php">Form tourist attraction Motivation</a></li>
                         </ul>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <a class="dropdown-item" href="Recommend_train_page.php">Recommend System Management</a>
                     </li>
                 </ul>
             </div>
@@ -308,20 +322,27 @@ if ($_SESSION['id_admin'] == "") {
             }
         </style>
 
-
         <?php
         include_once('functions.php');
         $fetchdataMember = new DB_con();
 
-        // Example function to fetch all members; replace with your actual method
+        $results_per_page = isset($_GET['results_per_page']) ? (int)$_GET['results_per_page'] : 10;
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        if ($page < 1) {
+            $page = 1;
+        }
+
+        $start_from = ($page - 1) * $results_per_page;
+        $total_results = $fetchdataMember->countTotalMemberspage(); // Make sure this function counts the total number of members
+        $total_pages = ceil($total_results / $results_per_page);
+        $index = $start_from + 1;
+
         try {
-            $sql = $fetchdataMember->fetchAllMembers(); // Ensure this returns a PDOStatement object
+            $sql = $fetchdataMember->fetchMembersPage($start_from, $results_per_page); // Fetch members with pagination
         } catch (Exception $e) {
             echo 'Error: ' . $e->getMessage();
             exit;
         }
-
-        $index = 1;
         ?>
 
         <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
@@ -367,7 +388,81 @@ if ($_SESSION['id_admin'] == "") {
                     </tbody>
                 </table>
             </div>
+
+            <!-- Results per page and pagination -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="margin-bottom: 20px; font-size: 20px;">
+                    <label for="resultsPerPage" class="form-label">ผลลัพธ์ต่อหน้า:</label>
+                    <select id="resultsPerPage" class="form-control" style="width: 60px;" onchange="updateResultsPerPage()">
+                        <option value="10" <?php echo $results_per_page == 10 ? 'selected' : ''; ?>>10</option>
+                        <option value="25" <?php echo $results_per_page == 25 ? 'selected' : ''; ?>>25</option>
+                        <option value="50" <?php echo $results_per_page == 50 ? 'selected' : ''; ?>>50</option>
+                        <option value="100" <?php echo $results_per_page == 100 ? 'selected' : ''; ?>>100</option>
+                    </select>
+                </div>
+
+                <nav aria-label="Page navigation example" style="font-size: 15px;">
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <li class="page-item <?php if ($page <= 1) echo 'disabled'; ?>">
+                            <a class="page-link" href="<?php if ($page > 1) echo "?page=" . ($page - 1) . "&results_per_page=" . $results_per_page; ?>" tabindex="-1" aria-disabled="true">หน้าเเรก</a>
+                        </li>
+                        <?php
+                        if ($total_pages <= 7) {
+                            for ($i = 1; $i <= $total_pages; $i++) {
+                                echo '<li class="page-item';
+                                if ($i == $page) echo ' active';
+                                echo '"><a class="page-link" href="?page=' . $i . '&results_per_page=' . $results_per_page . '">' . $i . '</a></li>';
+                            }
+                        } else {
+                            if ($page <= 4) {
+                                for ($i = 1; $i <= 5; $i++) {
+                                    echo '<li class="page-item';
+                                    if ($i == $page) echo ' active';
+                                    echo '"><a class="page-link" href="?page=' . $i . '&results_per_page=' . $results_per_page . '">' . $i . '</a></li>';
+                                }
+                                echo '<li class="page-item"><a class="page-link" href="javascript:void(0);" id="pagination-ellipsis">...</a></li>';
+                                echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . '&results_per_page=' . $results_per_page . '">' . $total_pages . '</a></li>';
+                            } elseif ($page > 4 && $page < $total_pages - 3) {
+                                echo '<li class="page-item"><a class="page-link" href="?page=1&results_per_page=' . $results_per_page . '">1</a></li>';
+                                echo '<li class="page-item"><a class="page-link" href="javascript:void(0);" id="pagination-ellipsis-start">...</a></li>';
+                                for ($i = $page - 1; $i <= $page + 1; $i++) {
+                                    echo '<li class="page-item';
+                                    if ($i == $page) echo ' active';
+                                    echo '"><a class="page-link" href="?page=' . $i . '&results_per_page=' . $results_per_page . '">' . $i . '</a></li>';
+                                }
+                                echo '<li class="page-item"><a class="page-link" href="javascript:void(0);" id="pagination-ellipsis-end">...</a></li>';
+                                echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . '&results_per_page=' . $results_per_page . '">' . $total_pages . '</a></li>';
+                            } else {
+                                echo '<li class="page-item"><a class="page-link" href="?page=1&results_per_page=' . $results_per_page . '">1</a></li>';
+                                echo '<li class="page-item"><a class="page-link" href="javascript:void(0);" id="pagination-ellipsis">...</a></li>';
+                                for ($i = $total_pages - 4; $i <= $total_pages; $i++) {
+                                    echo '<li class="page-item';
+                                    if ($i == $page) echo ' active';
+                                    echo '"><a class="page-link" href="?page=' . $i . '&results_per_page=' . $results_per_page . '">' . $i . '</a></li>';
+                                }
+                            }
+                        }
+                        ?>
+                        <li class="page-item <?php if ($page >= $total_pages) echo 'disabled'; ?>">
+                            <a class="page-link" href="<?php if ($page < $total_pages) echo "?page=" . ($page + 1) . "&results_per_page=" . $results_per_page; ?>">หน้าต่อไป</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
+
+        <script>
+            function updateResultsPerPage() {
+                const select = document.getElementById('resultsPerPage');
+                const resultsPerPage = select.value;
+                const url = new URL(window.location.href);
+
+                url.searchParams.set('results_per_page', resultsPerPage);
+                url.searchParams.set('page', 1);
+
+                window.location.href = url.toString();
+            }
+        </script>
 
 
 

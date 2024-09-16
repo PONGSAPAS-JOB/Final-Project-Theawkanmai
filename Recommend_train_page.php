@@ -1,3 +1,5 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <?php
 
 session_start();
@@ -17,34 +19,29 @@ if ($_SESSION['id_admin'] == "") {
 
     // Close the database connection (optional, as it will close automatically at the end of the script)
     $db->dbcon->close();
-
 ?>
     <!DOCTYPE html>
     <html lang="en">
 
     <head>
         <link rel="icon" href="img/icon.png" type="image/ico">
-
         <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Itim&family=LXGW+WenKai+TC&family=Lily+Script+One&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
         <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-        <!-- <script type="text/javascript" src="https://api.longdo.com/map/?key=5f0cf4be3ba02be29c4136aca052b5fd"></script> -->
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Lily+Script+One&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" type="text/css" href="./style.css" />
         <script type="module" src="./index.js"></script>
         <script src="https://developers.google.com/maps/get-started"></script>
-        <title>สถานที่ของฉัน</title>
+        <title>หน้าการจัดการระบบเเนะนำ</title>
     </head>
+
     <style>
         body {
             font-family: "Itim", cursive;
@@ -133,6 +130,7 @@ if ($_SESSION['id_admin'] == "") {
             .rounded-circle {
                 width: 5%;
                 height: 5%;
+                margin-top: 1%;
                 margin-right: 3%;
                 margin-bottom: -10%;
 
@@ -175,6 +173,15 @@ if ($_SESSION['id_admin'] == "") {
             .btn .btn-success {
                 font-family: "Itim", cursive;
             }
+
+            .rounded-circle {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                object-fit: cover;
+                margin-right: 10px;
+                margin-bottom: -10px;
+            }
         </style>
 
 
@@ -200,7 +207,6 @@ if ($_SESSION['id_admin'] == "") {
 
                     </a>
                     <img src="<?php echo htmlspecialchars($img_admin, ENT_QUOTES, 'UTF-8'); ?>" class="rounded-circle" alt="Admin Profile Picture">
-
 
 
                     <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
@@ -257,226 +263,211 @@ if ($_SESSION['id_admin'] == "") {
             </div>
         </div>
 
+
+
         <style>
             .addplace {
                 margin-top: 100px;
-                /* Adjusted margin-top to create space between button and cards */
                 width: 1000px;
-                /* Set button width */
                 margin-left: 150px;
                 margin-bottom: 10px;
                 text-align: center;
-                /* Center text within the button */
                 display: flex;
+            }
 
+            .containerbg {
+                width: 100%;
+                max-width: 1240px;
+                margin: 0 auto;
+                transition: transform 0.3s ease;
+                overflow: hidden;
+                opacity: 1;
+                background-color: #FFFFFF;
+                padding: 20px;
+                max-height: 400px;
+                overflow-y: auto;
+                padding-right: 15px;
+                resize: vertical;
+                min-height: 150px;
+                border: 1px solid #ccc;
             }
         </style>
 
+        </head>
 
-        <div class="addplace ">
-            <div style="width: 1000px; padding: 20px; white-space: nowrap;">
-                <h1><b>รายการสถานที่ท่องเที่ยว</b></h1>
-            </div>
-            <div style="width: 300px; padding: 20px; margin-left: 670px; white-space: nowrap; margin-top: 7px;">
-                <a href="addarea.php" class="btn btn-warning">เพิ่มสถานที่หลัก</a>
-            </div>
-
-        </div>
 
         <style>
-            .clicked {
-                background-color: #ccc;
-                /* Change to the desired gray color */
+            table {
+                width: 100%;
+                border-collapse: collapse;
             }
 
-
-            /* Style the page link text color */
-            .pagination .page-link {
-                color: black;
+            th,
+            td {
+                border: 1px solid #ddd;
+                padding: 8px;
             }
 
-            /* Style for the active page */
-            .pagination .active .page-link,
-            .pagination .page-link:hover {
-                background-color: #ffc107;
-                border-color: #ffc107;
-                color: black;
+            th {
+                background-color: #f4f4f4;
+                text-align: left;
             }
 
-
-            /* Style for the select element */
-            .form-control {
-
-
-                /* Add padding to accommodate the arrow */
-                background: url('img/down-arrow.png') no-repeat right center;
-                background-size: 1.0rem;
-                /* Size of the down arrow */
-                border-radius: 0.25rem;
-                /* Optional: rounded corners */
-            }
-
-            /* Optional: Style for the arrow to appear in the middle */
-            .form-control option {
-                background: white;
-                /* Set the background for the dropdown options */
+            .table-container {
+                padding: 20px;
             }
         </style>
 
 
         <?php
+        // Include the database connection file
         include_once('functions.php');
-        $fetchdataarea = new DB_con();
 
-        // กำหนดค่าเริ่มต้น
-        $results_per_page = isset($_GET['results_per_page']) ? (int)$_GET['results_per_page'] : 10;
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        if ($page < 1) {
-            $page = 1;
-        }
-        $start_from = ($page - 1) * $results_per_page;
-        $total_results = $fetchdataarea->countTotalAreas();
-        $total_pages = ceil($total_results / $results_per_page);
-        $index = $start_from + 1;
+        // Create a new instance of the DB_con class
+        $db = new DB_con();
 
-        // ดึงข้อมูลตามหน้า
-        $sql = $fetchdataarea->fetchdataareapage($start_from, $results_per_page);
+        // Handle form submission
+        $selectedId = isset($_POST['update_id']) ? $_POST['update_id'] : null;
+
+        // Fetch the distinct update IDs for the dropdown
+        $updateIds = $db->fetchUpdateTimes();
+
+        // Fetch the data based on the selected update ID
+        $data = $db->fetchvaluecluster($selectedId);
         ?>
 
+        <div class="addplace">
+            <div style="width: 500px; padding: 20px; white-space: nowrap;">
+                <h1><b>🌻การคำนวณค่า Cluster ในระบบ Recommend System</b></h1>
+            </div>
+        </div>
+
         <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
-            <b>สถานที่ท่องเที่ยว</b>
-            <div style="margin-top: 20px;">
-                <div class="container" style="margin-bottom: 20px;">
-                    <input type="text" id="searchInput" class="form-control" placeholder="ค้นหาชื่อสถานที่..." onkeyup="filterTable()">
-                </div>
-                <table class="table table-bordered" style="font-size: 15px;" id="placesTable">
+            <form method="post" action="">
+                <label for="update_id">เลือก ID Update:</label>
+                <select id="update_id" name="update_id" onchange="this.form.submit()">
+                    <option value="">เลือก ID Update</option>
+                    <?php while ($row = mysqli_fetch_assoc($updateIds)): ?>
+                        <option value="<?php echo htmlspecialchars($row['id_update_cluster']); ?>" <?php echo $selectedId == $row['id_update_cluster'] ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($row['id_update_cluster']); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </form>
+
+            <div style="display: flex;">
+                <b style="margin-left: 50px;">📑ค่า จากการ จัด Cluster ปัจจุบัน</b>
+            </div>
+            <div class="table-container">
+                <table class="table table-bordered" style="font-size: 10px;" id="placesTable">
                     <thead>
-                        <tr>
-                            <th scope="col">ลำดับสถานที่</th>
-                            <th scope="col">รูปภาพหน้าปก</th>
-                            <th scope="col">รายการสถานที่ท่องเที่ยวหลัก</th>
-                            <th scope="col">เบอร์โทรศัพท์</th>
-                            <th scope="col">Link googlemap</th>
-                            <th scope="col">เจ้าของสถานที่</th>
-                            <th scope="col">แก้ไข</th>
-                            <th scope="col">ลบ</th>
+                        <tr style='background-color: #ffcc00;'>
+                            <th>ID Cluster</th>
+                            <?php for ($i = 1; $i <= 20; $i++): ?>
+                                <th>Value<?php echo $i; ?></th>
+                            <?php endfor; ?>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        while ($row = mysqli_fetch_array($sql)) {
-                            $owner_info = 'ไม่ทราบข้อมูล'; // กำหนดค่าเริ่มต้น
-
-                            // ตรวจสอบว่า id_Manager ถูกตั้งค่าแล้วและไม่ใช่ null
-                            if (isset($row['id_Manager']) && $row['id_Manager'] !== null) {
-                                $info = $fetchdataarea->getinfomanager($row['id_Manager']);
-                                if ($info) {
-                                    $manager_info = mysqli_fetch_assoc($info);
-                                    $owner_info = isset($manager_info['username']) ? $manager_info['username'] : 'ไม่ทราบข้อมูลเจ้าของสถานที่';
-                                }
+                        // Display the data in table rows
+                        while ($row = mysqli_fetch_assoc($data)) {
+                            echo "<tr>";
+                            echo "<td>{$row['id_cluster']}</td>";
+                            for ($i = 1; $i <= 20; $i++) {
+                                echo "<td>{$row["value$i"]}</td>";
                             }
-                            // ตรวจสอบว่า id_Admin ถูกตั้งค่าแล้วและไม่ใช่ null
-                            elseif (isset($row['id_Admin']) && $row['id_Admin'] !== null) {
-                                $info = $fetchdataarea->getinfoadmin($row['id_Admin']);
-                                if ($info) {
-                                    $admin_info = mysqli_fetch_assoc($info);
-                                    $owner_info = isset($admin_info['username']) ? 'Admin: ' . $admin_info['username'] : 'ไม่ทราบข้อมูลเเอดมิน';
-                                }
-                            } else {
-                                $owner_info = 'ไม่ทราบข้อมูล';
-                            }
-                        ?>
-                            <tr>
-                                <td><?php echo $index++; ?></td>
-                                <td><img src="<?php echo $row['img_Area1']; ?>" alt="Image" width="100" height="100" style="border-radius: 10px; object-fit: cover;"></td>
-                                <td><?php echo $row['name_Area']; ?></td>
-                                <td><?php echo $row['phonenum_Area']; ?></td>
-                                <td><?php echo $row['has_map_Area']; ?></td>
-                                <td><?php echo $owner_info; ?></td>
-                                <td><a href="updateArea.php?id=<?php echo $row['id_Area']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
-                                <td><a href="deleteArea.php?del=<?php echo $row['id_Area']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
-                            </tr>
-                        <?php
+                            echo "</tr>";
                         }
                         ?>
                     </tbody>
                 </table>
             </div>
+            <?php
+            // Include the functions file
+            include_once('functions.php');
 
+            // Create a new instance of the DB_con class
+            $db = new DB_con();
 
-            <div style="display: flex;">
-                <div style="margin-bottom: 20px; margin-left: 20px; font-size: 25px; display: flex; width: 200px;">
-
-                    <label for="resultsPerPage" style=" font-size: 20px; width: 200px;" class="form-label">ผลลัพธ์ต่อหน้า:</label>
-                    <select id="resultsPerPage" class="form-control" style="  width: 60px;" onchange="updateResultsPerPage()">
-                        <option value="5" <?php echo $results_per_page == 5 ? 'selected' : ''; ?>>5</option>
-                        <option value="10" <?php echo $results_per_page == 10 ? 'selected' : ''; ?>>10</option>
-                        <option value="15" <?php echo $results_per_page == 15 ? 'selected' : ''; ?>>15</option>
-                        <option value="25" <?php echo $results_per_page == 25 ? 'selected' : ''; ?>>25</option>
-                        <option value="50" <?php echo $results_per_page == 50 ? 'selected' : ''; ?>>50</option>
-                        <option value="100" <?php echo $results_per_page == 100 ? 'selected' : ''; ?>>100</option>
-                    </select>
-                </div>
-
-                <!-- Pagination controls -->
-                <nav aria-label="Page navigation example" style=" margin-left: 170px; font-size: 15px; ">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item <?php if ($page <= 1) {
-                                                    echo 'disabled';
-                                                } ?>">
-                            <a class="page-link" href="<?php if ($page > 1) {
-                                                            echo "?page=" . ($page - 1);
-                                                        } ?>" tabindex="-1" aria-disabled="true">หน้าก่อนหน้า</a>
-                        </li>
-                        <?php for ($i = 1; $i <= $total_pages; $i++) { ?>
-                            <li class="page-item <?php if ($i == $page) {
-                                                        echo 'active';
-                                                    } ?>">
-                                <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                            </li>
-                        <?php } ?>
-                        <li class="page-item <?php if ($page >= $total_pages) {
-                                                    echo 'disabled';
-                                                } ?>">
-                            <a class="page-link" href="<?php if ($page < $total_pages) {
-                                                            echo "?page=" . ($page + 1);
-                                                        } ?>">หน้าต่อไป</a>
-                        </li>
-                    </ul>
-                </nav>
+            // Fetch the recommendations
+            $recommendations = $db->getClusterRecommendations();
+            ?>
+            <div class="table-container">
+                <table class="table table-bordered" id="placesTable">
+                    <thead>
+                        <tr style='background-color: #ffcc00;'>
+                            <th>Cluster</th>
+                            <th>กิจกรรมแนะนำ</th>
+                            <th>แหล่งท่องเที่ยวแนะนำ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($recommendations as $cluster => $data): ?>
+                            <tr>
+                                <td>Cluster <?php echo $cluster; ?></td>
+                                <td>
+                                    <ul>
+                                        <?php foreach ($data["กิจกรรม"] as $activity): ?>
+                                            <li><?php echo $activity; ?></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </td>
+                                <td>
+                                    <ul>
+                                        <?php foreach ($data["แหล่งท่องเที่ยว"] as $attraction): ?>
+                                            <li><?php echo $attraction; ?></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
+            <button id="test" style="margin-left: 500px;" class="btn-warning rounded" type="button">
+                <img src="img/team.png" alt="..." width="30" height="30"> Test ระบบ
+            </button>
+
+            <script>
+                document.getElementById('test').addEventListener('click', function() {
+                    window.location.href = 'homeadmin_for_cluster.php';
+                });
+            </script>
         </div>
 
         <script>
-            function updateResultsPerPage() {
-                const select = document.getElementById('resultsPerPage');
-                const resultsPerPage = select.value;
-                const urlParams = new URLSearchParams(window.location.search);
-                urlParams.set('results_per_page', resultsPerPage);
-                window.location.search = urlParams.toString();
-            }
+            $(document).ready(function() {
+                $('#addtypeButton').click(function(event) {
+                    event.preventDefault(); // Prevent the default button behavior
 
-
-            function filterTable() {
-                const input = document.getElementById('searchInput');
-                const filter = input.value.toUpperCase();
-                const table = document.getElementById('placesTable');
-                const tr = table.getElementsByTagName('tr');
-
-                for (let i = 0; i < tr.length; i++) {
-                    const td = tr[i].getElementsByTagName('td')[2]; // Column with place names
-                    if (td) {
-                        const textValue = td.textContent || td.innerText;
-                        if (textValue.toUpperCase().indexOf(filter) > -1) {
-                            tr[i].style.display = '';
-                        } else {
-                            tr[i].style.display = 'none';
+                    Swal.fire({
+                        title: 'คุณต้องการคำนวณค่าการจัดกลุ่มใหม่หรือไม่?',
+                        text: "จะเป็นการคำนวณข้อมูลกลุ่มใหม่ซึ่งจะมีผลต่อการ Recommend สถานที่ท่องเที่ยว ",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'ใช่ฉันต้องการคำนวณ!',
+                        cancelButtonText: 'ยังก่อน'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'กำลังจะเข้าสู่หน้าคำนวณ ข้อมูล!',
+                                icon: 'success',
+                                timer: 1000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.href = 'Rec_calculated_cluster.php';
+                            });
                         }
-                    }
-                }
-            }
+                    });
+                });
+            });
         </script>
-        </div>
+
+
+
 
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
@@ -486,8 +477,6 @@ if ($_SESSION['id_admin'] == "") {
     </body>
 
     </html>
-
-
 <?php
 }
 ?>

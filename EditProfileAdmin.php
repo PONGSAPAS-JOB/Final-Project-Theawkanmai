@@ -312,6 +312,9 @@ if (isset($_POST['update'])) {
                         <li><a class="dropdown-item mt-2" href="FormAns_Motivation.php">Form tourist attraction Motivation</a></li>
                     </ul>
                 </li>
+                <li class="nav-item mt-2">
+                    <a class="dropdown-item" href="Recommend_train_page.php">Recommend System Management</a>
+                </li>
             </ul>
         </div>
     </div>
@@ -419,7 +422,7 @@ if (isset($_POST['update'])) {
                     <img id="imgPreview1" class="img-preview" src="<?php echo $img_admin ? $img_admin : 'img/profile.png'; ?>" alt="Preview will be displayed here.">
 
                     <div style="margin-left: 450px; margin-bottom: 50px; width: 300px;" class="input-group">
-                        <input class="form-control" type="text" id="uploadfile1" name="uploadfile1" required oninput="showPreview(this.value, 'imgPreview1', 'uploadfile1')" value="<?php echo $img_admin; ?>">
+                        <input class="form-control" type="text" id="uploadfile1" name="uploadfile1" oninput="showPreview(this.value, 'imgPreview1', 'uploadfile1')" value="<?php echo $img_admin; ?>">
                         <button class="input-group-text" type="button" onclick="clearInput('uploadfile1', 'imgPreview1')">x</button>
                     </div>
                     <div style="display: flex;">

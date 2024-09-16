@@ -10,6 +10,18 @@ if ($_SESSION['id_admin'] == "") {
     header("location: signin.php");
 } else {
 
+    // Include the DB_con class
+    include 'functions.php';
+
+    // Create an instance of the DB_con class
+    $db = new DB_con();
+
+    $id_admin = $_SESSION['id_admin'];
+    $img_admin = $db->getAdminProfilePicture($id_admin);
+
+    // Close the database connection (optional, as it will close automatically at the end of the script)
+    $db->dbcon->close();
+
 ?>
     <?php
     include_once('functions.php');
@@ -373,6 +385,7 @@ if ($_SESSION['id_admin'] == "") {
             .rounded-circle {
                 width: 5%;
                 height: 5%;
+                margin-top: 1%;
                 margin-right: 3%;
                 margin-bottom: -10%;
 
@@ -412,7 +425,8 @@ if ($_SESSION['id_admin'] == "") {
                 /* Custom left margin */
             }
 
-            .btn .btn-success {
+            .btn .btn-danger {
+                margin-top: 1%;
                 font-family: "Itim", cursive;
             }
         </style>
@@ -439,10 +453,11 @@ if ($_SESSION['id_admin'] == "") {
                         <span class="app-desc">ผู้ดูเเลระบบ</span>
 
                     </a>
-                    <img src="img/pro.jpg" class="rounded-circle " alt="...">
+                    <img src="<?php echo htmlspecialchars($img_admin, ENT_QUOTES, 'UTF-8'); ?>" class="rounded-circle" alt="Admin Profile Picture">
 
 
-                    <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
+
+                    <a class="btn btn-danger" type="submit" href="logout.php" style="margin-top: 1%;">ออกจากระบบ</a>
                 </form>
             </div>
             </div>
@@ -489,9 +504,13 @@ if ($_SESSION['id_admin'] == "") {
                             <li><a class="dropdown-item mt-2" href="FormAns_Motivation.php">Form tourist attraction Motivation</a></li>
                         </ul>
                     </li>
+                    <li class="nav-item mt-2">
+                        <a class="dropdown-item" href="Recommend_train_page.php">Recommend System Management</a>
+                    </li>
                 </ul>
             </div>
         </div>
+
 
         <style>
             b {

@@ -9,6 +9,17 @@ session_start();
 if ($_SESSION['Id_manager'] == "") {
     header("location: signin.php");
 } else {
+    // Include the DB_con class
+    include 'functions.php';
+
+    // Create an instance of the DB_con class
+    $db = new DB_con();
+
+    $Id_manager = $_SESSION['Id_manager'];
+    $img_manager = $db->getManagerProfilePicture($Id_manager);
+
+    // Close the database connection (optional, as it will close automatically at the end of the script)
+    $db->dbcon->close();
 
 ?>
     <?php
@@ -308,7 +319,6 @@ if ($_SESSION['Id_manager'] == "") {
                 font-family: 'Lily Script One';
                 src: url('path_to_font_files/linly-script.woff2') format('woff2'),
                     url('path_to_font_files/linly-script.woff') format('woff');
-
             }
 
             a {
@@ -327,12 +337,10 @@ if ($_SESSION['Id_manager'] == "") {
                 margin-left: 21%;
                 flex-grow: 1;
                 justify-content: center;
-
             }
 
             .navbar-nav .nav-item {
                 margin-left: 10%;
-
             }
 
             .collapse .navbar-collapse {
@@ -358,14 +366,12 @@ if ($_SESSION['Id_manager'] == "") {
             .rounded-circle {
                 width: 60px;
                 height: 60px;
-                margin-right: 3%;
-                margin-top: 2%;
-                margin-bottom: -10%;
-
+                border-radius: 50%;
+                object-fit: cover;
+                margin-right: 10px;
+                margin-bottom: 5px;
             }
         </style>
-
-
 
         <nav class="navbar navbar-expand-lg navbar-light bg-warning " style="position: fixed;">
             <div class="container-fluid">
@@ -387,20 +393,15 @@ if ($_SESSION['Id_manager'] == "") {
                         <li class="nav-item">
                             <a class="nav-link active" style="white-space: nowrap;" aria-current="page" href="myplaces.php">My Places</a>
                         </li>
-
-
                     </ul>
                     <div>
-
                         <form class="d-flex justify-content-end ">
                             <a class="navbar-brand " href="#">Welcome, </a>
                             <a class="navbar-brand" href="ProfileManager.php">
                                 <span class="app-name"><?php echo $_SESSION['username']; ?></span>
                                 <span class="app-desc">ผู้ที่เกี่ยวข้องกับสถานที่</span>
-
                             </a>
-                            <img src="img/pro.jpg" class="rounded-circle " alt="...">
-
+                            <img src="<?php echo htmlspecialchars($img_manager, ENT_QUOTES, 'UTF-8'); ?>" class="rounded-circle" alt="Manager Profile Picture">
 
                             <a class="btn btn-danger" type="submit" href="logout.php">ออกจากระบบ</a>
                         </form>
@@ -408,8 +409,6 @@ if ($_SESSION['Id_manager'] == "") {
                 </div>
             </div>
         </nav>
-
-
         <style>
             b {
                 font-family: "Itim", cursive;
@@ -433,7 +432,7 @@ if ($_SESSION['Id_manager'] == "") {
             }
 
             .addplace {
-                margin-top: 100px;
+                margin-top: 150px;
                 /* Adjusted margin-top to create space between button and cards */
                 width: 200px;
                 /* Set button width */
