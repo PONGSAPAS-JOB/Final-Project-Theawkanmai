@@ -2312,7 +2312,7 @@ class DB_con
 
 
 
-    function getClusterRecommendations()
+    public function getClusterRecommendations()
     {
         $sql = "SELECT id_cluster, activity_cluster, group_cluster_dis FROM summarize_cluster";
         $result = $this->dbcon->query($sql);
@@ -2331,6 +2331,128 @@ class DB_con
         }
         return $recommendations;
     }
+
+
+    public function displayClusterResults($clusters, $customK)
+    {
+        $clusterHtml = '<h2>ผลการจัดกลุ่ม K = ' . $customK . '</h2>';
+        $clusterHtml .= '<table class="table table-bordered" style="font-size: 10px;" id="clusterTable">';
+        $clusterHtml .= '<thead><tr style="background-color: #ffcc00;"><th>ID Cluster</th>';
+        for ($i = 1; $i <= 20; $i++) {
+            $clusterHtml .= '<th>Value' . $i . '</th>';
+        }
+        $clusterHtml .= '</tr></thead><tbody>';
+
+        foreach ($clusters as $clusterId => $clusterValues) {
+            $clusterHtml .= '<tr>';
+            $clusterHtml .= '<td>' . $clusterId . '</td>';
+            foreach ($clusterValues as $value) {
+                $clusterHtml .= '<td>' . number_format($value, 6) . '</td>';
+            }
+            $clusterHtml .= '</tr>';
+        }
+        $clusterHtml .= '</tbody></table>';
+
+        return $clusterHtml;
+    }
+
+    public function getClusterMembers($clusterId)
+    {
+        global $dbcon;
+
+        $query = "SELECT id_member FROM clustering_results WHERE cluster_id = ?";
+
+        $stmt = $dbcon->prepare($query);
+        $stmt->bind_param('i', $clusterId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $members = [];
+        while ($row = $result->fetch_assoc()) {
+            $members[] = $row['id_member'];
+        }
+
+        return $members;
+    }
+
+    public function getMemberInterests($members)
+    {
+        global $dbcon;
+
+        $placeholders = implode(',', array_fill(0, count($members), '?'));
+        $types = str_repeat('i', count($members));
+
+        $query = "
+            SELECT 
+                AVG(ans1) as avg_ans1,
+                AVG(ans2) as avg_ans2,
+                AVG(ans3) as avg_ans3,
+                AVG(ans4) as avg_ans4,
+                AVG(ans5) as avg_ans5,
+                AVG(ans6) as avg_ans6,
+                AVG(ans7) as avg_ans7,
+                AVG(ans8) as avg_ans8
+            FROM ans_interest
+            WHERE id_member IN ($placeholders)
+        ";
+
+        $stmt = $dbcon->prepare($query);
+        $stmt->bind_param($types, ...$members);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $averages = $result->fetch_assoc();
+
+        return $averages;
+    }
+
+    public function getTourismCategories()
+    {
+        return [
+            "แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ" => ["value1", "value10", "value18"],
+            "แหล่งท่องเที่ยวเชิงอาหาร" => ["value5", "value11", "value18"],
+            "แหล่งท่องเที่ยวเชิงเทศกาล/งานประเพณี" => ["value4", "value6", "value17"],
+            "แหล่งท่องเที่ยวเชิงเกษตร" => ["value5", "value18", "value20"],
+            "แหล่งท่องเที่ยววัฒนธรรม/วิถีชีวิต" => ["value3", "value7", "value18"],
+            "แหล่งท่องเที่ยวเชิงผจญภัย" => ["value8", "value16", "value19"],
+            "แหล่งท่องเที่ยวเชิงสุขภาพ" => ["value2", "value9", "value15"],
+            "แหล่งท่องเที่ยวเชิงศาสนา" => ["value3", "value6", "value19"]
+        ];
+    }
+
+
+    public function getTop3Interests($clusterId)
+    {
+        // ใช้ $this-> เพื่อเรียกใช้เมธอดภายในคลาส
+        $members = $this->getClusterMembers($clusterId);
+        $averages = $this->getMemberInterests($members);
+
+        arsort($averages);
+        $top3 = array_slice($averages, 0, 3, true);
+
+        $labels = [
+            'avg_ans1' => 'แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ',
+            'avg_ans2' => 'แหล่งท่องเที่ยวเชิงอาหาร',
+            'avg_ans3' => 'แหล่งท่องเที่ยวเชิงเทศกาล/งานประเพณี',
+            'avg_ans4' => 'แหล่งท่องเที่ยวเชิงเกษตร',
+            'avg_ans5' => 'แหล่งท่องเที่ยววัฒนธรรม/วิถีชีวิต',
+            'avg_ans6' => 'แหล่งท่องเที่ยวเชิงผจญภัย',
+            'avg_ans7' => 'แหล่งท่องเที่ยวเชิงสุขภาพ',
+            'avg_ans8' => 'แหล่งท่องเที่ยวเชิงศาสนา'
+        ];
+
+        $top3Interests = [];
+        foreach ($top3 as $key => $value) {
+            $top3Interests[] = [
+                'interest' => $labels[$key],
+                'average' => $value
+            ];
+        }
+
+        return $top3Interests;
+    }
+
+
+
 
     //////////cal//////////////
 

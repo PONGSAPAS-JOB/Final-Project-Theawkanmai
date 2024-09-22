@@ -332,6 +332,8 @@ if ($_SESSION['id_admin'] == "") {
 
         // Fetch the data based on the selected update ID
         $data = $db->fetchvaluecluster($selectedId);
+
+
         ?>
 
         <div class="addplace">
@@ -342,9 +344,9 @@ if ($_SESSION['id_admin'] == "") {
 
         <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
             <form method="post" action="">
-                <label for="update_id">เลือก ID Update:</label>
+                <label for="update_id"> ครั้ง ที่อัพเดต :</label>
                 <select id="update_id" name="update_id" onchange="this.form.submit()">
-                    <option value="">เลือก ID Update</option>
+                    <option value="">ครั้ง ล่าสุด </option>
                     <?php while ($row = mysqli_fetch_assoc($updateIds)): ?>
                         <option value="<?php echo htmlspecialchars($row['id_update_cluster']); ?>" <?php echo $selectedId == $row['id_update_cluster'] ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($row['id_update_cluster']); ?>
@@ -354,7 +356,7 @@ if ($_SESSION['id_admin'] == "") {
             </form>
 
             <div style="display: flex;">
-                <b style="margin-left: 50px;">📑ค่า จากการ จัด Cluster ปัจจุบัน</b>
+                <b style="margin-left: 50px;">📑ค่า จากการ จัด Cluster <?php echo htmlspecialchars($selectedId); ?> </b>
             </div>
             <div class="table-container">
                 <table class="table table-bordered" style="font-size: 10px;" id="placesTable">
@@ -428,14 +430,49 @@ if ($_SESSION['id_admin'] == "") {
                 </div>
 
                 <div id="clusterResult" style="margin-top: 50px;"></div>
+                <div id="interestResults" style="margin-top: 50px;"></div>
+
 
                 <button id="saveClustersButton" style="margin-left:50px; margin-top:20px; display: none;" class="btn-warning rounded" type="button">
                     บันทึกค่า Cluster ใหม่
                 </button>
             </div>
 
-
             <script>
+                const descriptions = {
+                    value1: "ต้องการอยู่ในธรรมชาติที่สวยงามและอากาศบริสุทธิ์ มีน้ำตก พันธุ์ไม้สัตว์ป่า",
+                    value2: "ต้องการหลีกหนีจากชีวิตประจำวัน",
+                    value3: "ต้องการค้นหาตัวเอง/ ทบทวนความคิดของตนเอง",
+                    value4: "ต้องการสร้างแรงบันดาลใจและความคิดสร้างสรรค์",
+                    value5: "ต้องการได้รับความรู้และประสบการณ์แปลกใหม่",
+                    value6: "ต้องการสร้างความสัมพันธ์กับคนใกล้ชิด/ครอบครัว",
+                    value7: "ต้องการสร้างความสัมพันธ์กับผู้อื่น",
+                    value8: "ต้องการแสวงหาความตื่นเต้น เร้าใจ และความเสี่ยง",
+                    value9: "ต้องการเป็นที่ยอมรับนับถือจากผู้อื่น",
+                    value10: "ความสวยงาม ของแหล่งท่องเที่ยว",
+                    value11: "มีร้านอาหารสำหรับบริการที่หลากหลายและเพียงพอ",
+                    value12: "มีสาธารณูปโภคขั้นพื้นฐาน เช่น น้ำสะอาด ไฟฟ้า สัญญาณโทรศัพท์ อย่างเหมาะสมกับมีจุดบริการ/ศูนย์บริการข้อมูลแก่นักท่องเที่ยว",
+                    value13: "ประเภท ของที่พักมีความหลากหลายให้เลือกใช้บริการ",
+                    value14: "ที่พักมีราคาที่เหมาะสม",
+                    value15: "มีสิ่งอำนวยความสะดวกที่รับรองความต้องการ เช่น อินเตอร์เน็ต ห้องออกกำลังกาย สระว่ายน้ำ ฯลฯ",
+                    value16: "กิจกรรมท่องเที่ยว มีความน่าสนใจ",
+                    value17: "กิจกรรมท่องเที่ยวมีความหลากหลาย",
+                    value18: "กิจกรรมท่องเที่ยวที่ส่งเสริมการเรียนรู้",
+                    value19: "กิจกรรมท่องเที่ยวที่มีความปลอดภัย",
+                    value20: "กิจกรรมท่องเที่ยวที่ก่อให้เกิดประโยชน์ต่อสังคม"
+                };
+
+                const tourismCategories = {
+                    "แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ": ["value1", "value10", "value18"],
+                    "แหล่งท่องเที่ยวเชิงอาหาร": ["value5", "value11", "value18"],
+                    "แหล่งท่องเที่ยวเชิงเทศกาล/งานประเพณี": ["value4", "value6", "value17"],
+                    "แหล่งท่องเที่ยวเชิงเกษตร": ["value5", "value18", "value20"],
+                    "แหล่งท่องเที่ยววัฒนธรรม/วิถีชีวิต": ["value3", "value7", "value18"],
+                    "แหล่งท่องเที่ยวเชิงผจญภัย": ["value8", "value16", "value19"],
+                    "แหล่งท่องเที่ยวเชิงสุขภาพ": ["value2", "value9", "value15"],
+                    "แหล่งท่องเที่ยวเชิงศาสนา": ["value3", "value6", "value19"]
+                };
+
                 document.getElementById('addtypeButton').addEventListener('click', function() {
                     fetch('calculate_kmeans.php')
                         .then(response => response.json())
@@ -443,7 +480,6 @@ if ($_SESSION['id_admin'] == "") {
                             const optimalKs = data.optimal_k;
                             const imageUrl = data.graph_path;
 
-                            // Display the graph and optimal K values
                             const graphContainer = document.getElementById('elbowGraph');
                             graphContainer.innerHTML = `
                     <h2>Optimal K Values: ${optimalKs.join(', ')}</h2>
@@ -481,19 +517,60 @@ if ($_SESSION['id_admin'] == "") {
                                 clusterHtml += '</tr>';
                             }
                             clusterHtml += '</tbody></table>';
+
+                            // สรุปผลการจัดกลุ่ม
+                            clusterHtml += '<h2>สรุปผลการจัดกลุ่ม</h2>';
+                            for (const [clusterId, clusterValues] of Object.entries(clusters)) {
+                                const topThree = clusterValues
+                                    .map((value, index) => ({
+                                        value,
+                                        key: 'value' + (index + 1)
+                                    }))
+                                    .sort((a, b) => b.value - a.value)
+                                    .slice(0, 3);
+
+                                clusterHtml += `<h3>กลุ่ม ${clusterId}</h3>`;
+                                clusterHtml += '<ul>';
+                                topThree.forEach(item => {
+                                    clusterHtml += `<li>${descriptions[item.key]} (${item.key}: ${item.value.toFixed(6)})</li>`;
+                                });
+                                clusterHtml += '</ul>';
+
+                                // เพิ่มการจับคู่กับประเภทแหล่งท่องเที่ยว
+                                const matchedCategories = [];
+                                for (const category in tourismCategories) {
+                                    const relatedValues = tourismCategories[category];
+                                    // เช็คว่ามีค่าไหนใน topThree ที่ตรงกับค่าของประเภทนี้บ้าง
+                                    const match = topThree.some(item => relatedValues.includes(item.key));
+                                    if (match) {
+                                        matchedCategories.push(category);
+                                    }
+                                }
+
+                                if (matchedCategories.length > 0) {
+                                    clusterHtml += '<h4>ประเภทแหล่งท่องเที่ยวที่เกี่ยวข้อง:</h4><ul>';
+                                    matchedCategories.forEach(category => {
+                                        clusterHtml += `<li>${category}</li>`;
+                                    });
+                                    clusterHtml += '</ul>';
+                                } else {
+                                    clusterHtml += '<p>ไม่พบประเภทแหล่งท่องเที่ยวที่เกี่ยวข้อง</p>';
+                                }
+                            }
+
                             clusterResult.innerHTML = clusterHtml;
 
-                            // Show the Save Clusters button
+                            // แสดงปุ่มบันทึกคลัสเตอร์
                             document.getElementById('saveClustersButton').style.display = 'block';
 
-                            // Store the clusters data for saving later
+                            // เก็บข้อมูลคลัสเตอร์ไว้สำหรับการบันทึก
                             window.currentClusters = clusters;
                         })
                         .catch(error => console.error('Error:', error));
                 });
 
                 document.getElementById('saveClustersButton').addEventListener('click', function() {
-                    const clusters = window.currentClusters; // Use the stored clusters data
+                    const clusters = window.currentClusters; // ใช้ข้อมูลคลัสเตอร์ที่เก็บไว้
 
                     fetch('save_clusters.php', {
                             method: 'POST',
@@ -507,26 +584,28 @@ if ($_SESSION['id_admin'] == "") {
                             if (data.success) {
                                 Swal.fire({
                                     icon: 'success',
-                                    title: 'Success',
-                                    text: 'Clusters saved successfully'
+                                    title: 'สำเร็จ',
+                                    text: 'บันทึกคลัสเตอร์สำเร็จแล้ว'
                                 });
                             } else {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Error',
-                                    text: 'Error: ' + data.message
+                                    title: 'ข้อผิดพลาด',
+                                    text: 'ข้อผิดพลาด: ' + data.message
                                 });
                             }
                         })
                         .catch(error => {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Error',
-                                text: 'Error: ' + error.message
+                                title: 'ข้อผิดพลาด',
+                                text: 'ข้อผิดพลาด: ' + error.message
                             });
                         });
                 });
             </script>
+
+
 
 
 

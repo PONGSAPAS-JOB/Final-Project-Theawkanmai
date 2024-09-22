@@ -344,9 +344,9 @@ if ($_SESSION['id_admin'] == "") {
 
         <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
             <form method="post" action="">
-                <label for="update_id">เลือก ID Update:</label>
+                <label for="update_id"> ครั้ง ที่อัพเดต :</label>
                 <select id="update_id" name="update_id" onchange="this.form.submit()">
-                    <option value="">เลือก ID Update</option>
+                    <option value="">ครั้ง ล่าสุด </option>
                     <?php while ($row = mysqli_fetch_assoc($updateIds)): ?>
                         <option value="<?php echo htmlspecialchars($row['id_update_cluster']); ?>" <?php echo $selectedId == $row['id_update_cluster'] ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($row['id_update_cluster']); ?>
@@ -356,7 +356,8 @@ if ($_SESSION['id_admin'] == "") {
             </form>
 
             <div style="display: flex;">
-                <b style="margin-left: 50px;">📑ค่า จากการ จัด Cluster ปัจจุบัน</b>
+                <b style="margin-left: 50px;">📑ค่า จากการ จัด Cluster <?php echo htmlspecialchars($selectedId); ?> </b>
+                <button id="addtypeButton" style="margin-left: 500px;" class="btn-warning rounded" type="button"><img src="img/team.png" alt="..." width="30" height="30"> คำนวณค่า Cluster ใหม่</button>
             </div>
             <div class="table-container">
                 <table class="table table-bordered" style="font-size: 10px;" id="placesTable">
