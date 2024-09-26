@@ -412,6 +412,21 @@ if ($_SESSION['id_admin'] == "") {
                 #clusterTable th {
                     background-color: #ffcc00;
                 }
+
+                #interestTable {
+                    font-size: 10px;
+                    margin-top: 20px;
+                }
+
+                #interestTable th {
+                    background-color: #ffcc00;
+                }
+
+                .highlight {
+                    background-color: #ffeb3b;
+                    /* Change to your desired highlight color */
+                    font-weight: bold;
+                }
             </style>
             <div class="container">
                 <button id="addtypeButton" style="margin-left:50px;" class="btn-warning rounded" type="button">
@@ -432,51 +447,21 @@ if ($_SESSION['id_admin'] == "") {
                 <div id="clusterResult" style="margin-top: 50px;"></div>
                 <div id="interestResults" style="margin-top: 50px;"></div>
 
-
                 <button id="saveClustersButton" style="margin-left:50px; margin-top:20px; display: none;" class="btn-warning rounded" type="button">
                     บันทึกค่า Cluster ใหม่
                 </button>
             </div>
 
             <script>
-                const descriptions = {
-                    value1: "ต้องการอยู่ในธรรมชาติที่สวยงามและอากาศบริสุทธิ์ มีน้ำตก พันธุ์ไม้สัตว์ป่า",
-                    value2: "ต้องการหลีกหนีจากชีวิตประจำวัน",
-                    value3: "ต้องการค้นหาตัวเอง/ ทบทวนความคิดของตนเอง",
-                    value4: "ต้องการสร้างแรงบันดาลใจและความคิดสร้างสรรค์",
-                    value5: "ต้องการได้รับความรู้และประสบการณ์แปลกใหม่",
-                    value6: "ต้องการสร้างความสัมพันธ์กับคนใกล้ชิด/ครอบครัว",
-                    value7: "ต้องการสร้างความสัมพันธ์กับผู้อื่น",
-                    value8: "ต้องการแสวงหาความตื่นเต้น เร้าใจ และความเสี่ยง",
-                    value9: "ต้องการเป็นที่ยอมรับนับถือจากผู้อื่น",
-                    value10: "ความสวยงาม ของแหล่งท่องเที่ยว",
-                    value11: "มีร้านอาหารสำหรับบริการที่หลากหลายและเพียงพอ",
-                    value12: "มีสาธารณูปโภคขั้นพื้นฐาน เช่น น้ำสะอาด ไฟฟ้า สัญญาณโทรศัพท์ อย่างเหมาะสมกับมีจุดบริการ/ศูนย์บริการข้อมูลแก่นักท่องเที่ยว",
-                    value13: "ประเภท ของที่พักมีความหลากหลายให้เลือกใช้บริการ",
-                    value14: "ที่พักมีราคาที่เหมาะสม",
-                    value15: "มีสิ่งอำนวยความสะดวกที่รับรองความต้องการ เช่น อินเตอร์เน็ต ห้องออกกำลังกาย สระว่ายน้ำ ฯลฯ",
-                    value16: "กิจกรรมท่องเที่ยว มีความน่าสนใจ",
-                    value17: "กิจกรรมท่องเที่ยวมีความหลากหลาย",
-                    value18: "กิจกรรมท่องเที่ยวที่ส่งเสริมการเรียนรู้",
-                    value19: "กิจกรรมท่องเที่ยวที่มีความปลอดภัย",
-                    value20: "กิจกรรมท่องเที่ยวที่ก่อให้เกิดประโยชน์ต่อสังคม"
-                };
-
-                const tourismCategories = {
-                    "แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ": ["value1", "value10", "value18"],
-                    "แหล่งท่องเที่ยวเชิงอาหาร": ["value5", "value11", "value18"],
-                    "แหล่งท่องเที่ยวเชิงเทศกาล/งานประเพณี": ["value4", "value6", "value17"],
-                    "แหล่งท่องเที่ยวเชิงเกษตร": ["value5", "value18", "value20"],
-                    "แหล่งท่องเที่ยววัฒนธรรม/วิถีชีวิต": ["value3", "value7", "value18"],
-                    "แหล่งท่องเที่ยวเชิงผจญภัย": ["value8", "value16", "value19"],
-                    "แหล่งท่องเที่ยวเชิงสุขภาพ": ["value2", "value9", "value15"],
-                    "แหล่งท่องเที่ยวเชิงศาสนา": ["value3", "value6", "value19"]
-                };
-
                 document.getElementById('addtypeButton').addEventListener('click', function() {
+                    console.log('Finding optimal K values...');
                     fetch('calculate_kmeans.php')
-                        .then(response => response.json())
+                        .then(response => {
+                            console.log('Response received from calculate_kmeans.php');
+                            return response.json();
+                        })
                         .then(data => {
+                            console.log('Data:', data);
                             const optimalKs = data.optimal_k;
                             const imageUrl = data.graph_path;
 
@@ -490,6 +475,7 @@ if ($_SESSION['id_admin'] == "") {
                 });
 
                 document.getElementById('customKButton').addEventListener('click', function() {
+                    console.log('Displaying custom K input form');
                     document.getElementById('customKForm').style.display = 'block';
                 });
 
@@ -500,28 +486,124 @@ if ($_SESSION['id_admin'] == "") {
                         .then(data => {
                             const clusters = data.clusters;
                             const clusterResult = document.getElementById('clusterResult');
+
+                            // Define the descriptions for the types of tourism attractions
+                            const interestDescriptions = [
+                                'แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ', // ans1
+                                'แหล่งท่องเที่ยวเชิงอาหาร', // ans2
+                                'แหล่งท่องเที่ยวเชิงเทศกาล/งานประเพณี', // ans3
+                                'แหล่งท่องเที่ยวเชิงเกษตร', // ans4
+                                'แหล่งท่องเที่ยววัฒนธรรม/วิถีชีวิต', // ans5
+                                'แหล่งท่องเที่ยวเชิงผจญภัย', // ans6
+                                'แหล่งท่องเที่ยวเชิงสุขภาพ', // ans7
+                                'แหล่งท่องเที่ยวเชิงศาสนา' // ans8
+                            ];
+
+                            // Define the descriptions for the cluster values
+                            const descriptions = {
+                                value1: "ต้องการอยู่ในธรรมชาติที่สวยงามและอากาศบริสุทธิ์ มีน้ำตก พันธุ์ไม้สัตว์ป่า",
+                                value2: "ต้องการหลีกหนีจากชีวิตประจำวัน",
+                                value3: "ต้องการค้นหาตัวเอง/ ทบทวนความคิดของตนเอง",
+                                value4: "ต้องการสร้างแรงบันดาลใจและความคิดสร้างสรรค์",
+                                value5: "ต้องการได้รับความรู้และประสบการณ์แปลกใหม่",
+                                value6: "ต้องการสร้างความสัมพันธ์กับคนใกล้ชิด/ครอบครัว",
+                                value7: "ต้องการสร้างความสัมพันธ์กับผู้อื่น",
+                                value8: "ต้องการแสวงหาความตื่นเต้น เร้าใจ และความเสี่ยง",
+                                value9: "ต้องการเป็นที่ยอมรับนับถือจากผู้อื่น",
+                                value10: "ความสวยงาม ของแหล่งท่องเที่ยว",
+                                value11: "มีร้านอาหารสำหรับบริการที่หลากหลายและเพียงพอ",
+                                value12: "มีสาธารณูปโภคขั้นพื้นฐาน เช่น น้ำสะอาด ไฟฟ้า สัญญาณโทรศัพท์ อย่างเหมาะสมกับมีจุดบริการ/ศูนย์บริการข้อมูลแก่นักท่องเที่ยว",
+                                value13: "ประเภท ของที่พักมีความหลากหลายให้เลือกใช้บริการ",
+                                value14: "ที่พักมีราคาที่เหมาะสม",
+                                value15: "มีสิ่งอำนวยความสะดวกที่รับรองความต้องการ เช่น อินเตอร์เน็ต ห้องออกกำลังกาย สระว่ายน้ำ ฯลฯ",
+                                value16: "กิจกรรมท่องเที่ยว มีความน่าสนใจ",
+                                value17: "กิจกรรมท่องเที่ยวมีความหลากหลาย",
+                                value18: "กิจกรรมท่องเที่ยวที่ส่งเสริมการเรียนรู้",
+                                value19: "กิจกรรมท่องเที่ยวที่มีความปลอดภัย",
+                                value20: "กิจกรรมท่องเที่ยวที่ก่อให้เกิดประโยชน์ต่อสังคม"
+                            };
+                            // Generate "ผลการจัดกลุ่ม K" table
                             let clusterHtml = '<h2>ผลการจัดกลุ่ม K = ' + customK + '</h2>';
+                            clusterHtml += '<div style="overflow-x:auto;">'; // Add this line to enable horizontal scrolling
                             clusterHtml += '<table class="table table-bordered" style="font-size: 10px;" id="clusterTable">';
                             clusterHtml += '<thead><tr style="background-color: #ffcc00;"><th>ID Cluster</th>';
+                            clusterHtml += '<th>Count</th>';
                             for (let i = 1; i <= 20; i++) {
                                 clusterHtml += '<th>Value' + i + '</th>';
                             }
                             clusterHtml += '</tr></thead><tbody>';
 
-                            for (const [clusterId, clusterValues] of Object.entries(clusters)) {
+                            for (const [clusterId, clusterData] of Object.entries(clusters)) {
                                 clusterHtml += '<tr>';
                                 clusterHtml += '<td>' + clusterId + '</td>';
-                                clusterValues.forEach(value => {
-                                    clusterHtml += '<td>' + value.toFixed(6) + '</td>';
+                                clusterHtml += '<td>' + clusterData.count + '</td>';
+
+                                // Find top 3 values
+                                const topThreeIndices = clusterData.means
+                                    .map((value, index) => ({
+                                        value,
+                                        index
+                                    }))
+                                    .sort((a, b) => b.value - a.value)
+                                    .slice(0, 3)
+                                    .map(item => item.index);
+
+                                clusterData.means.slice(0, 20).forEach((value, index) => { // Only up to Value20
+                                    if (topThreeIndices.includes(index)) {
+                                        clusterHtml += `<td><span style="background-color: #66FF66; padding: 2px;">${value.toFixed(6)}</span></td>`; // Marker-like highlight
+                                    } else {
+                                        clusterHtml += `<td>${value.toFixed(6)}</td>`;
+                                    }
                                 });
                                 clusterHtml += '</tr>';
                             }
                             clusterHtml += '</tbody></table>';
+                            clusterHtml += '</div>'; // Add this line to close the div
 
-                            // สรุปผลการจัดกลุ่ม
-                            clusterHtml += '<h2>สรุปผลการจัดกลุ่ม</h2>';
-                            for (const [clusterId, clusterValues] of Object.entries(clusters)) {
-                                const topThree = clusterValues
+                            // Generate "ผลลัพธ์ ความสนใจ" table
+                            let interestHtml = '<h2>ผลลัพธ์ ความสนใจ</h2>';
+                            interestHtml += '<table class="table table-bordered" style="font-size: 15px;" id="interestTable">';
+                            interestHtml += '<thead><tr style="background-color: #ffcc00;"><th>ID Cluster</th>';
+                            interestHtml += '<th>จำนวน คนในกลุ่ม</th>';
+                            for (let i = 0; i <= 7; i++) {
+                                interestHtml += '<th>' + interestDescriptions[i] + '</th>';
+                            }
+                            interestHtml += '</tr></thead><tbody>';
+
+                            for (const [clusterId, clusterData] of Object.entries(clusters)) {
+                                interestHtml += '<tr>';
+                                interestHtml += '<td>' + clusterId + '</td>';
+                                interestHtml += '<td>' + clusterData.count + ' คน</td>';
+
+                                // Find top 3 interest counts
+                                const interestTopThreeIndices = clusterData.interest_counts
+                                    .map((count, index) => ({
+                                        count,
+                                        index
+                                    }))
+                                    .sort((a, b) => b.count - a.count)
+                                    .slice(0, 3)
+                                    .map(item => item.index);
+
+                                clusterData.interest_counts.slice(0, 8).forEach((count, index) => { // Only up to Ans8
+                                    if (interestTopThreeIndices.includes(index)) {
+                                        interestHtml += `<td><span style="background-color: #66FF66; padding: 2px;">${count} %</span></td>`; // Marker-like highlight
+                                    } else {
+                                        interestHtml += `<td>${count} %</td>`;
+                                    }
+                                });
+                                interestHtml += '</tr>';
+                            }
+                            interestHtml += '</tbody></table>';
+
+
+                            // Generate "สรุปผลการจัดกลุ่ม" table
+                            let summaryHtml = '<h2>สรุปผลการจัดกลุ่ม</h2>';
+                            summaryHtml += '<table class="table table-bordered" style="font-size: 15px;" id="summaryTable">';
+                            summaryHtml += '<thead><tr style="background-color: #ffcc00;"><th>ID Cluster</th><th>ค่าเฉลี่ยสูงสุด 3 ค่า</th><th>ผลการสนใจสูงสุด 3 ค่า</th></tr></thead><tbody>';
+
+                            for (const [clusterId, clusterData] of Object.entries(clusters)) {
+                                const topThree = clusterData.means
                                     .map((value, index) => ({
                                         value,
                                         key: 'value' + (index + 1)
@@ -529,79 +611,30 @@ if ($_SESSION['id_admin'] == "") {
                                     .sort((a, b) => b.value - a.value)
                                     .slice(0, 3);
 
-                                clusterHtml += `<h3>กลุ่ม ${clusterId}</h3>`;
-                                clusterHtml += '<ul>';
+                                const interestTopThree = clusterData.interest_counts
+                                    .map((count, index) => ({
+                                        count,
+                                        key: interestDescriptions[index]
+                                    }))
+                                    .sort((a, b) => b.count - a.count)
+                                    .slice(0, 3);
+
+                                summaryHtml += `<tr><td>${clusterId}</td><td>`;
                                 topThree.forEach(item => {
-                                    clusterHtml += `<li>${descriptions[item.key]} (${item.key}: ${item.value.toFixed(6)})</li>`;
+                                    summaryHtml += `${descriptions[item.key]} (${item.value.toFixed(6)})<br>`;
                                 });
-                                clusterHtml += '</ul>';
-
-                                // เพิ่มการจับคู่กับประเภทแหล่งท่องเที่ยว
-                                const matchedCategories = [];
-                                for (const category in tourismCategories) {
-                                    const relatedValues = tourismCategories[category];
-                                    // เช็คว่ามีค่าไหนใน topThree ที่ตรงกับค่าของประเภทนี้บ้าง
-                                    const match = topThree.some(item => relatedValues.includes(item.key));
-                                    if (match) {
-                                        matchedCategories.push(category);
-                                    }
-                                }
-
-                                if (matchedCategories.length > 0) {
-                                    clusterHtml += '<h4>ประเภทแหล่งท่องเที่ยวที่เกี่ยวข้อง:</h4><ul>';
-                                    matchedCategories.forEach(category => {
-                                        clusterHtml += `<li>${category}</li>`;
-                                    });
-                                    clusterHtml += '</ul>';
-                                } else {
-                                    clusterHtml += '<p>ไม่พบประเภทแหล่งท่องเที่ยวที่เกี่ยวข้อง</p>';
-                                }
+                                summaryHtml += `</td><td>`;
+                                interestTopThree.forEach(item => {
+                                    summaryHtml += `${item.key} (${item.count})<br>`;
+                                });
+                                summaryHtml += `</td></tr>`;
                             }
+                            summaryHtml += '</tbody></table>';
 
-                            clusterResult.innerHTML = clusterHtml;
-
-                            // แสดงปุ่มบันทึกคลัสเตอร์
-                            document.getElementById('saveClustersButton').style.display = 'block';
-
-                            // เก็บข้อมูลคลัสเตอร์ไว้สำหรับการบันทึก
-                            window.currentClusters = clusters;
+                            // Combine all HTML parts
+                            clusterResult.innerHTML = clusterHtml + interestHtml + summaryHtml;
                         })
                         .catch(error => console.error('Error:', error));
-                });
-
-                document.getElementById('saveClustersButton').addEventListener('click', function() {
-                    const clusters = window.currentClusters; // ใช้ข้อมูลคลัสเตอร์ที่เก็บไว้
-
-                    fetch('save_clusters.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(clusters)
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'สำเร็จ',
-                                    text: 'บันทึกคลัสเตอร์สำเร็จแล้ว'
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'ข้อผิดพลาด',
-                                    text: 'ข้อผิดพลาด: ' + data.message
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'ข้อผิดพลาด',
-                                text: 'ข้อผิดพลาด: ' + error.message
-                            });
-                        });
                 });
             </script>
 

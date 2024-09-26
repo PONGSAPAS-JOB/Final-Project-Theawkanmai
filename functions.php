@@ -2383,18 +2383,18 @@ class DB_con
         $types = str_repeat('i', count($members));
 
         $query = "
-            SELECT 
-                AVG(ans1) as avg_ans1,
-                AVG(ans2) as avg_ans2,
-                AVG(ans3) as avg_ans3,
-                AVG(ans4) as avg_ans4,
-                AVG(ans5) as avg_ans5,
-                AVG(ans6) as avg_ans6,
-                AVG(ans7) as avg_ans7,
-                AVG(ans8) as avg_ans8
-            FROM ans_interest
-            WHERE id_member IN ($placeholders)
-        ";
+        SELECT 
+            AVG(ans1) as avg_ans1,
+            AVG(ans2) as avg_ans2,
+            AVG(ans3) as avg_ans3,
+            AVG(ans4) as avg_ans4,
+            AVG(ans5) as avg_ans5,
+            AVG(ans6) as avg_ans6,
+            AVG(ans7) as avg_ans7,
+            AVG(ans8) as avg_ans8
+        FROM ans_interest
+        WHERE id_member IN ($placeholders)
+    ";
 
         $stmt = $dbcon->prepare($query);
         $stmt->bind_param($types, ...$members);
@@ -2426,9 +2426,11 @@ class DB_con
         $members = $this->getClusterMembers($clusterId);
         $averages = $this->getMemberInterests($members);
 
+        // เรียงลำดับผลลัพธ์จากมากไปน้อย
         arsort($averages);
         $top3 = array_slice($averages, 0, 3, true);
 
+        // กำหนดชื่อสำหรับค่าเฉลี่ย
         $labels = [
             'avg_ans1' => 'แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ',
             'avg_ans2' => 'แหล่งท่องเที่ยวเชิงอาหาร',
@@ -2454,6 +2456,7 @@ class DB_con
 
 
 
+
     //////////cal//////////////
 
     // Fetch data from eva_form1 and eva_form2 for a specific member
@@ -2461,17 +2464,19 @@ class DB_con
     public function fetchAllEvaluationData()
     {
         $query = "
-            SELECT eva_p1_ans1, eva_p1_ans2, eva_p1_ans3, eva_p1_ans4, eva_p1_ans5, 
-                   eva_p1_ans6, eva_p1_ans7, eva_p1_ans8, eva_p1_ans9, 
-                   eva_p2_ans1, eva_p2_ans10, eva_p2_ans11, eva_p2_ans12, 
-                   eva_p2_ans13, eva_p2_ans14, eva_p2_ans15, eva_p2_ans16, 
-                   eva_p2_ans17, eva_p2_ans18, eva_p2_ans19
-            FROM eva_form1
-            LEFT JOIN eva_form2 ON eva_form1.id_member = eva_form2.id_member
-        ";
+        SELECT eva_p1_ans1, eva_p1_ans2, eva_p1_ans3, eva_p1_ans4, eva_p1_ans5, 
+               eva_p1_ans6, eva_p1_ans7, eva_p1_ans8, eva_p1_ans9, 
+               eva_p2_ans1, eva_p2_ans10, eva_p2_ans11, eva_p2_ans12, 
+               eva_p2_ans13, eva_p2_ans14, eva_p2_ans15, eva_p2_ans16, 
+               eva_p2_ans17, eva_p2_ans18, eva_p2_ans19,
+               ans_interest.ans1, ans_interest.ans2, ans_interest.ans3, ans_interest.ans4, 
+               ans_interest.ans5, ans_interest.ans6, ans_interest.ans7, ans_interest.ans8
+        FROM eva_form1
+        LEFT JOIN eva_form2 ON eva_form1.id_member = eva_form2.id_member
+        LEFT JOIN ans_interest ON eva_form1.id_member = ans_interest.id_member
+    ";
         return $this->dbcon->query($query);
     }
-
 
     // Calculate optimal K using Elbow Method
     public function calculateOptimalK()
@@ -2516,37 +2521,6 @@ class DB_con
         return $output;
     }
 
-    // Example Python script (calculate_kmeans.py)
-    // Make sure to install necessary libraries: pip install numpy pandas sklearn matplotlib
-    /*
-import numpy as np
-import pandas as pd
-from sklearn.cluster import KMeans
-import matplotlib.pyplot as plt
-
-# Assuming data is passed as a CSV file
-data = pd.read_csv('data.csv')
-
-# Elbow method to find the optimal k
-sse = []
-k_range = range(1, 11)
-for k in k_range:
-    kmeans = KMeans(n_clusters=k)
-    kmeans.fit(data)
-    sse.append(kmeans.inertia_)
-
-# Plotting the Elbow Method graph
-plt.figure(figsize=(10, 6))
-plt.plot(k_range, sse, marker='o')
-plt.title('Elbow Method for Optimal K')
-plt.xlabel('Number of clusters')
-plt.ylabel('SSE')
-plt.savefig('elbow_method.png')
-
-# Print the optimal K value
-optimal_k = sse.index(min(sse)) + 1
-print(optimal_k)
-*/
 
     public function saveNewClusterValues($clusters)
     {
