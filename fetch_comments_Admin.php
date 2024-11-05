@@ -30,7 +30,7 @@ if (isset($_POST['id_Area'])) {
                 echo "<tr style='background-color: #ffffff;'>";
                 echo "<td style='border: 1px solid #ddd; padding: 8px;'>" . htmlspecialchars($row['date']) . "</td>";
                 echo "<td style='border: 1px solid #ddd; padding: 8px;'>" . htmlspecialchars($row['username']) . "</td>";
-                echo "<td style='border: 1px solid #ddd; padding: 8px;'>" . htmlspecialchars($row['star']) . " / 5</td>";
+                echo "<td style='border: 1px solid #ddd; padding: 8px;'>" . htmlspecialchars($row['star'] + '1') . " / 5</td>";
                 echo "<td style='border: 1px solid #ddd; padding: 8px;'>" . nl2br(htmlspecialchars($row['comment_details'])) . "</td>";
                 echo "<td style='border: 1px solid #ddd; padding: 8px; text-align: center;'>
                         <a href='deletecomment_area.php?del=" . $row['id_comment'] . "'>

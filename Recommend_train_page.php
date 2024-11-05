@@ -16,6 +16,32 @@ if ($_SESSION['id_admin'] == "") {
 
     $id_admin = $_SESSION['id_admin'];
     $img_admin = $db->getAdminProfilePicture($id_admin);
+    if (isset($_POST['delete_id'])) {
+        $deleteId = $_POST['delete_id'];
+        if ($db->deleteClusterUpdate($deleteId)) {
+            echo "<script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted successfully!',
+                    text: 'The record has been deleted.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.href = window.location.href; // Refresh the page
+                });
+            </script>";
+        } else {
+            echo "<script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to delete.',
+                    text: 'There was an error deleting the record.',
+                    confirmButtonText: 'OK'
+                });
+            </script>";
+        }
+    }
+
+
 
     // Close the database connection (optional, as it will close automatically at the end of the script)
     $db->dbcon->close();
@@ -29,6 +55,9 @@ if ($_SESSION['id_admin'] == "") {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Itim&family=LXGW+WenKai+TC&family=Lily+Script+One&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
         <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
@@ -349,7 +378,7 @@ if ($_SESSION['id_admin'] == "") {
                     <option value="">ครั้ง ล่าสุด </option>
                     <?php while ($row = mysqli_fetch_assoc($updateIds)): ?>
                         <option value="<?php echo htmlspecialchars($row['id_update_cluster']); ?>" <?php echo $selectedId == $row['id_update_cluster'] ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($row['id_update_cluster']); ?>
+                            ครั้งที่ :<?php echo htmlspecialchars($row['id_update_cluster']); ?> วันที่ <?php echo htmlspecialchars($row['formatted_time']); ?>
                         </option>
                     <?php endwhile; ?>
                 </select>
@@ -364,6 +393,7 @@ if ($_SESSION['id_admin'] == "") {
                     <thead>
                         <tr style='background-color: #ffcc00;'>
                             <th>ID Cluster</th>
+                            <th>Count</th>
                             <?php for ($i = 1; $i <= 20; $i++): ?>
                                 <th>Value<?php echo $i; ?></th>
                             <?php endfor; ?>
@@ -375,6 +405,7 @@ if ($_SESSION['id_admin'] == "") {
                         while ($row = mysqli_fetch_assoc($data)) {
                             echo "<tr>";
                             echo "<td>{$row['id_cluster']}</td>";
+                            echo "<td>{$row['Count']}</td>";
                             for ($i = 1; $i <= 20; $i++) {
                                 echo "<td>{$row["value$i"]}</td>";
                             }
@@ -392,7 +423,8 @@ if ($_SESSION['id_admin'] == "") {
             $db = new DB_con();
 
             // Fetch the recommendations
-            $recommendations = $db->getClusterRecommendations();
+            $recommendations = $db->getClusterRecommendations($selectedId);
+
             ?>
             <div class="table-container">
                 <table class="table table-bordered" id="placesTable">
@@ -426,46 +458,68 @@ if ($_SESSION['id_admin'] == "") {
                     </tbody>
                 </table>
             </div>
-            <button id="test" style="margin-left: 500px;" class="btn-warning rounded" type="button">
-                <img src="img/team.png" alt="..." width="30" height="30"> Test ระบบ
+            <button id="deleteButton" style="margin-left: 20px;" class="btn-danger rounded" type="button">
+                <img src="img/recycle-bin.png" alt="Delete" width="30" height="30"> ลบข้อมูล Cluster นี้
             </button>
 
+
             <script>
+                document.getElementById('deleteButton').addEventListener('click', function() {
+                    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูล?")) {
+                        const form = document.createElement('form');
+                        form.method = 'post';
+                        form.action = '';
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'delete_id';
+                        input.value = '<?php echo htmlspecialchars($selectedId); ?>'; // Use the selected ID
+                        form.appendChild(input);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            </script>
+            <script>
+                $(document).ready(function() {
+                    $('#addtypeButton').click(function(event) {
+                        event.preventDefault(); // Prevent the default button behavior
+
+                        Swal.fire({
+                            title: 'คุณต้องการคำนวณค่าการจัดกลุ่มใหม่หรือไม่?',
+                            text: "จะเป็นการคำนวณข้อมูลกลุ่มใหม่ซึ่งจะมีผลต่อการ Recommend สถานที่ท่องเที่ยว ",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'ใช่ฉันต้องการคำนวณ!',
+                            cancelButtonText: 'ยังก่อน'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                Swal.fire({
+                                    title: 'กำลังจะเข้าสู่หน้าคำนวณ ข้อมูล!',
+                                    icon: 'success',
+                                    timer: 1000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.href = 'Rec_calculated_cluster.php';
+                                });
+                            }
+                        });
+                    });
+                });
+            </script>
+
+            <!-- <button id="test" style="margin-left: 500px;" class="btn-warning rounded" type="button">
+                <img src="img/team.png" alt="..." width="30" height="30"> Test ระบบ
+            </button> -->
+
+            <!-- <script>
                 document.getElementById('test').addEventListener('click', function() {
                     window.location.href = 'homeadmin_for_cluster.php';
                 });
-            </script>
+            </script> -->
         </div>
 
-        <script>
-            $(document).ready(function() {
-                $('#addtypeButton').click(function(event) {
-                    event.preventDefault(); // Prevent the default button behavior
-
-                    Swal.fire({
-                        title: 'คุณต้องการคำนวณค่าการจัดกลุ่มใหม่หรือไม่?',
-                        text: "จะเป็นการคำนวณข้อมูลกลุ่มใหม่ซึ่งจะมีผลต่อการ Recommend สถานที่ท่องเที่ยว ",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'ใช่ฉันต้องการคำนวณ!',
-                        cancelButtonText: 'ยังก่อน'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            Swal.fire({
-                                title: 'กำลังจะเข้าสู่หน้าคำนวณ ข้อมูล!',
-                                icon: 'success',
-                                timer: 1000,
-                                showConfirmButton: false
-                            }).then(() => {
-                                window.location.href = 'Rec_calculated_cluster.php';
-                            });
-                        }
-                    });
-                });
-            });
-        </script>
 
 
 

@@ -1,20 +1,24 @@
 <?php
-// Include the database connection file
-include_once('functions.php');
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get the JSON data
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        echo json_encode(['message' => 'Invalid JSON received']);
+        exit;
+    }
 
-// Get the raw POST data
-$postData = file_get_contents('php://input');
-$clusters = json_decode($postData, true);
+    // Include database connection
+    require 'functions.php';
+    $db = new DB_con();
 
-// Create a new instance of the DB_con class
-$db = new DB_con();
+    // Call the saveNewClusterValues function
+    $resultCluster = $db->saveNewClusterValues($data['clusters']);
 
-// Save the new cluster values
-$result = $db->saveNewClusterValues($clusters);
 
-// Return a JSON response
-if ($result === "Clusters saved successfully") {
-    echo json_encode(['success' => true, 'message' => $result]);
-} else {
-    echo json_encode(['success' => false, 'message' => $result]);
+    // Check if the result indicates success or an error message
+    if ($resultCluster === "Clusters saved successfully") {
+        echo json_encode(['message' => $resultCluster]);
+    } else {
+        echo json_encode(['message' => 'Error: ' . $resultCluster]);
+    }
 }

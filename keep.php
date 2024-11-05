@@ -340,12 +340,6 @@ if ($_SESSION['id_admin'] == "") {
             <div style="width: 500px; padding: 20px; white-space: nowrap;">
                 <h1><b>🌻การคำนวณค่า Cluster ในระบบ Recommend System</b></h1>
             </div>
-
-        </div>
-        <div class="addplace">
-            <a id="test" style="margin-left:50px;" class="btn-warning rounded" type="button" href="test_claster.php">
-                <img src="img/team.png" alt="..." width="30px" height="30px"> TESTTTTTTTTT
-            </a>
         </div>
 
         <div class="container" style="margin-left: 150px; font-size: 25px; background-color: #ffffff; width: 1230px; padding: 20px; box-shadow: 0px 4px 10px rgba(0, 0, 10, 0.15); text-align: center;">
@@ -355,12 +349,11 @@ if ($_SESSION['id_admin'] == "") {
                     <option value="">ครั้ง ล่าสุด </option>
                     <?php while ($row = mysqli_fetch_assoc($updateIds)): ?>
                         <option value="<?php echo htmlspecialchars($row['id_update_cluster']); ?>" <?php echo $selectedId == $row['id_update_cluster'] ? 'selected' : ''; ?>>
-                            ครั้งที่ : <?php echo htmlspecialchars($row['id_update_cluster']); ?> วันที่ <?php echo htmlspecialchars($row['formatted_time']); ?>
+                            <?php echo htmlspecialchars($row['id_update_cluster']); ?>
                         </option>
                     <?php endwhile; ?>
                 </select>
             </form>
-
 
             <div style="display: flex;">
                 <b style="margin-left: 50px;">📑ค่า จากการ จัด Cluster <?php echo htmlspecialchars($selectedId); ?> </b>
@@ -457,36 +450,97 @@ if ($_SESSION['id_admin'] == "") {
 
                 <div id="elbowGraph" style="width: 800px; margin-top:50px; margin-left: 200px;"></div>
 
-                <button id="customKButton" style="display: none; margin-left: 450px; margin-top:20px; display: none;" class="btn-warning rounded" type="button">
+                <button id="customKButton" style="margin-left: 450px; margin-top:20px; display: none;" class="btn-warning rounded" type="button">
                     กรอกจำนวนกลุ่มที่ต้องการจัด
                 </button>
 
-                <div id="customKForm" style="display: none; margin-left: 10px; margin-top: 20px;">
-                    <input type="number" id="customKInput" placeholder="จำนวนกลุ่ม" style="font-size: 16px; padding: 5px; width: 150px;" min="1" max="11">
+                <div id="customKForm" style="display: none; margin-left:10px; margin-top: 20px;">
+                    <input type="number" id="customKInput" placeholder="จำนวนกลุ่ม" style="font-size: 16px; padding: 5px;">
                     <button id="submitCustomK" class="btn-warning rounded" type="button">ตกลง</button>
                 </div>
 
+                <div id="clusterResult" class="table-container">
+                    <h2>ผลการจัดกลุ่ม K</h2>
+                    <div style="overflow-x:auto;">
+                        <table class="table table-bordered" style="font-size: 10px;" id="clusterTable">
+                            <thead>
+                                <tr style="background-color: #ffcc00;">
+                                    <th>ID Cluster</th>
+                                    <th>Count</th>
+                                    <th>Value1</th>
+                                    <th>Value2</th>
+                                    <th>Value3</th>
+                                    <th>Value4</th>
+                                    <th>Value5</th>
+                                    <th>Value6</th>
+                                    <th>Value7</th>
+                                    <th>Value8</th>
+                                    <th>Value9</th>
+                                    <th>Value10</th>
+                                    <th>Value11</th>
+                                    <th>Value12</th>
+                                    <th>Value13</th>
+                                    <th>Value14</th>
+                                    <th>Value15</th>
+                                    <th>Value16</th>
+                                    <th>Value17</th>
+                                    <th>Value18</th>
+                                    <th>Value19</th>
+                                    <th>Value20</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be inserted here via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-                <div id="clusterResult" style="margin-top: 50px;"></div>
-                <div id="interestResults" style="margin-top: 50px;"></div>
-                <div id="summaryResults" style="margin-top: 50px;"></div>
+                <div id="interestResults" class="table-container">
+                    <h2>ผลลัพธ์ ความสนใจ</h2>
+                    <table class="table table-bordered" style="font-size: 15px;" id="interestTable">
+                        <thead>
+                            <tr style="background-color: #ffcc00;">
+                                <th>ID Cluster</th>
+                                <th>จำนวน คนในกลุ่ม</th>
+                                <th>แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ</th>
+                                <th>แหล่งท่องเที่ยวเชิงอาหาร</th>
+                                <th>แหล่งท่องเที่ยวเชิงเทศกาล/งานประเพณี</th>
+                                <th>แหล่งท่องเที่ยวเชิงเกษตร</th>
+                                <th>แหล่งท่องเที่ยววัฒนธรรม/วิถีชีวิต</th>
+                                <th>แหล่งท่องเที่ยวเชิงผจญภัย</th>
+                                <th>แหล่งท่องเที่ยวเชิงสุขภาพ</th>
+                                <th>แหล่งท่องเที่ยวเชิงศาสนา</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be inserted here via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
 
-                <button id="saveAllButton" style="display: none; margin-left:50px; margin-top:20px;" class="btn-warning rounded">Save All Data</button>
-
-
-                <!-- <button id="saveClustersButton" style="margin-left:50px; margin-top:20px; display: none;" class="btn-warning rounded" type="button">
-                    บันทึกค่า Cluster ใหม่
-                </button> -->
+                <div id="summaryResults" class="table-container">
+                    <h2>สรุปผลการจัดกลุ่ม</h2>
+                    <table class="table table-bordered" style="font-size: 15px;" id="summaryTable">
+                        <thead>
+                            <tr style="background-color: #ffcc00;">
+                                <th>ID Cluster</th>
+                                <th>ค่าเฉลี่ยสูงสุด 3 ค่า</th>
+                                <th>ผลการสนใจสูงสุด 3 ค่า</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be inserted here via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <script>
                 document.getElementById('addtypeButton').addEventListener('click', function() {
                     console.log('Finding optimal K values...');
                     fetch('calculate_kmeans.php')
-                        .then(response => {
-                            console.log('Response received from calculate_kmeans.php');
-                            return response.json();
-                        })
+                        .then(response => response.json())
                         .then(data => {
                             console.log('Data:', data);
                             const optimalKs = data.optimal_k;
@@ -494,9 +548,11 @@ if ($_SESSION['id_admin'] == "") {
 
                             const graphContainer = document.getElementById('elbowGraph');
                             graphContainer.innerHTML = `
-                    <h2>Optimal K Values: ${optimalKs.join(', ')}</h2>
-                    <img src="${imageUrl}" alt="Elbow Method Graph">
-                `;
+                        <h2>Optimal K Values: ${optimalKs.join(', ')}</h2>
+                        <img src="${imageUrl}" alt="Elbow Method Graph">
+                    `;
+
+                            document.getElementById('customKButton').style.display = 'block';
                         })
                         .catch(error => console.error('Error:', error));
                 });
@@ -506,20 +562,10 @@ if ($_SESSION['id_admin'] == "") {
                     document.getElementById('customKForm').style.display = 'block';
                 });
 
-                document.getElementById('addtypeButton').addEventListener('click', function() {
-                    console.log('Displaying custom K input button');
-                    document.getElementById('customKButton').style.display = 'block';
-                });
-
-                document.getElementById('submitCustomK').addEventListener('click', function() {
-                    console.log('Displaying custom K input button');
-                    document.getElementById('saveAllButton').style.display = 'block';
-                });
-
                 document.getElementById('submitCustomK').addEventListener('click', function() {
                     const customK = document.getElementById('customKInput').value;
-                    if (customK <= 0 || !Number.isInteger(Number(customK)) || customK > 11) {
-                        alert('Please enter a valid positive integer for K (maximum is 11).');
+                    if (customK <= 0 || !Number.isInteger(Number(customK))) {
+                        alert('Please enter a valid positive integer for K.');
                         return;
                     }
 
@@ -527,12 +573,18 @@ if ($_SESSION['id_admin'] == "") {
                     this.disabled = true;
                     document.getElementById('customKButton').disabled = true;
 
-
                     fetch(`calculate_custom_kmeans.php?k=${customK}`)
                         .then(response => response.json())
                         .then(data => {
                             const clusters = data.clusters;
-                            const clusterResult = document.getElementById('clusterResult');
+                            const clusterTableBody = document.querySelector('#clusterTable tbody');
+                            const interestTableBody = document.querySelector('#interestTable tbody');
+                            const summaryTableBody = document.querySelector('#summaryTable tbody');
+
+                            // Clear previous data
+                            clusterTableBody.innerHTML = '';
+                            interestTableBody.innerHTML = '';
+                            summaryTableBody.innerHTML = '';
 
                             // Define the descriptions for the types of tourism attractions
                             const interestDescriptions = [
@@ -556,286 +608,88 @@ if ($_SESSION['id_admin'] == "") {
                                 value6: "ต้องการสร้างความสัมพันธ์กับคนใกล้ชิด/ครอบครัว",
                                 value7: "ต้องการสร้างความสัมพันธ์กับผู้อื่น",
                                 value8: "ต้องการแสวงหาความตื่นเต้น เร้าใจ และความเสี่ยง",
-                                value9: "ต้องการเป็นที่ยอมรับนับถือจากผู้อื่น",
-
-                                value10: "ความสวยงาม ของแหล่งท่องเที่ยว",
-                                value11: "ความมีชื่อเสียงของแหล่งท่องเที่ยว",
-                                value12: "ความหลากหลายของประเภทแหล่งท่องเที่ยว",
-                                value13: "มีป้ายบอกทางเข้าถึงแหล่งท่องเที่ยว ",
-                                value14: "เส้นทางคมนาคมที่ใช้เข้าถึงแหล่งท่องเที่ยว",
-                                value15: "มีสถานที่ให้บริการทางคมนาคม เช่น ปั๊มน้ำมัน จุดพักรถ อย่างทั่วถึง",
-                                value16: "มีความปลอดภัยในการเดินทาง",
-                                value17: "มีสถานที่จอดรถอย่างเพียงพอ",
-                                value18: "มีร้านค้า ตั้งใกล้อยู่แหล่งแหล่งท่องเที่ยวและชุมชน",
-                                value19: "มีร้านอาหารสำหรับบริการที่ หลากหลายและเพียงพอ",
-                                value20: "มีร้านอาหารสำหรับบริการที่หลากหลายและเพียงพอ",
-                                value21: "มีสาธารณูปโภคขั้นพื้นฐาน เช่น น้ำสะอาด ไฟฟ้า สัญญาณโทรศัพท์ อย่างเหมาะสมกับมีจุดบริการ/ศูนย์บริการข้อมูลแก่นักท่องเที่ยว",
-                                value22: "ประเภท ของที่พักมีความหลากหลายให้เลือกใช้บริการ",
-                                value23: "ที่พักมีราคาที่เหมาะสม",
-                                value24: "มีสิ่งอำนวยความสะดวกที่รับรองความต้องการ เช่น อินเตอร์เน็ต ห้องออกกำลังกาย สระว่ายน้ำ ฯลฯ",
-                                value25: "กิจกรรมท่องเที่ยว มีความน่าสนใจ",
-                                value26: "กิจกรรมท่องเที่ยวมีความหลากหลาย",
-                                value27: "กิจกรรมท่องเที่ยวที่ส่งเสริมการเรียนรู้",
-                                value28: "กิจกรรมท่องเที่ยวที่มีความปลอดภัย",
-                                value29: "กิจกรรมท่องเที่ยวที่ก่อให้เกิดประโยชน์ต่อสังคม"
+                                value9: "ต้องการแสวงหาความบันเทิง",
+                                value10: "ต้องการแสวงหาความตื่นตัวทางสติปัญญาและอารมณ์",
+                                value11: "มีสิ่งอำนวยความสะดวกในแหล่งท่องเที่ยว เช่น ที่พัก ร้านอาหาร",
+                                value12: "มีความสะอาดและมีอนามัย",
+                                value13: "มีความปลอดภัย",
+                                value14: "การเดินทางสะดวก",
+                                value15: "ผู้คนน่ารักเป็นมิตร",
+                                value16: "มีการจัดการและการบริการที่ดี",
+                                value17: "มีบรรยากาศการช้อปปิ้ง",
+                                value18: "มีความทันสมัย",
+                                value19: "มีชื่อเสียง เป็นที่นิยม",
+                                value20: "ก่อให้เกิดประโยชน์ต่อสังคม"
                             };
-                            // Generate "ผลการจัดกลุ่ม K" table
-                            let clusterHtml = '<h2>ผลการจัดกลุ่ม K = ' + customK + '</h2>';
-                            clusterHtml += '<div style="overflow-x:auto;">'; // Add this line to enable horizontal scrolling
-                            clusterHtml += '<table class="table table-bordered" style="font-size: 10px;" id="clusterTable">';
-                            clusterHtml += '<thead><tr style="background-color: #ffcc00;"><th>ID Cluster</th>';
-                            clusterHtml += '<th>Count</th>';
-                            for (let i = 1; i <= 29; i++) {
-                                clusterHtml += '<th>Value' + i + '</th>';
-                            }
-                            clusterHtml += '</tr></thead><tbody>';
 
-                            for (const [clusterId, clusterData] of Object.entries(clusters)) {
-                                clusterHtml += '<tr>';
-                                clusterHtml += '<td>' + clusterId + '</td>';
-                                clusterHtml += '<td>' + clusterData.count + '</td>';
+                            clusters.forEach((cluster, clusterIndex) => {
+                                const clusterRow = document.createElement('tr');
+                                clusterRow.innerHTML = `
+                            <td>${cluster.id_cluster}</td>
+                            <td>${cluster.count}</td>
+                            <td>${cluster.value1}</td>
+                            <td>${cluster.value2}</td>
+                            <td>${cluster.value3}</td>
+                            <td>${cluster.value4}</td>
+                            <td>${cluster.value5}</td>
+                            <td>${cluster.value6}</td>
+                            <td>${cluster.value7}</td>
+                            <td>${cluster.value8}</td>
+                            <td>${cluster.value9}</td>
+                            <td>${cluster.value10}</td>
+                            <td>${cluster.value11}</td>
+                            <td>${cluster.value12}</td>
+                            <td>${cluster.value13}</td>
+                            <td>${cluster.value14}</td>
+                            <td>${cluster.value15}</td>
+                            <td>${cluster.value16}</td>
+                            <td>${cluster.value17}</td>
+                            <td>${cluster.value18}</td>
+                            <td>${cluster.value19}</td>
+                            <td>${cluster.value20}</td>
+                        `;
+                                clusterTableBody.appendChild(clusterRow);
 
-                                // Find top 3 values
-                                const topThreeIndices = clusterData.means
-                                    .map((value, index) => ({
-                                        value,
-                                        index
-                                    }))
-                                    .sort((a, b) => b.value - a.value)
+                                const interestRow = document.createElement('tr');
+                                interestRow.innerHTML = `
+                            <td>${cluster.id_cluster}</td>
+                            <td>${cluster.count}</td>
+                            <td>${cluster.ans1}</td>
+                            <td>${cluster.ans2}</td>
+                            <td>${cluster.ans3}</td>
+                            <td>${cluster.ans4}</td>
+                            <td>${cluster.ans5}</td>
+                            <td>${cluster.ans6}</td>
+                            <td>${cluster.ans7}</td>
+                            <td>${cluster.ans8}</td>
+                        `;
+                                interestTableBody.appendChild(interestRow);
+
+                                const top3Values = Object.entries(descriptions)
+                                    .sort(([, a], [, b]) => b - a)
                                     .slice(0, 3)
-                                    .map(item => item.index);
+                                    .map(([key]) => descriptions[key])
+                                    .join(', ');
 
-                                clusterData.means.slice(0, 20).forEach((value, index) => { // Only up to Value20
-                                    if (topThreeIndices.includes(index)) {
-                                        clusterHtml += `<td><span style="background-color: #66FF66; padding: 2px;">${value.toFixed(6)}</span></td>`; // Marker-like highlight
-                                    } else {
-                                        clusterHtml += `<td>${value.toFixed(6)}</td>`;
-                                    }
-                                });
-                                clusterHtml += '</tr>';
-                            }
-                            clusterHtml += '</tbody></table>';
-                            clusterHtml += '</div>'; // Add this line to close the div
-
-                            document.getElementById('clusterResult').innerHTML = clusterHtml;
-
-                            function saveClusterData() {
-                                const clusters = [];
-                                const rows = document.querySelectorAll('#clusterTable tbody tr');
-                                rows.forEach(row => {
-                                    const cells = row.querySelectorAll('td');
-                                    const cluster = {
-                                        id_cluster: parseInt(cells[0].innerText),
-                                        count: parseInt(cells[1].innerText),
-                                        values: Array.from(cells).slice(2).map(cell => parseFloat(cell.innerText))
-                                    };
-                                    clusters.push(cluster);
-                                });
-
-                                console.log(clusters);
-
-                                return fetch('save_clusters.php', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        clusters
-                                    })
-                                });
-                            }
-
-                            // Generate "ผลลัพธ์ ความสนใจ" table
-                            let interestHtml = '<h2>ผลลัพธ์ ความสนใจ</h2>';
-                            interestHtml += '<table class="table table-bordered" style="font-size: 15px;" id="interestTable">';
-                            interestHtml += '<thead><tr style="background-color: #ffcc00;"><th>ID Cluster</th>';
-                            interestHtml += '<th>จำนวน คนในกลุ่ม</th>';
-                            for (let i = 0; i <= 7; i++) {
-                                interestHtml += '<th>' + interestDescriptions[i] + '</th>';
-                            }
-                            interestHtml += '</tr></thead><tbody>';
-
-                            const uniqueClusters = new Set();
-
-                            for (const [clusterId, clusterData] of Object.entries(clusters)) {
-                                if (uniqueClusters.has(clusterId)) {
-                                    continue; // Skip if clusterId is already processed
-                                }
-                                uniqueClusters.add(clusterId);
-
-                                interestHtml += '<tr>';
-                                interestHtml += '<td>' + clusterId + '</td>';
-                                interestHtml += '<td>' + clusterData.count + ' คน</td>';
-
-                                // Find top 3 interest counts
-                                const interestTopThreeIndices = clusterData.interest_counts
-                                    .map((count, index) => ({
-                                        count,
-                                        index
-                                    }))
-                                    .sort((a, b) => b.count - a.count)
+                                const top3Interests = interestDescriptions
+                                    .sort((a, b) => b - a)
                                     .slice(0, 3)
-                                    .map(item => item.index);
+                                    .map((desc, index) => interestDescriptions[index])
+                                    .join(', ');
 
-                                clusterData.interest_counts.slice(0, 8).forEach((count, index) => { // Only up to Ans8
-                                    if (interestTopThreeIndices.includes(index)) {
-                                        interestHtml += `<td><span style="background-color: #66FF66; padding: 2px;">${count} %</span></td>`; // Marker-like highlight
-                                    } else {
-                                        interestHtml += `<td>${count} %</td>`;
-                                    }
-                                });
-                                interestHtml += '</tr>';
-                            }
-                            interestHtml += '</tbody></table>';
-
-                            document.getElementById('interestResults').innerHTML = interestHtml;
-
-                            // Debug: Log the generated HTML for the table
-                            console.log("Generated Interest Table HTML:", interestHtml);
-
-                            function saveInterestData() {
-                                const clusters = [];
-                                const rows = document.querySelectorAll('#interestTable tbody tr');
-                                rows.forEach(row => {
-                                    const cells = row.querySelectorAll('td');
-                                    const cluster = {
-                                        id_cluster: parseInt(cells[0].innerText),
-                                        count: parseInt(cells[1].innerText),
-                                        values: Array.from(cells).slice(2).map(cell => {
-                                            const text = cell.innerText;
-                                            return text.includes('%') ? parseFloat(text) : 0;
-                                        })
-                                    };
-                                    clusters.push(cluster);
-                                });
-
-                                console.log("Collected Clusters Data:", clusters);
-
-                                return fetch('save_interest.php', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        clusters
-                                    })
-                                });
-                            }
-
-
-
-                            // Generate "สรุปผลการจัดกลุ่ม" table
-                            let summaryHtml = '<h2>สรุปผลการจัดกลุ่ม</h2>';
-                            summaryHtml += '<table class="table table-bordered" style="font-size: 15px;" id="summaryTable">';
-                            summaryHtml += '<thead><tr style="background-color: #ffcc00;"><th>ID Cluster</th><th>ค่าเฉลี่ยสูงสุด 3 ค่า</th><th>ผลการสนใจสูงสุด 3 ค่า</th></tr></thead><tbody>';
-
-                            for (const [clusterId, clusterData] of Object.entries(clusters)) {
-                                const topThree = clusterData.means
-                                    .map((value, index) => ({
-                                        value,
-                                        key: 'value' + (index + 1)
-                                    }))
-                                    .sort((a, b) => b.value - a.value)
-                                    .slice(0, 3);
-
-                                const interestTopThree = clusterData.interest_counts
-                                    .map((count, index) => ({
-                                        count,
-                                        key: interestDescriptions[index]
-                                    }))
-                                    .sort((a, b) => b.count - a.count)
-                                    .slice(0, 3);
-
-                                summaryHtml += `<tr><td>${clusterId}</td><td>`;
-                                topThree.forEach(item => {
-                                    summaryHtml += `${descriptions[item.key]} (${item.value.toFixed(6)})<br>`;
-                                });
-                                summaryHtml += `</td><td>`;
-                                interestTopThree.forEach(item => {
-                                    summaryHtml += `${item.key} (${item.count})<br>`;
-                                });
-                                summaryHtml += `</td></tr>`;
-                            }
-                            summaryHtml += '</tbody></table>';
-
-                            document.getElementById('summaryResults').innerHTML = summaryHtml;
-
-                            function saveSummaryData() {
-                                const clusters = [];
-                                const rows = document.querySelectorAll('#summaryTable tbody tr');
-                                rows.forEach(row => {
-                                    const cells = row.querySelectorAll('td');
-                                    const clusterId = parseInt(cells[0].innerText);
-                                    const topActivityCluster = Array.from(cells[1].innerHTML.split('<br>')).map(text => text.trim()).filter(text => text);
-                                    const interestCategories = Array.from(cells[2].innerHTML.split('<br>')).map(text => text.trim()).filter(text => text);
-                                    const cluster = {
-                                        id_cluster: clusterId,
-                                        top_activity_cluster: topActivityCluster.join(', '),
-                                        interest_1: interestCategories[0].split(' ')[0],
-                                        interest_2: interestCategories[1].split(' ')[0],
-                                        interest_3: interestCategories[2].split(' ')[0]
-                                    };
-                                    clusters.push(cluster);
-                                });
-
-                                console.log("Collected Clusters Data:", clusters);
-
-                                return fetch('save_summary.php', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        clusters
-                                    })
-                                });
-                            }
-
-                            document.getElementById('saveAllButton').addEventListener('click', function() {
-                                Promise.all([
-                                        saveClusterData(),
-                                        saveInterestData(),
-                                        saveSummaryData()
-                                    ])
-                                    .then(responses => Promise.all(responses.map(response => response.json())))
-                                    .then(results => {
-                                        let allSuccess = true;
-                                        results.forEach(result => {
-                                            if (result.message.includes("saved successfully")) {
-                                                Swal.fire({
-                                                    title: 'บันทึกสำเร็จ!',
-                                                    text: result.message,
-                                                    icon: 'success',
-                                                    confirmButtonText: 'ตกลง'
-                                                });
-                                            } else {
-                                                allSuccess = false;
-                                                Swal.fire({
-                                                    title: 'บันทึกไม่สำเร็จ!',
-                                                    text: result.message,
-                                                    icon: 'error',
-                                                    confirmButtonText: 'ตกลง'
-                                                });
-                                            }
-                                        });
-                                        if (allSuccess) {
-                                            window.location.href = 'Recommend_train_page.php';
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Error:', error);
-                                        Swal.fire({
-                                            title: 'Error!',
-                                            text: 'An error occurred while saving the data.',
-                                            icon: 'error',
-                                            confirmButtonText: 'OK'
-                                        });
-                                    });
+                                const summaryRow = document.createElement('tr');
+                                summaryRow.innerHTML = `
+                            <td>${cluster.id_cluster}</td>
+                            <td>${top3Values}</td>
+                            <td>${top3Interests}</td>
+                        `;
+                                summaryTableBody.appendChild(summaryRow);
                             });
-
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
                         });
                 });
-
 
                 $(document).ready(function() {
                     $('#addtypeButton').click(function(event) {
@@ -905,6 +759,183 @@ if ($_SESSION['id_admin'] == "") {
                             }
                         });
                     });
+                });
+
+
+
+                document.getElementById('submitCustomK').addEventListener('click', function() {
+                    const customK = document.getElementById('customKInput').value;
+                    if (customK <= 0 || !Number.isInteger(Number(customK))) {
+                        alert('Please enter a valid positive integer for K.');
+                        return;
+                    }
+
+                    // Disable buttons
+                    this.disabled = true;
+                    document.getElementById('customKButton').disabled = true;
+
+
+                    fetch(`calculate_custom_kmeans.php?k=${customK}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const clusters = data.clusters;
+                            const clusterResult = document.getElementById('clusterResult');
+
+                            // Define the descriptions for the types of tourism attractions
+                            const interestDescriptions = [
+                                'แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ', // ans1
+                                'แหล่งท่องเที่ยวเชิงอาหาร', // ans2
+                                'แหล่งท่องเที่ยวเชิงเทศกาล/งานประเพณี', // ans3
+                                'แหล่งท่องเที่ยวเชิงเกษตร', // ans4
+                                'แหล่งท่องเที่ยววัฒนธรรม/วิถีชีวิต', // ans5
+                                'แหล่งท่องเที่ยวเชิงผจญภัย', // ans6
+                                'แหล่งท่องเที่ยวเชิงสุขภาพ', // ans7
+                                'แหล่งท่องเที่ยวเชิงศาสนา' // ans8
+                            ];
+
+                            // Define the descriptions for the cluster values
+                            const descriptions = {
+                                value1: "ต้องการอยู่ในธรรมชาติที่สวยงามและอากาศบริสุทธิ์ มีน้ำตก พันธุ์ไม้สัตว์ป่า",
+                                value2: "ต้องการหลีกหนีจากชีวิตประจำวัน",
+                                value3: "ต้องการค้นหาตัวเอง/ ทบทวนความคิดของตนเอง",
+                                value4: "ต้องการสร้างแรงบันดาลใจและความคิดสร้างสรรค์",
+                                value5: "ต้องการได้รับความรู้และประสบการณ์แปลกใหม่",
+                                value6: "ต้องการสร้างความสัมพันธ์กับคนใกล้ชิด/ครอบครัว",
+                                value7: "ต้องการสร้างความสัมพันธ์กับผู้อื่น",
+                                value8: "ต้องการแสวงหาความตื่นเต้น เร้าใจ และความเสี่ยง",
+                                value9: "ต้องการเป็นที่ยอมรับนับถือจากผู้อื่น",
+                                value10: "ความสวยงาม ของแหล่งท่องเที่ยว",
+                                value11: "มีร้านอาหารสำหรับบริการที่หลากหลายและเพียงพอ",
+                                value12: "มีสาธารณูปโภคขั้นพื้นฐาน เช่น น้ำสะอาด ไฟฟ้า สัญญาณโทรศัพท์ อย่างเหมาะสมกับมีจุดบริการ/ศูนย์บริการข้อมูลแก่นักท่องเที่ยว",
+                                value13: "ประเภท ของที่พักมีความหลากหลายให้เลือกใช้บริการ",
+                                value14: "ที่พักมีราคาที่เหมาะสม",
+                                value15: "มีสิ่งอำนวยความสะดวกที่รับรองความต้องการ เช่น อินเตอร์เน็ต ห้องออกกำลังกาย สระว่ายน้ำ ฯลฯ",
+                                value16: "กิจกรรมท่องเที่ยว มีความน่าสนใจ",
+                                value17: "กิจกรรมท่องเที่ยวมีความหลากหลาย",
+                                value18: "กิจกรรมท่องเที่ยวที่ส่งเสริมการเรียนรู้",
+                                value19: "กิจกรรมท่องเที่ยวที่มีความปลอดภัย",
+                                value20: "กิจกรรมท่องเที่ยวที่ก่อให้เกิดประโยชน์ต่อสังคม"
+                            };
+
+                            // Generate "ผลการจัดกลุ่ม K" table
+                            let clusterHtml = '<h2>ผลการจัดกลุ่ม K = ' + customK + '</h2>';
+                            clusterHtml += '<div style="overflow-x:auto;">'; // Add this line to enable horizontal scrolling
+                            clusterHtml += '<table class="table table-bordered" style="font-size: 10px;" id="clusterTable">';
+                            clusterHtml += '<thead><tr style="background-color: #ffcc00;"><th>ID Cluster</th>';
+                            clusterHtml += '<th>Count</th>';
+                            for (let i = 1; i <= 20; i++) {
+                                clusterHtml += '<th>Value' + i + '</th>';
+                            }
+                            clusterHtml += '</tr></thead><tbody>';
+
+                            for (const [clusterId, clusterData] of Object.entries(clusters)) {
+                                clusterHtml += '<tr>';
+                                clusterHtml += '<td>' + clusterId + '</td>';
+                                clusterHtml += '<td>' + clusterData.count + '</td>';
+
+                                // Find top 3 values
+                                const topThreeIndices = clusterData.means
+                                    .map((value, index) => ({
+                                        value,
+                                        index
+                                    }))
+                                    .sort((a, b) => b.value - a.value)
+                                    .slice(0, 3)
+                                    .map(item => item.index);
+
+                                clusterData.means.slice(0, 20).forEach((value, index) => { // Only up to Value20
+                                    if (topThreeIndices.includes(index)) {
+                                        clusterHtml += `<td><span style="background-color: #66FF66; padding: 2px;">${value.toFixed(6)}</span></td>`; // Marker-like highlight
+                                    } else {
+                                        clusterHtml += `<td>${value.toFixed(6)}</td>`;
+                                    }
+                                });
+                                clusterHtml += '</tr>';
+                            }
+                            clusterHtml += '</tbody></table>';
+
+                            clusterHtml += '</div>'; // Add this line to close the div
+
+                            // Generate "ผลลัพธ์ ความสนใจ" table
+                            let interestHtml = '<h2>ผลลัพธ์ ความสนใจ</h2>';
+                            interestHtml += '<table class="table table-bordered" style="font-size: 15px;" id="interestTable">';
+                            interestHtml += '<thead><tr style="background-color: #ffcc00;"><th>ID Cluster</th>';
+                            interestHtml += '<th>จำนวน คนในกลุ่ม</th>';
+                            for (let i = 0; i <= 7; i++) {
+                                interestHtml += '<th>' + interestDescriptions[i] + '</th>';
+                            }
+                            interestHtml += '</tr></thead><tbody>';
+
+                            for (const [clusterId, clusterData] of Object.entries(clusters)) {
+                                interestHtml += '<tr>';
+                                interestHtml += '<td>' + clusterId + '</td>';
+                                interestHtml += '<td>' + clusterData.count + ' คน</td>';
+
+                                // Find top 3 interest counts
+                                const interestTopThreeIndices = clusterData.interest_counts
+                                    .map((count, index) => ({
+                                        count,
+                                        index
+                                    }))
+                                    .sort((a, b) => b.count - a.count)
+                                    .slice(0, 3)
+                                    .map(item => item.index);
+
+                                clusterData.interest_counts.slice(0, 8).forEach((count, index) => { // Only up to Ans8
+                                    if (interestTopThreeIndices.includes(index)) {
+                                        interestHtml += `<td><span style="background-color: #66FF66; padding: 2px;">${count} %</span></td>`; // Marker-like highlight
+                                    } else {
+                                        interestHtml += `<td>${count} %</td>`;
+                                    }
+                                });
+                                interestHtml += '</tr>';
+                            }
+                            interestHtml += '</tbody></table>';
+                            // interestHtml += '<button id="saveinterestButton" style="margin-left:50px; margin-top:20px; display: none;" class="btn-warning rounded" type="button">บันทึกค่า Cluster interest ใหม่</button>';
+
+
+                            // Generate "สรุปผลการจัดกลุ่ม" table
+                            let summaryHtml = '<h2>สรุปผลการจัดกลุ่ม</h2>';
+                            summaryHtml += '<table class="table table-bordered" style="font-size: 15px;" id="summaryTable">';
+                            summaryHtml += '<thead><tr style="background-color: #ffcc00;"><th>ID Cluster</th><th>ค่าเฉลี่ยสูงสุด 3 ค่า</th><th>ผลการสนใจสูงสุด 3 ค่า</th></tr></thead><tbody>';
+
+                            for (const [clusterId, clusterData] of Object.entries(clusters)) {
+                                const topThree = clusterData.means
+                                    .map((value, index) => ({
+                                        value,
+                                        key: 'value' + (index + 1)
+                                    }))
+                                    .sort((a, b) => b.value - a.value)
+                                    .slice(0, 3);
+
+                                const interestTopThree = clusterData.interest_counts
+                                    .map((count, index) => ({
+                                        count,
+                                        key: interestDescriptions[index]
+                                    }))
+                                    .sort((a, b) => b.count - a.count)
+                                    .slice(0, 3);
+
+                                summaryHtml += `<tr><td>${clusterId}</td><td>`;
+                                topThree.forEach(item => {
+                                    summaryHtml += `${descriptions[item.key]} (${item.value.toFixed(6)})<br>`;
+                                });
+                                summaryHtml += `</td><td>`;
+                                interestTopThree.forEach(item => {
+                                    summaryHtml += `${item.key} (${item.count})<br>`;
+                                });
+                                summaryHtml += `</td></tr>`;
+                            }
+                            summaryHtml += '</tbody></table>';
+                            // summaryHtml += '<button id="savesummaryButton" style="margin-left:50px; margin-top:20px; display: none;" class="btn-warning rounded" type="button">บันทึกค่า Cluster ใหม่</button>';
+
+                            // Combine all HTML parts
+                            clusterResult.innerHTML = clusterHtml + interestHtml + summaryHtml;
+                            // document.getElementById('saveClustersButton').style.display = 'block';
+                            // document.getElementById('saveinterestButton').style.display = 'block';
+                            // document.getElementById('savesummaryButton').style.display = 'block';
+                        })
+                        .catch(error => console.error('Error:', error));
                 });
             </script>
         </div>

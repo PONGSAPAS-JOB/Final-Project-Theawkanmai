@@ -1,0 +1,780 @@
+{
+    "extension": "linecounter",
+    "version": "0.2.7",
+    "workspace": "c:\\xampp\\htdocs\\Project",
+    "linecount": [
+        {
+            "version": "0.2.7",
+            "counttime": "2024-10-04 15:32:33",
+            "filesum": 116,
+            "codesum": 27277,
+            "commentsum": 1275,
+            "blanksum": 4171,
+            "statistics": {
+                ".php": {
+                    "code": 21594,
+                    "comment": 1252,
+                    "blank": 4016
+                },
+                ".py": {
+                    "code": 66,
+                    "comment": 23,
+                    "blank": 24
+                },
+                ".log": {
+                    "code": 1,
+                    "comment": 0,
+                    "blank": 0
+                },
+                ".csv": {
+                    "code": 357,
+                    "comment": 0,
+                    "blank": 0
+                },
+                ".ipynb": {
+                    "code": 5259,
+                    "comment": 0,
+                    "blank": 131
+                }
+            },
+            "filelist": [
+                {
+                    "blank": 50,
+                    "code": 298,
+                    "comment": 20,
+                    "filename": "A Keepcategory.php"
+                },
+                {
+                    "blank": 172,
+                    "code": 1192,
+                    "comment": 58,
+                    "filename": "addarea.php"
+                },
+                {
+                    "blank": 141,
+                    "code": 1063,
+                    "comment": 50,
+                    "filename": "addareabymanager.php"
+                },
+                {
+                    "blank": 135,
+                    "code": 970,
+                    "comment": 44,
+                    "filename": "addplaces.php"
+                },
+                {
+                    "blank": 155,
+                    "code": 1069,
+                    "comment": 50,
+                    "filename": "addplacesbyAD.php"
+                },
+                {
+                    "blank": 131,
+                    "code": 5259,
+                    "comment": 0,
+                    "filename": "analysisform.ipynb"
+                },
+                {
+                    "blank": 80,
+                    "code": 348,
+                    "comment": 19,
+                    "filename": "areaandplacesMG.php"
+                },
+                {
+                    "blank": 88,
+                    "code": 358,
+                    "comment": 19,
+                    "filename": "areacategoryMG.php"
+                },
+                {
+                    "blank": 79,
+                    "code": 379,
+                    "comment": 27,
+                    "filename": "Areamanagement.php"
+                },
+                {
+                    "blank": 9,
+                    "code": 27,
+                    "comment": 9,
+                    "filename": "calculate_custom_kmeans.php"
+                },
+                {
+                    "blank": 14,
+                    "code": 34,
+                    "comment": 13,
+                    "filename": "calculate_custom_kmeans.py"
+                },
+                {
+                    "blank": 17,
+                    "code": 66,
+                    "comment": 13,
+                    "filename": "calculate_custom_kmeans_progress.php"
+                },
+                {
+                    "blank": 7,
+                    "code": 23,
+                    "comment": 10,
+                    "filename": "calculate_kmeans.php"
+                },
+                {
+                    "blank": 6,
+                    "code": 23,
+                    "comment": 6,
+                    "filename": "calculate_kmeans.py"
+                },
+                {
+                    "blank": 5,
+                    "code": 13,
+                    "comment": 1,
+                    "filename": "checkarea_available.php"
+                },
+                {
+                    "blank": 5,
+                    "code": 13,
+                    "comment": 1,
+                    "filename": "checkarea_category_available.php"
+                },
+                {
+                    "blank": 5,
+                    "code": 13,
+                    "comment": 1,
+                    "filename": "checkareaType_available.php"
+                },
+                {
+                    "blank": 6,
+                    "code": 14,
+                    "comment": 1,
+                    "filename": "checkemail_available.php"
+                },
+                {
+                    "blank": 5,
+                    "code": 13,
+                    "comment": 1,
+                    "filename": "checkplaces_available.php"
+                },
+                {
+                    "blank": 5,
+                    "code": 13,
+                    "comment": 1,
+                    "filename": "checktagplaces_available.php"
+                },
+                {
+                    "blank": 5,
+                    "code": 13,
+                    "comment": 1,
+                    "filename": "checktourType_available.php"
+                },
+                {
+                    "blank": 6,
+                    "code": 14,
+                    "comment": 1,
+                    "filename": "checkuser_available.php"
+                },
+                {
+                    "blank": 35,
+                    "code": 209,
+                    "comment": 11,
+                    "filename": "chooseAdd.php"
+                },
+                {
+                    "blank": 9,
+                    "code": 30,
+                    "comment": 9,
+                    "filename": "cluster_with_k.php"
+                },
+                {
+                    "blank": 4,
+                    "code": 9,
+                    "comment": 4,
+                    "filename": "cluster_with_k.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 357,
+                    "comment": 0,
+                    "filename": "data.csv"
+                },
+                {
+                    "blank": 4,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "deleteArea.php"
+                },
+                {
+                    "blank": 4,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "deleteAreacategory.php"
+                },
+                {
+                    "blank": 4,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "deleteAreaType.php"
+                },
+                {
+                    "blank": 4,
+                    "code": 14,
+                    "comment": 2,
+                    "filename": "deletecomment_area.php"
+                },
+                {
+                    "blank": 4,
+                    "code": 14,
+                    "comment": 2,
+                    "filename": "deletecomment_places.php"
+                },
+                {
+                    "blank": 5,
+                    "code": 13,
+                    "comment": 0,
+                    "filename": "deleteformcatagory.php"
+                },
+                {
+                    "blank": 4,
+                    "code": 16,
+                    "comment": 0,
+                    "filename": "deleteformMember.php"
+                },
+                {
+                    "blank": 3,
+                    "code": 14,
+                    "comment": 2,
+                    "filename": "deleteManager.php"
+                },
+                {
+                    "blank": 4,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "deletemember.php"
+                },
+                {
+                    "blank": 4,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "deleteplaces.php"
+                },
+                {
+                    "blank": 4,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "deleteplacesAD.php"
+                },
+                {
+                    "blank": 4,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "deleteTagPlaces.php"
+                },
+                {
+                    "blank": 4,
+                    "code": 14,
+                    "comment": 0,
+                    "filename": "deletetourType.php"
+                },
+                {
+                    "blank": 69,
+                    "code": 347,
+                    "comment": 26,
+                    "filename": "EditProfileAdmin.php"
+                },
+                {
+                    "blank": 58,
+                    "code": 265,
+                    "comment": 20,
+                    "filename": "EditProfileManager.php"
+                },
+                {
+                    "blank": 77,
+                    "code": 353,
+                    "comment": 26,
+                    "filename": "EditProfileManagerByadmin.php"
+                },
+                {
+                    "filename": "elbow_method.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 7,
+                    "code": 31,
+                    "comment": 10,
+                    "filename": "fetch_comments.php"
+                },
+                {
+                    "blank": 6,
+                    "code": 39,
+                    "comment": 2,
+                    "filename": "fetch_comments_Admin.php"
+                },
+                {
+                    "blank": 6,
+                    "code": 28,
+                    "comment": 9,
+                    "filename": "fetch_comments_places.php"
+                },
+                {
+                    "blank": 7,
+                    "code": 39,
+                    "comment": 3,
+                    "filename": "fetch_comments_places_Admin.php"
+                },
+                {
+                    "blank": 86,
+                    "code": 365,
+                    "comment": 28,
+                    "filename": "FormAns_Motivation.php"
+                },
+                {
+                    "blank": 85,
+                    "code": 402,
+                    "comment": 26,
+                    "filename": "FormAns_User_personality.php"
+                },
+                {
+                    "blank": 382,
+                    "code": 1649,
+                    "comment": 153,
+                    "filename": "functions.php"
+                },
+                {
+                    "blank": 68,
+                    "code": 391,
+                    "comment": 5,
+                    "filename": "home.php"
+                },
+                {
+                    "blank": 80,
+                    "code": 428,
+                    "comment": 17,
+                    "filename": "homeadmin.php"
+                },
+                {
+                    "blank": 107,
+                    "code": 454,
+                    "comment": 33,
+                    "filename": "homeadmin_for_cluster.php"
+                },
+                {
+                    "filename": "image\\A0001.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "image\\A0002.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "image\\A0003.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "image\\A0007.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "image\\A0008.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "image\\A0009.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "image\\A0010.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "image\\A0024.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "image\\A0037.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "image\\A0056.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\ana.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\Bear Bear Bear3.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\Cafe de Phumin (บ้านรักขนม)1.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\check.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\close.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\down-arrow.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\edit.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\icon.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\img1.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\img2.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\img3.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\img4.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\module_table_bottom.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\module_table_top.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\pro.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\profile.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\Pulu at Phusang2.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\recycle-bin.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\resume.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\team.png",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\ธุมะสิกขีศรีจอมทอง (ลานพญานาคกว๊านพะเยา)1.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\บ่อกุ้งเพลินใจ ภูซาง4.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\มันตึงลำคาเฟ่2.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\ร้านแสงจันทร์3.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\วัดพระธาตุจอมทอง1.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\วัดศรีโคมคำ1.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\อุทยานแห่งชาติดอยภูนาง3.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\อุทยานแห่งชาติภูซาง1.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "img\\อุทยานแห่งชาติแม่ปืม4.jpg",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 67,
+                    "code": 188,
+                    "comment": 6,
+                    "filename": "index.php"
+                },
+                {
+                    "blank": 98,
+                    "code": 681,
+                    "comment": 13,
+                    "filename": "keep required.php"
+                },
+                {
+                    "blank": 2,
+                    "code": 7,
+                    "comment": 2,
+                    "filename": "logout.php"
+                },
+                {
+                    "blank": 72,
+                    "code": 321,
+                    "comment": 24,
+                    "filename": "ManagerMG.php"
+                },
+                {
+                    "blank": 78,
+                    "code": 384,
+                    "comment": 23,
+                    "filename": "MemberMG.php"
+                },
+                {
+                    "blank": 28,
+                    "code": 220,
+                    "comment": 3,
+                    "filename": "myplaces.php"
+                },
+                {
+                    "blank": 49,
+                    "code": 254,
+                    "comment": 14,
+                    "filename": "ProfileAdmin.php"
+                },
+                {
+                    "blank": 38,
+                    "code": 172,
+                    "comment": 8,
+                    "filename": "ProfileManager.php"
+                },
+                {
+                    "blank": 52,
+                    "code": 287,
+                    "comment": 13,
+                    "filename": "ProfileMember.php"
+                },
+                {
+                    "blank": 0,
+                    "code": 1,
+                    "comment": 0,
+                    "filename": "python_output.log"
+                },
+                {
+                    "blank": 119,
+                    "code": 626,
+                    "comment": 67,
+                    "filename": "Rec_calculated_cluster.php"
+                },
+                {
+                    "blank": 75,
+                    "code": 392,
+                    "comment": 19,
+                    "filename": "Recommend_train_page.php"
+                },
+                {
+                    "blank": 4,
+                    "code": 11,
+                    "comment": 5,
+                    "filename": "save_clusters.php"
+                },
+                {
+                    "blank": 58,
+                    "code": 176,
+                    "comment": 6,
+                    "filename": "signin.php"
+                },
+                {
+                    "blank": 93,
+                    "code": 354,
+                    "comment": 14,
+                    "filename": "tagplacesMG.php"
+                },
+                {
+                    "blank": 8,
+                    "code": 50,
+                    "comment": 2,
+                    "filename": "test.php"
+                },
+                {
+                    "blank": 89,
+                    "code": 351,
+                    "comment": 19,
+                    "filename": "tourtypeMG.php"
+                },
+                {
+                    "blank": 91,
+                    "code": 354,
+                    "comment": 19,
+                    "filename": "typeareaMG.php"
+                },
+                {
+                    "blank": 177,
+                    "code": 1270,
+                    "comment": 62,
+                    "filename": "updateArea.php"
+                },
+                {
+                    "blank": 164,
+                    "code": 1200,
+                    "comment": 56,
+                    "filename": "updateAreaByManager.php"
+                },
+                {
+                    "blank": 148,
+                    "code": 943,
+                    "comment": 52,
+                    "filename": "updateplaces.php"
+                },
+                {
+                    "blank": 158,
+                    "code": 1042,
+                    "comment": 58,
+                    "filename": "updateplacesAD.php"
+                },
+                {
+                    "blank": 143,
+                    "code": 832,
+                    "comment": 26,
+                    "filename": "viewDetailsform.php"
+                },
+                {
+                    "blank": 96,
+                    "code": 367,
+                    "comment": 30,
+                    "filename": "viewDetailsformcatagory.php"
+                }
+            ]
+        }
+    ]
+}

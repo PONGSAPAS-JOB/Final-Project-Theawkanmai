@@ -366,7 +366,7 @@ if ($_SESSION['id_admin'] == "") {
                     </thead>
                     <tbody>
                         <?php while ($row = mysqli_fetch_array($sql)) {
-                            $survey_completed = $fetchdataMember->checkSurveyStatus($row['id_member']);
+                            $survey_completed = $fetchdataMember->checkSurveyStatus($row['id']);
                         ?>
                             <tr>
                                 <td><?php echo $index++; ?></td>
@@ -381,8 +381,8 @@ if ($_SESSION['id_admin'] == "") {
                                         <img src="img/close.png" alt="Not Completed" width="30" height="30">
                                     <?php } ?>
                                 </td>
-                                <td><a href="ProfileMember.php?id=<?php echo $row['id_member']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
-                                <td><a href="deletemember.php?del=<?php echo $row['id_member']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
+                                <td><a href="ProfileMember.php?id=<?php echo $row['id']; ?>"><img src="img/edit.png" alt="แก้ไข" width="30" height="30"></a></td>
+                                <td><a href="deletemember.php?del=<?php echo $row['id']; ?>"><img src="img/recycle-bin.png" alt="ลบ" width="30" height="30"></a></td>
                             </tr>
                         <?php } ?>
                     </tbody>

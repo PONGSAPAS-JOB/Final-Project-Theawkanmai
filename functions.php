@@ -20,6 +20,10 @@ class DB_con
             echo "Failed to connect to MySQL" . mysqli_connect_error();
         }
     }
+    public function prepare($query)
+    {
+        return $this->dbcon->prepare($query);
+    }
 
     public function usernameavailable($username)
     {
@@ -34,7 +38,7 @@ class DB_con
 
     public function registration($username, $useremail, $phone, $password)
     {
-        $reg = mysqli_query($this->dbcon, "INSERT INTO manager(username,email,phone,password) VALUE('$username','$useremail','$phone','$password')");
+        $reg = mysqli_query($this->dbcon, "INSERT INTO manager(username,email,phone,password,img_manager) VALUE('$username','$useremail','$phone','$password','https://lh3.googleusercontent.com/d/1FcfjYhE89qHB8apWMansH3Hz7pWpEtbi=s1600-rw')");
         return $reg;
     }
 
@@ -77,7 +81,7 @@ class DB_con
 
         // Set a default image if img_admin is empty
         if (empty($img_admin)) {
-            $img_admin = "img/pro.jpg"; // Path to default image
+            $img_admin = "https://lh3.googleusercontent.com/d/1FcfjYhE89qHB8apWMansH3Hz7pWpEtbi=s1600-rw"; // Path to default image
         }
 
         return $img_admin;
@@ -99,7 +103,7 @@ class DB_con
 
         // Set a default image if img_admin is empty
         if (empty($img_manager)) {
-            $img_manager = "img/pro.jpg"; // Path to default image
+            $img_manager = "https://lh3.googleusercontent.com/d/1FcfjYhE89qHB8apWMansH3Hz7pWpEtbi=s1600-rw"; // Path to default image
         }
 
         return $img_manager;
@@ -315,17 +319,17 @@ class DB_con
     }
 
 
-    public function checkSurveyStatus($id_member)
+    public function checkSurveyStatus($id)
     {
-        $query = "SELECT COUNT(*) as count FROM eva_form1 WHERE id_member = '$id_member'";
+        $query = "SELECT COUNT(*) as count FROM eva_form1 WHERE id_member = '$id'";
         $result = mysqli_query($this->dbcon, $query);
         $row = mysqli_fetch_assoc($result);
         return $row['count'] > 0;
     }
 
-    public function deletemember($id_member)
+    public function deletemember($id)
     {
-        $deletemember = mysqli_query($this->dbcon, "DELETE FROM member WHERE id_member = '$id_member'");
+        $deletemember = mysqli_query($this->dbcon, "DELETE FROM member WHERE id = '$id'");
         return $deletemember;
     }
 
@@ -1496,7 +1500,7 @@ class DB_con
         $query = "
         SELECT ans_interest.id_member, member.username, member.email, member.phone
         FROM ans_interest
-        INNER JOIN member ON ans_interest.id_member = member.id_member
+        INNER JOIN member ON ans_interest.id_member = member.id
     ";
 
         $result = mysqli_query($this->dbcon, $query);
@@ -1519,7 +1523,7 @@ class DB_con
         $sql = "
         SELECT ans_interest.id_member, member.username, member.email, member.phone
         FROM ans_interest
-        INNER JOIN member ON ans_interest.id_member = member.id_member
+        INNER JOIN member ON ans_interest.id_member = member.id
         LIMIT $start_from, $results_per_page
     ";
         $result = mysqli_query($this->dbcon, $sql);
@@ -2112,7 +2116,7 @@ class DB_con
     {
         $query = "SELECT c.comment_details, c.star, c.date, m.username, c.id_comment
                   FROM comment c
-                  JOIN member m ON c.id_member = m.id_member
+                  JOIN member m ON c.email = m.email
                   WHERE c.id_Area = ?";
 
         $stmt = $this->dbcon->prepare($query);
@@ -2131,7 +2135,7 @@ class DB_con
 
     public function fetchUsernameById($id_member)
     {
-        $getinfo = mysqli_query($this->dbcon, "SELECT username FROM member WHERE id_member = '$id_member' ");
+        $getinfo = mysqli_query($this->dbcon, "SELECT username FROM member WHERE id = '$id_member' ");
         return $getinfo;
     }
 
@@ -2182,7 +2186,7 @@ class DB_con
     {
         $query = "SELECT c.detail_comment, c.star, c.date, m.username, c.id_comment_p 
                   FROM comment_places c
-                  JOIN member m ON c.id_member = m.id_member
+                  JOIN member m ON c.email = m.email
                   WHERE c.id_places = ?";
 
         $stmt = $this->dbcon->prepare($query);
@@ -2231,7 +2235,12 @@ class DB_con
 
     public function fetchUpdateTimes()
     {
-        $query = "SELECT DISTINCT id_update_cluster FROM cluster_value ORDER BY id_update_cluster DESC"; // Adjust as necessary
+        $todayDate = date('Y-m-d'); // Get today's date in YYYY-MM-DD format
+        $query = "SELECT id_update_cluster, DATE(day_update) AS update_date, 
+           DATE_FORMAT(day_update, '%Y-%m-%d %H:%i') AS formatted_time
+    FROM cluster_value 
+    GROUP BY DATE_FORMAT(day_update, '%Y-%m-%d %H:%i')
+    ORDER BY day_update DESC"; // Adjust as necessary
         $stmt = mysqli_prepare($this->dbcon, $query);
 
         if (!$stmt) {
@@ -2312,17 +2321,57 @@ class DB_con
 
 
 
-    public function getClusterRecommendations()
+    public function getClusterRecommendations($selectedId = null)
     {
-        $sql = "SELECT id_cluster, activity_cluster, group_cluster_dis FROM summarize_cluster";
-        $result = $this->dbcon->query($sql);
+        // If no ID is selected, fetch the latest id_update_cluster
+        if (empty($selectedId)) {
+            // First get the latest update ID
+            $latestIdQuery = "SELECT id_update_cluster FROM summarize_cluster ORDER BY id_update_cluster DESC LIMIT 1";
+            $latestResult = $this->dbcon->query($latestIdQuery);
+
+            if ($latestResult && $latestRow = $latestResult->fetch_assoc()) {
+                $selectedId = $latestRow['id_update_cluster'];
+            }
+        }
+
+        // Now fetch recommendations based on the selected or latest ID
+        $sql = "SELECT id_cluster, top_activity_cluster, id_category_1, id_category_2, id_category_3 
+                FROM summarize_cluster 
+                WHERE id_update_cluster = ?";
+
+        $stmt = $this->dbcon->prepare($sql);
+        $stmt->bind_param('i', $selectedId); // Assuming id_update_cluster is an integer
+        $stmt->execute();
+        $result = $stmt->get_result();
+
         $recommendations = [];
+        $interestDescriptions = [
+            'แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ' => 1,
+            'แหล่งท่องเที่ยวเชิงอาหาร' => 2,
+            'แหล่งท่องเที่ยวเชิงเทศกาล/งานประเพณี' => 3,
+            'แหล่งท่องเที่ยวเชิงเกษตร' => 4,
+            'แหล่งท่องเที่ยววัฒนธรรม/วิถีชีวิต' => 5,
+            'แหล่งท่องเที่ยวเชิงผจญภัย' => 6,
+            'แหล่งท่องเที่ยวเชิงสุขภาพ' => 7,
+            'แหล่งท่องเที่ยวเชิงศาสนา' => 8
+        ];
 
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $cluster = $row['id_cluster'];
-                $activities = explode(',', $row['activity_cluster']); // Assuming activities are comma-separated
-                $attractions = explode(',', $row['group_cluster_dis']); // Assuming attractions are comma-separated
+                $activities = explode(',', $row['top_activity_cluster']); // Assuming activities are comma-separated
+
+                // Map category IDs to descriptions
+                $attractions = [];
+                foreach (['id_category_1', 'id_category_2', 'id_category_3'] as $categoryField) {
+                    $categoryId = $row[$categoryField];
+                    // Reverse the $interestDescriptions array to get the key by value
+                    $attraction = array_search($categoryId, $interestDescriptions);
+                    if ($attraction !== false) {
+                        $attractions[] = $attraction; // Add the description
+                    }
+                }
+
                 $recommendations[$cluster] = [
                     "กิจกรรม" => $activities,
                     "แหล่งท่องเที่ยว" => $attractions
@@ -2331,6 +2380,7 @@ class DB_con
         }
         return $recommendations;
     }
+
 
 
     public function displayClusterResults($clusters, $customK)
@@ -2459,21 +2509,22 @@ class DB_con
 
     //////////cal//////////////
 
-    // Fetch data from eva_form1 and eva_form2 for a specific member
+    // Fetch data from form_member
     // ฟังก์ชันดึงข้อมูลจากทุก id_member
     public function fetchAllEvaluationData()
     {
         $query = "
-        SELECT eva_p1_ans1, eva_p1_ans2, eva_p1_ans3, eva_p1_ans4, eva_p1_ans5, 
+        SELECT ans_form1, ans_form2,ans_form3, ans_form4, ans_form5, ans_form6, ans_form7, ans_form8,
+        eva_p1_ans1, eva_p1_ans2, eva_p1_ans3, eva_p1_ans4, eva_p1_ans5, 
                eva_p1_ans6, eva_p1_ans7, eva_p1_ans8, eva_p1_ans9, 
-               eva_p2_ans1, eva_p2_ans10, eva_p2_ans11, eva_p2_ans12, 
+               eva_p2_ans1, eva_p2_ans2, eva_p2_ans3, eva_p2_ans4,
+               eva_p2_ans5, eva_p2_ans6, eva_p2_ans7, eva_p2_ans8, eva_p2_ans9,
+               eva_p2_ans10, eva_p2_ans11, eva_p2_ans12, 
                eva_p2_ans13, eva_p2_ans14, eva_p2_ans15, eva_p2_ans16, 
                eva_p2_ans17, eva_p2_ans18, eva_p2_ans19,
-               ans_interest.ans1, ans_interest.ans2, ans_interest.ans3, ans_interest.ans4, 
-               ans_interest.ans5, ans_interest.ans6, ans_interest.ans7, ans_interest.ans8
-        FROM eva_form1
-        LEFT JOIN eva_form2 ON eva_form1.id_member = eva_form2.id_member
-        LEFT JOIN ans_interest ON eva_form1.id_member = ans_interest.id_member
+               ans1, ans2, ans3, ans4, 
+               ans5, ans6, ans7, ans8
+        FROM form_member
     ";
         return $this->dbcon->query($query);
     }
@@ -2482,11 +2533,20 @@ class DB_con
     public function calculateOptimalK()
     {
         $data = [];
-        $query = "SELECT * FROM eva_form1 UNION SELECT * FROM eva_form2";
+        $query = "SELECT * FROM form_member";
         $result = mysqli_query($this->dbcon, $query);
 
         while ($row = mysqli_fetch_assoc($result)) {
             $data[] = [
+                $row["ans_form1"],
+                $row["ans_form2"],
+                $row["ans_form3"],
+                $row["ans_form4"],
+                $row["ans_form5"],
+                $row["ans_form6"],
+                $row["ans_form7"],
+                $row["ans_form8"],
+                $row["ans_form9"],
                 $row["eva_p1_ans1"],
                 $row["eva_p1_ans2"],
                 $row["eva_p1_ans3"],
@@ -2497,6 +2557,14 @@ class DB_con
                 $row["eva_p1_ans8"],
                 $row["eva_p1_ans9"],
                 $row["eva_p2_ans1"],
+                $row["eva_p2_ans2"],
+                $row["eva_p2_ans3"],
+                $row["eva_p2_ans4"],
+                $row["eva_p2_ans5"],
+                $row["eva_p2_ans6"],
+                $row["eva_p2_ans7"],
+                $row["eva_p2_ans8"],
+                $row["eva_p2_ans9"],
                 $row["eva_p2_ans10"],
                 $row["eva_p2_ans11"],
                 $row["eva_p2_ans12"],
@@ -2521,35 +2589,220 @@ class DB_con
         return $output;
     }
 
+    private function getNewIdUpdateCluster($tableName)
+    {
+        $conn = $this->dbcon;
+        $result = $conn->query("SELECT MAX(id_update_cluster) AS latest_id FROM $tableName");
+
+        if (!$result) {
+            throw new Exception("Error fetching latest id_update_cluster from $tableName: " . $conn->error);
+        }
+
+        $row = $result->fetch_assoc();
+        return ($row['latest_id'] !== null ? $row['latest_id'] : 0) + 1;
+    }
+
+
 
     public function saveNewClusterValues($clusters)
     {
         $conn = $this->dbcon;
 
-        // Get the latest id_update_cluster
-        $result = $conn->query("SELECT MAX(id_update_cluster) AS max_id FROM cluster_value");
-        if ($result === false) {
-            return "Error querying max id_update_cluster: " . $conn->error;
-        }
-        $row = $result->fetch_assoc();
-        $next_id_update_cluster = $row['max_id'] + 1;
+        // Start a transaction
+        $conn->begin_transaction();
 
-        foreach ($clusters as $clusterId => $clusterValues) {
-            // Prepare the query
-            $query = "INSERT INTO cluster_value (id_cluster, id_update_cluster, value1, value2, value3, value4, value5, value6, value7, value8, value9, value10, value11, value12, value13, value14, value15, value16, value17, value18, value19, value20)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try {
+            // Fetch the new id_update_cluster
+            $newIdUpdateCluster = $this->getNewIdUpdateCluster("cluster_value");
 
-            // Prepare and bind
-            if ($stmt = $conn->prepare($query)) {
-                $stmt->bind_param("ii" . str_repeat("d", 20), $clusterId, $next_id_update_cluster, ...$clusterValues);
-                if (!$stmt->execute()) {
-                    return "Error executing statement: " . $stmt->error;
+            foreach ($clusters as $cluster) {
+                if (count($cluster['values']) !== 20) {
+                    return "Error: 'values' array does not contain 20 elements.";
                 }
-                $stmt->close();
-            } else {
-                return "Error preparing statement: " . $conn->error;
+
+                // Prepare the query
+                $query = "INSERT INTO cluster_value (id_update_cluster, id_cluster, Count, 
+                    value1, value2, value3, value4, value5, value6, value7, value8, 
+                    value9, value10, value11, value12, value13, value14, value15, 
+                    value16, value17, value18, value19, value20)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+                // Prepare and bind
+                if ($stmt = $conn->prepare($query)) {
+                    $stmt->bind_param(
+                        "iii" . str_repeat("d", 20),
+                        $newIdUpdateCluster,
+                        $cluster['id_cluster'],
+                        $cluster['count'],
+                        ...$cluster['values']
+                    );
+
+                    if (!$stmt->execute()) {
+                        return "Error executing query: " . $stmt->error;
+                    }
+
+                    $stmt->close();
+                } else {
+                    return "Error preparing query: " . $conn->error;
+                }
             }
+
+            $conn->commit();
+            return "Clusters saved successfully";
+        } catch (Exception $e) {
+            $conn->rollback();
+            return "Error: " . $e->getMessage();
         }
-        return "Clusters saved successfully";
+    }
+
+    public function saveNewInterestValues($interests)
+    {
+        $conn = $this->dbcon;
+
+        // Start a transaction
+        $conn->begin_transaction();
+
+        try {
+            // Fetch the new id_update_cluster
+            $newIdUpdateCluster = $this->getNewIdUpdateCluster("cluster_interrest_value");
+
+            foreach ($interests as $interest) {
+                if (count($interest['values']) !== 8) {
+                    throw new Exception("Error: 'values' array does not contain 8 elements.");
+                }
+
+                // Prepare the query with ON DUPLICATE KEY UPDATE
+                $query = "INSERT INTO cluster_interrest_value (id_update_cluster, id_cluster, Count, 
+                    ans1_per, ans2_per, ans3_per, ans4_per, ans5_per, ans6_per, ans7_per, ans8_per)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE
+                    Count = VALUES(Count),
+                    ans1_per = VALUES(ans1_per),
+                    ans2_per = VALUES(ans2_per),
+                    ans3_per = VALUES(ans3_per),
+                    ans4_per = VALUES(ans4_per),
+                    ans5_per = VALUES(ans5_per),
+                    ans6_per = VALUES(ans6_per),
+                    ans7_per = VALUES(ans7_per),
+                    ans8_per = VALUES(ans8_per)";
+
+                if ($stmt = $conn->prepare($query)) {
+                    $stmt->bind_param(
+                        "iii" . str_repeat("d", 8),
+                        $newIdUpdateCluster,
+                        $interest['id_cluster'],
+                        $interest['count'],
+                        ...$interest['values']
+                    );
+
+                    if (!$stmt->execute()) {
+                        throw new Exception("Error executing query: " . $stmt->error);
+                    }
+
+                    $stmt->close();
+                } else {
+                    throw new Exception("Error preparing query: " . $conn->error);
+                }
+            }
+
+            $conn->commit();
+            return "Interests saved successfully";
+        } catch (Exception $e) {
+            $conn->rollback();
+            return "Error: " . $e->getMessage();
+        }
+    }
+
+    public function saveSummaryClusterValues($clusters)
+    {
+        $conn = $this->dbcon;
+
+        // Start a transaction
+        $conn->begin_transaction();
+
+        try {
+            // Fetch the new id_update_cluster
+            $newIdUpdateCluster = $this->getNewIdUpdateCluster("summarize_cluster");
+
+            // Map interest descriptions to category IDs
+            $interestDescriptions = [
+                'แหล่งท่องเที่ยวเชิงนิเวศ/ธรรมชาติ' => 1,
+                'แหล่งท่องเที่ยวเชิงอาหาร' => 2,
+                'แหล่งท่องเที่ยวเชิงเทศกาล/งานประเพณี' => 3,
+                'แหล่งท่องเที่ยวเชิงเกษตร' => 4,
+                'แหล่งท่องเที่ยววัฒนธรรม/วิถีชีวิต' => 5,
+                'แหล่งท่องเที่ยวเชิงผจญภัย' => 6,
+                'แหล่งท่องเที่ยวเชิงสุขภาพ' => 7,
+                'แหล่งท่องเที่ยวเชิงศาสนา' => 8
+            ];
+            foreach ($clusters as $cluster) {
+                $id_cluster = $cluster['id_cluster'];
+                $top_activity_cluster = $conn->real_escape_string($cluster['top_activity_cluster']);
+
+                // Map interest descriptions to category IDs (as before)
+                // Assuming $interestDescriptions is defined
+
+                // Convert interest descriptions to category IDs (as before)
+                $id_category_1 = $interestDescriptions[$cluster['interest_1']] ?? null;
+                $id_category_2 = $interestDescriptions[$cluster['interest_2']] ?? null;
+                $id_category_3 = $interestDescriptions[$cluster['interest_3']] ?? null;
+
+                // Prepare and execute the insert/update query
+                $query = "INSERT INTO summarize_cluster (id_cluster, top_activity_cluster, id_category_1, id_category_2, id_category_3, id_update_cluster)
+                    VALUES ('$id_cluster', '$top_activity_cluster', '$id_category_1', '$id_category_2', '$id_category_3', '$newIdUpdateCluster')
+                    ON DUPLICATE KEY UPDATE
+                    top_activity_cluster = '$top_activity_cluster', 
+                    id_category_1 = '$id_category_1', 
+                    id_category_2 = '$id_category_2', 
+                    id_category_3 = '$id_category_3',
+                    id_update_cluster = '$newIdUpdateCluster'";
+
+                if (!$conn->query($query)) {
+                    throw new Exception("Error executing query: " . $conn->error);
+                }
+            }
+
+            $conn->commit();
+            return "Summary clusters saved successfully";
+        } catch (Exception $e) {
+            $conn->rollback();
+            return "An error occurred while saving the summary clusters: " . $e->getMessage();
+        }
+    }
+
+
+    public function getCategoryIds()
+    {
+        $conn = $this->dbcon;
+        $categoryIds = [];
+
+        $result = $conn->query("SELECT id_category, name_category FROM area_category");
+        if (!$result) {
+            throw new Exception("Error fetching category IDs: " . $conn->error);
+        }
+
+        while ($row = $result->fetch_assoc()) {
+            $categoryIds[$row['name_category']] = $row['id_category'];
+        }
+
+        return $categoryIds;
+    }
+
+    public function deleteClusterUpdate($updateId)
+    {
+        $queries = [
+            "DELETE FROM cluster_value WHERE id_update_cluster = ?",
+            "DELETE FROM cluster_interrest_value WHERE id_update_cluster = ?",
+            "DELETE FROM summarize_cluster WHERE id_update_cluster = ?"
+        ];
+
+        foreach ($queries as $query) {
+            $stmt = mysqli_prepare($this->dbcon, $query);
+            mysqli_stmt_bind_param($stmt, 'i', $updateId);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
+        }
+
+        return true; // Return true if successful
     }
 }
